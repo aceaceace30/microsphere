@@ -1,7 +1,11 @@
+import re
+
 from django.db import models
 from django.contrib.auth.models import User
 
 from django.core.validators import RegexValidator, validate_ipv4_address
+from .validators import validate_mac_address
+
 
 PM_COVERAGE = (
 	('Annual', 'Annual'),
@@ -179,7 +183,7 @@ class Unit(models.Model):
     operating_system = models.ForeignKey(OperatingSystem, on_delete=models.CASCADE)
     office_application = models.ForeignKey(OfficeApplication, on_delete=models.CASCADE)
     host_name = models.CharField(max_length=255, blank=True, null=True)
-    mac_address = models.CharField(max_length=255, blank=True, null=True)
+    mac_address = models.CharField(max_length=17, blank=True, null=True, validators=[validate_mac_address])
     ip_address = models.CharField(max_length=20, validators=[validate_ipv4_address]) #NUMBERS AND PERIOD ONLY
     processor = models.ForeignKey(Processor, on_delete=models.CASCADE)
     total_ram = models.ForeignKey(TotalRam, on_delete=models.CASCADE)
@@ -194,3 +198,21 @@ class Unit(models.Model):
 
     def __str__(self):
     	return self.serial_number
+
+class PreventiveMaintenance(models.Model):
+
+    service_report_number = models.CharField(max_length=255)
+    target_date = models.DateField()
+    actual_date = models.DateField()
+    pm_date_done = models.DateField()
+    status = models.BooleanField(default=False)
+    remarks = models.TextField(max_length=500, blank=True, null=True)
+    active = models.BooleanField(default=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pm_created')
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pm_updated')
+
+    def __str__(self):
+        return self.number

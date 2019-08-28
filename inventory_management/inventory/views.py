@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 
-from .models import Unit
+from .models import Unit, PreventiveMaintenance
 from .forms import UnitForm
 
 def get_active_units():
@@ -31,6 +31,18 @@ class UnitListView(LoginRequiredMixin, ListView):
 	# override get_queryset method in ListView Class
 	def get_queryset(self):
 		return get_active_units()
+
+class PmListView(LoginRequiredMixin, ListView):
+
+	# override login_url variable in LoginRequiredMixin class
+	login_url = '/accounts/login/'
+
+	context_object_name = 'pms'
+
+	paginate_by = 50
+
+	def get_queryset(self):
+		return PreventiveMaintenance.objects.all()
 
 def unit_save(request, form, template_name):
 	data = dict()

@@ -29,4 +29,4 @@ class UnitForm(forms.ModelForm):
     class Meta:
         model = Unit
         #fields = ('business_unit', 'machine_type')
-        exclude = ('mst_tag', 'host_name', 'mac_address', 'remarks', 'active','created_at', 'updated_at', 'created_by', 'updated_by')
+        exclude = ('active','created_at', 'updated_at', 'created_by', 'updated_by')

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import ClientProfile, BusinessUnit, MachineType, Brand, Model, OperatingSystem,\
-OfficeApplication, Processor, TotalRam, HddSize, Unit
+OfficeApplication, Processor, TotalRam, HddSize, Unit, PreventiveMaintenance
 
 site_header = 'Microsphere Administration'
 
@@ -30,3 +30,4 @@ admin.site.register(Processor)
 admin.site.register(TotalRam)
 admin.site.register(HddSize)
 admin.site.register(Unit)
+admin.site.register(PreventiveMaintenance)

@@ -13,28 +13,34 @@
     <div class="container-fluid">
 
     	<button type="button" data-url="{% url 'unit-create' %}" class="btn btn-success btn-fill js-create-unit">
-			Add New Unit
+			Add New PM
 		</button>
 
     	<div class="card-body table-full-width table-responsive">
 	    	<table class="table" id="unit-table">
 	    		<thead>
 	    			<tr>
-	    				<th>Location</th>
-	    				<th>Business Unit</th>
-	    				<th>Branch Code</th>
-	    				<th>Machine Type</th>
-	    				<th>Brand/Model</th>
-	    				<th>Serial Number</th>
-	    				<th>Tag Number</th>
-	    				<th>Current User</th>
-	    				<!--<th>Created at</th>-->
+	    				<th>SR #</th>
+	    				<th>Target</th>
+	    				<th>Actual</th>
+	    				<th>Date Done</th>
+	    				<th>Status</th>
+	    				<th>Created</th>
 	    				<th>Actions</th>
 	    			</tr>
 	    		</thead>
 	    		<tbody>
-
-	    			{% include 'inventory/includes/table_unit_list.html' %}
+	    			{% for pm in pms %}
+	    			<tr>
+	    				<th>{{ pm.service_report_number }}</th>
+	    				<th>{{ pm.target_date }}</th>
+	    				<th>{{ pm.actual_date }}</th>
+	    				<th>{{ pm.pm_date_done }}</th>
+	    				<th>{{ pm.status }}</th>
+	    				<th>{{ pm.created_at }}</th>
+	    				<th><button class="btn btn-fill">Edit</button></th>
+	    			</tr>
+	    			{% endfor %}
 
 	    		</tbody>
 	    		
