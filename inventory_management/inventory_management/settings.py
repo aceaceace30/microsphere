@@ -25,7 +25,7 @@ SECRET_KEY = '!8s!mxg^t#9)n=e4_e*xmeg%6qvv2p4s)ds2@7825st(r1kw7x'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'widget_tweaks',
     'inventory',
 ]
 
@@ -55,7 +56,7 @@ ROOT_URLCONF = 'inventory_management.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -112,10 +113,19 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# where users sent once successfull login
+LOGIN_REDIRECT_URL = 'unit-list'
+LOGOUT_REDIRECT_URL = '/accounts/login'
+
+# same as the default LOGIN_URL for convention
+LOGIN_URL = '/accounts/login'
+
