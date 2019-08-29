@@ -1,15 +1,15 @@
-<form method="post" action="{% url 'unit-edit' form.instance.pk %}" class="js-unit-edit-form">
+<form method="post" action="{% url 'pm-edit' form.instance.pk %}" class="js-pm-edit-form">
   {% csrf_token %}
   <div class="modal-header">
-    <h4 class="modal-title">Edit Unit</h4>
+    <h4 class="modal-title">Edit PM</h4>
   </div>
   <div class="modal-body">
     <div class="container-fluid col-md-12">
-        {% include 'inventory/includes/partial_unit_form.html' %}
+        {% include 'inventory/includes/preventive_maintenance/partial_pm_form.html' %}
     </div>
   </div>
   <div class="modal-footer">
-    <button type="submit" class="btn btn-success btn-fill">Update Unit</button>
+    <button type="submit" class="btn btn-success btn-fill">Update PM</button>
     <button type="button" class="btn btn-danger btn-fill" data-dismiss="modal">Cancel</button>
   </div>
 </form>

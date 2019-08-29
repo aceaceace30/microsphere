@@ -1,5 +1,3 @@
-import re
-
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -45,7 +43,7 @@ class ClientProfile(models.Model):
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client_updated')
 
     def __str__(self):
-    	return self.client_code
+    	return self.client_name
 
 class BusinessUnit(models.Model):
 
@@ -201,8 +199,10 @@ class Unit(models.Model):
 
 class PreventiveMaintenance(models.Model):
 
-    service_report_number = models.CharField(max_length=255)
+    business_unit = models.ForeignKey(BusinessUnit, on_delete=models.CASCADE)
+    service_report_number = models.CharField(max_length=255, unique=True)
     target_date = models.DateField()
+    target_time = models.TimeField()
     actual_date = models.DateField()
     pm_date_done = models.DateField()
     status = models.BooleanField(default=False)
@@ -215,4 +215,4 @@ class PreventiveMaintenance(models.Model):
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pm_updated')
 
     def __str__(self):
-        return self.number
+        return self.service_report_number

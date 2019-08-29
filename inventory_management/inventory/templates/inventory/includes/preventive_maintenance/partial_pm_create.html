@@ -1,0 +1,15 @@
+<form method="post" action="{% url 'pm-create' %}" class="js-pm-create-form">
+  {% csrf_token %}
+  <div class="modal-header">
+    <h4 class="modal-title">Create PM Schedule</h4>
+  </div>
+  <div class="modal-body">
+    <div class="container-fluid col-md-12">
+        {% include 'inventory/includes/preventive_maintenance/partial_pm_form.html' %}
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-success btn-fill">Create PM</button>
+    <button type="button" class="btn btn-danger btn-fill" data-dismiss="modal">Cancel</button>
+  </div>
+</form>

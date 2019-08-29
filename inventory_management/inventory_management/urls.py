@@ -12,7 +12,7 @@ urlpatterns = [
 # django admin customization
 
 # redirect page when clicking the 'view site' in django admin
-admin.site.site_url = "/inventory/list/"
+admin.site.site_url = "/inventory/unit-list/"
 
 admin.site.site_header = 'Microsphere | Inventory Management'
 admin.site.site_title = 'Microsphere - Inventory Management'

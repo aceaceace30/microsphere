@@ -1,0 +1,45 @@
+<form method="post" action="{% url 'unit-edit' form.instance.pk %}" class="js-unit-edit-form">
+  {% csrf_token %}
+  <div class="modal-header">
+    <h4 class="modal-title">Edit Unit</h4>
+  </div>
+  <div class="modal-body">
+    <div class="container-fluid col-md-12">
+        {% include 'inventory/includes/unit/partial_unit_form.html' %}
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-success btn-fill">Update Unit</button>
+    <button type="button" class="btn btn-danger btn-fill" data-dismiss="modal">Cancel</button>
+  </div>
+</form>
+
+<!--<div class="row">
+  <div class="col-md-3">
+      1st col
+  </div>
+  <div class="col-md-3">
+      1st col
+  </div>
+  <div class="col-md-3">
+      1st col
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-3">
+      2nd col
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-3">
+      3rd col
+  </div>
+</div>-->
+<!--<div class="container-fluid col-md-12">
+  {% for field in form %}
+
+    <label for="{{ field.id_for_label }}"> {{ field.label }}</label>
+    {{ field }}
+
+  {% endfor %}
+</div>-->

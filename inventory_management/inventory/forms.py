@@ -1,5 +1,5 @@
 from django import forms
-from .models import Unit
+from .models import Unit, PreventiveMaintenance
 
 
 class UnitForm(forms.ModelForm):
@@ -28,5 +28,16 @@ class UnitForm(forms.ModelForm):
 
     class Meta:
         model = Unit
-        #fields = ('business_unit', 'machine_type')
+        #fields = ()
         exclude = ('active','created_at', 'updated_at', 'created_by', 'updated_by')
+
+class PreventiveMaintenanceForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs): 
+        super(PreventiveMaintenanceForm, self).__init__(*args, **kwargs)
+        self.fields['service_report_number'].label = 'SR #'
+
+    class Meta:
+        model = PreventiveMaintenance
+        #fields = ()
+        exclude = ('status','active','created_at', 'updated_at', 'created_by', 'updated_by')
