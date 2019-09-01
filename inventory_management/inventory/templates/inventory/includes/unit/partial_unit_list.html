@@ -8,14 +8,8 @@
 		<td>{{ unit.serial_number }}</td>
 		<td>{{ unit.mst_tag }}</td>
 		<td>{{ unit.user }}</td>
-		<!--<td>{{ unit.created_at }}</td>-->
-		{% if perms.inventory.change_unit %}
-			<td><button class="btn btn-sm btn-fill js-edit-unit" data-url="{% url 'unit-edit' unit.pk %}">Edit</button></td>
-		{% endif %}
-
-		{% if perms.inventory.delete_unit %}
-			<td><button class="btn btn-sm btn-fill btn-danger js-delete-unit" data-url="{% url 'unit-delete' unit.pk %}">Delete</button></td>
-		{% endif %}
+		<td><button class="btn btn-sm btn-fill js-edit-unit" data-url="{% url 'unit-edit' unit.pk %}">Edit</button></td>
+		<td><button class="btn btn-sm btn-fill btn-danger js-delete-unit" data-url="{% url 'unit-delete' unit.pk %}">Delete</button></td>
 	</tr>
 {% empty %}
 	<tr>

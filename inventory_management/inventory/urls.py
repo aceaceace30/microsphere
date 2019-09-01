@@ -11,4 +11,7 @@ urlpatterns = [
     path('pm-create/', views.pm_create, name='pm-create'),
     path('pm-edit/<int:pk>/', views.pm_edit, name='pm-edit'),
     path('pm-delete/<int:pk>/', views.pm_delete, name='pm-delete'),
+
+    path('<int:pk>/unit-list/', views.units_per_business_unit, name='get_list_per_businessunit'),
+    path('<int:pk>/tag-pm-done-or-undone/', views.tag_pm_done_or_undone, name='pm-tag')
 ]

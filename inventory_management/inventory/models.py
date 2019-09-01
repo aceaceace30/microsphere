@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from django.core.validators import RegexValidator, validate_ipv4_address
+from django.core.validators import RegexValidator
 from .validators import validate_mac_address
 
 
@@ -210,7 +210,7 @@ class Unit(models.Model):
     office_application = models.ForeignKey(OfficeApplication, on_delete=models.PROTECT, blank=True, null=True)
     host_name = models.CharField(max_length=255, blank=True, null=True)
     mac_address = models.CharField(max_length=17, blank=True, null=True, validators=[validate_mac_address])
-    ip_address = models.CharField(max_length=20, validators=[validate_ipv4_address], blank=True, null=True) #NUMBERS AND PERIOD ONLY
+    ip_address = models.GenericIPAddressField(blank=True, null=True) #NUMBERS AND PERIOD ONLY
     processor = models.ForeignKey(Processor, on_delete=models.PROTECT, blank=True, null=True)
     total_ram = models.ForeignKey(TotalRam, on_delete=models.PROTECT, blank=True, null=True)
     hdd_size = models.ForeignKey(HddSize, on_delete=models.PROTECT, blank=True, null=True)
@@ -249,7 +249,7 @@ class PreventiveMaintenance(models.Model):
     target_date = models.DateField()
     target_time = models.TimeField()
     actual_date = models.DateField()
-    pm_date_done = models.DateField()
+    pm_date_done = models.DateField(blank=True, null=True)
     pm_done = models.BooleanField(default=False)
     status = models.CharField(choices=STATUS, max_length=100)
     remarks = models.TextField(max_length=500, blank=True, null=True)

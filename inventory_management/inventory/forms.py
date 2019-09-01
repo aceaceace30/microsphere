@@ -1,36 +1,26 @@
 from django import forms
 from .models import Unit, PreventiveMaintenance
 
-
-class PrinterForm(forms.ModelForm):
-
-    class Meta:
-        model = Unit
-        fields = ('business_unit', 'machine_type', 'machine_brand', 'model',
-                  'serial_number', 'computer_tag', 'mst_tag', 'user', 'designation', 'remarks')
-        #exclude = ('active','created_at', 'updated_at', 'created_by', 'updated_by')
-
-class PcForm(forms.ModelForm):
-
-    class Meta:
-        model = Unit
-        #fields = ('business_unit', 'model', 'serial_number', 'computer_tag', 'mst_tag', 'user', 'designation')
-        exclude = ('active','created_at', 'updated_at', 'created_by', 'updated_by')
-
 class UnitForm(forms.ModelForm):
 
     class Meta:
         model = Unit
-        #fields = ()
+        #ields = ('business_unit', 'active')
         exclude = ('active','created_at', 'updated_at', 'created_by', 'updated_by')
 
 class PreventiveMaintenanceForm(forms.ModelForm):
 
+    date_format = 'mm/dd/yyyy'
+    time_format = 'hh:mm'
+
     def __init__(self, *args, **kwargs): 
         super(PreventiveMaintenanceForm, self).__init__(*args, **kwargs)
         self.fields['service_report_number'].label = 'SR #'
+        self.fields['target_date'].widget.attrs['placeholder'] = self.date_format
+        self.fields['target_time'].widget.attrs['placeholder'] = self.time_format
+        self.fields['actual_date'].widget.attrs['placeholder'] = self.date_format
 
     class Meta:
         model = PreventiveMaintenance
-        #fields = ()
-        exclude = ('status','active','created_at', 'updated_at', 'created_by', 'updated_by')
+        #fields = ('business_unit', 'active')
+        exclude = ('pm_done', 'pm_date_done', 'status','active','created_at', 'updated_at', 'created_by', 'updated_by')

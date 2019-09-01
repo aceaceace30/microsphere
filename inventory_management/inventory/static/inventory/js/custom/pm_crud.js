@@ -25,12 +25,31 @@ $(document).ready(function () {
         dataType: 'json',
         success: function (data) {
           if (data.form_is_valid) {
-            console.log(data);
             $("#pm-table tbody").html(data.html_pm_list);
             $("#modal-pm").modal("hide");
           }
           else {
             $("#modal-pm .modal-content").html(data.html_form);
+          }
+        }
+      });
+      return false;
+  };
+
+  let tagForm = function () {
+      var form = $(this);
+      $.ajax({
+        url: form.attr("action"),
+        data: form.serialize(),
+        type: form.attr("method"),
+        dataType: 'json',
+        success: function (data) {
+          if (data.form_is_valid) {
+            $("#pm-table tbody").html(data.html_pm_list);
+            $("#modal-tag-pm").modal("hide");
+          }
+          else {
+            $("#modal-tag-pm .modal-content").html(data.html_form);
           }
         }
       });
@@ -48,5 +67,9 @@ $("#modal-pm").on("submit", ".js-pm-edit-form", saveForm);
 // delete unit
 $("#pm-table").on("click", ".js-delete-pm", loadForm);
 $("#modal-pm").on("submit", ".js-pm-delete-form", saveForm);
+
+// mark done pm
+$("#pm-table").on("click", ".js-tag-pm", loadForm);
+$("#modal-tag-pm").on("submit", ".js-pm-tag-form", tagForm);
 
 });

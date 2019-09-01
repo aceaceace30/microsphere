@@ -2,22 +2,16 @@
 {% load static %}
 
 <!-- Dynamic title per module -->
-{% block title %} Unit List {% endblock %}
+{% block title %} Preventive Maintenance - {{ business_unit_name|upper }} {% endblock %}
 
 <!-- Dynamic header per module -->
-{% block header %} Unit List {% endblock %}
+{% block header %} Preventive Maintenance  | Business unit: <strong>{{ business_unit_name|upper }}</strong> {% endblock %}
 
 <!-- Dynamic content per module -->
 {% block content %}
 <div class="content">
     <div class="container-fluid">
     	
-		{% if perms.inventory.add_unit %}
-	    	<button type="button" data-url="{% url 'unit-create' %}" class="btn btn-success btn-fill js-create-unit">
-				Add Unit
-			</button>
-		{% endif %}
-
 		{% if perms.inventory.view_unit %}
 	    	<div class="card-body table-full-width table-responsive">
 		    	<table class="table table-hover" id="unit-table">
@@ -46,17 +40,5 @@
     </div>
 </div>
 
-<!-- Unit Modal -->
-<div class="modal fade" id="modal-unit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-        </div>
-    </div>
-</div>
-<!--  End Modal -->
-
 {% endblock %}
 
-{% block javascript %}
-	<script src="{% static 'inventory/js/custom/unit_crud.js' %}" type="text/javascript"></script>
-{% endblock %}

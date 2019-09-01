@@ -1,9 +1,5 @@
 $(document).ready(function () {
 
-  $('#test_select').change(function(){
-      alert('TEST!');            
-  });
-
   let loadForm = function () {
       let btn = $(this);
 
@@ -21,7 +17,7 @@ $(document).ready(function () {
   };
 
   let saveForm = function () {
-      var form = $(this);
+      let form = $(this);
       $.ajax({
         url: form.attr("action"),
         data: form.serialize(),

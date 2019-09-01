@@ -3,11 +3,13 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.views.generic.list import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.template.loader import render_to_string
 
-from .models import Unit, PreventiveMaintenance
-from .forms import PrinterForm, PcForm, PreventiveMaintenanceForm, UnitForm
+from .models import Unit, PreventiveMaintenance, MachineType
+from .forms import PreventiveMaintenanceForm, UnitForm
+
+import datetime
 
 def get_active_units():
 	return Unit.objects.filter(active=True)
@@ -28,9 +30,18 @@ class UnitListView(LoginRequiredMixin, ListView):
 	# set pagination
 	paginate_by = 50
 
-	# override get_queryset method in ListView Class
-	def get_queryset(self):
-		return get_active_units()
+	# override queryset variable
+	queryset = get_active_units()
+
+def units_per_business_unit(request, pk):
+
+	units = Unit.objects.filter(active=True, business_unit__pk=pk)
+	template_name = 'inventory/unit_list_per_branch.html'
+
+	context = {'units': units,
+			   'business_unit_name': units[0].business_unit if units else None} #fix this
+
+	return render(request, template_name, context)
 
 def unit_save(request, form, template_name):
 	data = dict()
@@ -65,11 +76,11 @@ def unit_create(request):
 
 	if request.method == 'POST':
 
-		form = PrinterForm(request.POST)
+		form = UnitForm(request.POST)
 
 	else:
 
-		form = PrinterForm()
+		form = UnitForm()
 
 	return unit_save(request, form, render_create_html)
 
@@ -120,8 +131,7 @@ class PmListView(LoginRequiredMixin, ListView):
 
 	paginate_by = 50
 
-	def get_queryset(self):
-		return PreventiveMaintenance.objects.filter(active=True)
+	queryset = get_active_pms()
 
 def pm_save(request, form, template_name):
 	data = dict()
@@ -199,6 +209,30 @@ def pm_delete(request, pk):
 	else:
 		context = {'pm':pm}
 		data['html_form'] = render_to_string(render_delete_html, context, request=request)
+
+	return JsonResponse(data)
+
+def tag_pm_done_or_undone(request, pk):
+	data = dict()
+	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
+
+	render_tag_html = 'inventory/includes/preventive_maintenance/partial_pm_tag.html'
+	render_table_html = 'inventory/includes/preventive_maintenance/partial_pm_list.html'
+
+	if request.method == 'POST':
+		pm.pm_done=True
+		pm.pm_date_done=datetime.datetime.now()
+		pm.updated_by=request.user
+		pm.updated_at=datetime.datetime.now()
+		pm.save()
+
+		data['form_is_valid'] = True
+
+		pms = get_active_pms()
+		data['html_pm_list'] = render_to_string(render_table_html, {'pms': pms})
+	else:
+		context = {'pm':pm}
+		data['html_form'] = render_to_string(render_tag_html, context, request=request)
 
 	return JsonResponse(data)
 
