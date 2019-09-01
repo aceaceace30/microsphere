@@ -1,5 +1,9 @@
 $(document).ready(function () {
 
+  $('#test_select').change(function(){
+      alert('TEST!');            
+  });
+
   let loadForm = function () {
       let btn = $(this);
 
@@ -47,5 +51,7 @@ $("#modal-unit").on("submit", ".js-unit-edit-form", saveForm);
 // delete unit
 $("#unit-table").on("click", ".js-delete-unit", loadForm);
 $("#modal-unit").on("submit", ".js-unit-delete-form", saveForm);
+
+
 
 });

@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.template.loader import render_to_string
 
 from .models import Unit, PreventiveMaintenance
-from .forms import UnitForm, PreventiveMaintenanceForm
+from .forms import PrinterForm, PcForm, PreventiveMaintenanceForm, UnitForm
 
 def get_active_units():
 	return Unit.objects.filter(active=True)
@@ -65,11 +65,11 @@ def unit_create(request):
 
 	if request.method == 'POST':
 
-		form = UnitForm(request.POST)
+		form = PrinterForm(request.POST)
 
 	else:
 
-		form = UnitForm()
+		form = PrinterForm()
 
 	return unit_save(request, form, render_create_html)
 

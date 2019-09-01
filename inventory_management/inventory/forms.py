@@ -2,29 +2,22 @@ from django import forms
 from .models import Unit, PreventiveMaintenance
 
 
+class PrinterForm(forms.ModelForm):
+
+    class Meta:
+        model = Unit
+        fields = ('business_unit', 'machine_type', 'machine_brand', 'model',
+                  'serial_number', 'computer_tag', 'mst_tag', 'user', 'designation', 'remarks')
+        #exclude = ('active','created_at', 'updated_at', 'created_by', 'updated_by')
+
+class PcForm(forms.ModelForm):
+
+    class Meta:
+        model = Unit
+        #fields = ('business_unit', 'model', 'serial_number', 'computer_tag', 'mst_tag', 'user', 'designation')
+        exclude = ('active','created_at', 'updated_at', 'created_by', 'updated_by')
+
 class UnitForm(forms.ModelForm):
-    """
-    Render the basic crud create form
-    
-    full_name = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control',
-                                      'placeholder': 'Enter your full name',
-                                      'maxlength': '75'}))
-
-    email = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control',
-                                      'placeholder': 'Enter your working email',
-                                      'maxlength': '254'}))
-
-    subject = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'class': 'form-control', 'placeholder': 'Enter your subject',
-            'maxlength': '75'}))
-
-    message = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control textarea',
-                                     'placeholder': 'Enter your message'}))
-    """
 
     class Meta:
         model = Unit

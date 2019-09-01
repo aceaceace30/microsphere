@@ -14,5 +14,6 @@ urlpatterns = [
 # redirect page when clicking the 'view site' in django admin
 admin.site.site_url = "/inventory/unit-list/"
 
+# overide header and title
 admin.site.site_header = 'Microsphere | Inventory Management'
 admin.site.site_title = 'Microsphere - Inventory Management'

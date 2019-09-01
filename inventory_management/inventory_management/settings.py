@@ -37,7 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'import_export',
     'widget_tweaks',
+    'admin_reorder',
     'inventory',
 ]
 
@@ -49,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'admin_reorder.middleware.ModelAdminReorder',
 ]
 
 ROOT_URLCONF = 'inventory_management.urls'
@@ -129,3 +132,37 @@ LOGOUT_REDIRECT_URL = '/accounts/login'
 # same as the default LOGIN_URL for convention
 LOGIN_URL = '/accounts/login'
 
+# Docs: https://pypi.org/project/django-modeladmin-reorder/
+
+ADMIN_REORDER = (
+    # Rename app
+    {'app': 'auth', 'label': 'Accounts', 'models': (
+        {'model': 'auth.User', 'label': 'Users'},)},
+
+    {'app': 'auth', 'label': 'Group Permissions', 'models': (
+        {'model': 'auth.Group', 'label': 'Groups'},)},
+
+    {'app': 'inventory', 'label': 'Clients', 'models': (
+        {'model': 'inventory.ClientProfile', 'label': 'Client accounts'},
+        {'model': 'inventory.BusinessUnit', 'label': 'Business units'},)},
+
+    {'app': 'inventory', 'label': 'Inventory', 'models': (
+        {'model': 'inventory.Unit', 'label': 'Units'},)},
+
+    {'app': 'inventory', 'label': 'Preventive Maintenance', 'models': (
+        {'model': 'inventory.PreventiveMaintenance', 'label': 'Schedules'},)},
+
+    {'app': 'inventory', 'label': 'Details Maintenance', 'models': (
+        {'model': 'inventory.MachineType', 'label': 'Machine types'},
+        {'model': 'inventory.Brand', 'label': 'Brands'},
+        {'model': 'inventory.Model', 'label': 'Models'},
+        {'model': 'inventory.OperatingSystem', 'label': 'Operating systems'},
+        {'model': 'inventory.OfficeApplication', 'label': 'Office application'},
+        {'model': 'inventory.TotalRam', 'label': 'RAM'},
+        {'model': 'inventory.HddSize', 'label': 'HDD size'},)},
+
+
+
+    #{'app': 'inventory', 'label': 'Maintenance', 'models': (
+        #{'model': 'inventory.Group', 'label': 'Groups'},)},
+)
