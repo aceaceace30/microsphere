@@ -127,7 +127,7 @@ STATIC_URL = '/static/'
 
 # where users sent once successfull login
 LOGIN_REDIRECT_URL = 'unit-list'
-LOGOUT_REDIRECT_URL = '/accounts/login'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 # same as the default LOGIN_URL for convention
 LOGIN_URL = '/accounts/login'
