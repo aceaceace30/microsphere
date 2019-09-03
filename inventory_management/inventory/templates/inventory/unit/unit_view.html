@@ -5,7 +5,7 @@
 	<div class="breadcrumbs">
         <div class="col-sm-4">
             <div class="page-header float-left">
-                <div class="page-title">
+                <div class="page-title pt-1">
                     <h1>Serial Number: <span class="text-success">{{ unit.serial_number }}</span></h1>
                 </div>
             </div>
@@ -14,8 +14,15 @@
             <div class="page-header float-right">
                 <div class="page-title">
                     <ol class="breadcrumb text-right">
-                        <button type="button" class="btn btn-success btn-sm js-create-unit" data-url="{% url 'unit-create' %}" data-toggle="modal" data-target="#modal-unit">
-                            Edit Unit
+
+                    	<div class="pr-2">
+	                        <button type="button" class="btn btn-success btn-sm js-create-unit" data-url="{% url 'unit-create' %}" data-toggle="modal" data-target="#modal-unit">
+	                            Edit Unit
+	                        </button>
+                    	</div>
+
+                        <button type="button" class="btn btn-info btn-sm js-create-unit" data-url="{% url 'unit-create' %}" data-toggle="modal" data-target="#modal-unit">
+                            Show PM History
                         </button>
                         <!--<li class="active">Unit List</li>
                         <li><a href="#">Table</a></li>
@@ -38,150 +45,168 @@
                             <strong class="card-title">Business Unit: <span class="text-success">{{ unit.business_unit }}</span></strong>
                         </div>
                         <div class="card-body">
-                        	<div class="container">
-									
-								<div class="row border border-success rounded">
-									<div class="col-2">
-										<label>Class: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.machine_type.machine_class }}
+                        	<div class="container-fluid">
+
+                        		<div class="col-md-5">
+
+                        			<div class="row border border-success rounded">
+										<div class="col-4">
+											<label>Class: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ unit.machine_type.machine_class }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>Type: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ unit.machine_type }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>Brand: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ unit.machine_brand }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>Model: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ unit.model }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>Computer Tag: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ unit.computer_tag }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>MST Tag: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ unit.mst_tag }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>User: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ unit.user }}</span>
+										</div>
+										<div class="col-4">
+											<label>Designation: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ unit.designation }}</span>
+										</div>
 									</div>
 
-									<div class="col-2">
-										<label>Type: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.machine_type }}
+							    </div>
+
+						    	<div class="col-md-6 ml-1">
+
+							    	<div class="row border border-success rounded">
+										<div class="col-5">
+											<label>Operating System: </label>
+										</div>
+										<div class="col-7">
+											<span class="text-success font-weight-bold">{{ unit.operating_system }}</span>
+										</div>
+
+										<div class="col-5">
+											<label>Office Application: </label>
+										</div>
+										<div class="col-7">
+											<span class="text-success font-weight-bold">{{ unit.office_application }}</span>
+										</div>
+
+										<div class="col-5">
+											<label>Host Name: </label>
+										</div>
+										<div class="col-7">
+											<span class="text-success font-weight-bold">{{ unit.host_name }}</span>
+										</div>
+
+										<div class="col-5">
+											<label>MAC Address: </label>
+										</div>
+										<div class="col-7">
+											<span class="text-success font-weight-bold">{{ unit.mac_address }}</span>
+										</div>
+
+										<div class="col-5">
+											<label>IP Address: </label>
+										</div>
+										<div class="col-7">
+											<span class="text-success font-weight-bold">{{ unit.ip_address }}</span>
+										</div>
+
+										<div class="col-5">
+											<label>Processor: </label>
+										</div>
+										<div class="col-7">
+											<span class="text-success font-weight-bold">{{ unit.processor }}</span>
+										</div>
+
+										<div class="col-5">
+											<label>Total Ram: </label>
+										</div>
+										<div class="col-7">
+											<span class="text-success font-weight-bold">{{ unit.total_ram }}</span>
+										</div>
+										<div class="col-5">
+											<label>HDD Size: </label>
+										</div>
+										<div class="col-7">
+											<span class="text-success font-weight-bold">{{ unit.hdd_size }}</span>
+										</div>
 									</div>
 
-									<div class="col-2">
-										<label>Brand: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.machine_brand }}
+						    	</div>
+
+							    <div class="col-5 mt-1">
+										
+									<div class="row border border-success rounded">
+										<div class="col-4">
+											<label>Monitor Type: </label>
+										</div>
+										<div class="col-8">
+											{{ unit.monitor_type }}
+										</div>
+										<div class="col-4">
+											<label>Monitor Brand: </label>
+										</div>
+										<div class="col-8">
+											{{ unit.monitor_brand }}
+										</div>
+										<div class="col-4">
+											<label>Monitor Size: </label>
+										</div>
+										<div class="col-8">
+											{{ unit.monitor_size }}
+										</div>
 									</div>
 
-									<div class="col-2">
-										<label>Model: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.model }}
-									</div>
-
-									<div class="col-2">
-										<label>Computer Tag: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.computer_tag }}
-									</div>
-
-									<div class="col-2">
-										<label>MST Tag: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.mst_tag }}
-									</div>
-
-									<div class="col-2">
-										<label>User: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.user }}
-									</div>
-									<div class="col-2">
-										<label>Designation: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.designation }}
-									</div>
 								</div>
 
-								<div class="row border border-success rounded">
-									<div class="col-2">
-										<label>Operating System: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.operating_system }}
+								<div class="col-6 mt-1 ml-1">
+
+									<div class="row border border-success rounded">
+										<div class="col-2">
+											<label>Remarks: </label>
+										</div>
+										<div class="col-8">
+											dasdsadasdsadsadsadsadsadsadsadsadsadsadsadasdsadasdsadsadasdsadaseqwewqewqewqewqewqewqewqewqewqewqewqewq
+											{{ unit.remarks }}
+										</div>
 									</div>
 
-									<div class="col-2">
-										<label>Office Application: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.office_application }}
-									</div>
-
-									<div class="col-2">
-										<label>Host Name: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.host_name }}
-									</div>
-
-									<div class="col-2">
-										<label>MAC Address: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.mac_address }}
-									</div>
-
-									<div class="col-2">
-										<label>IP Address: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.ip_address }}
-									</div>
-
-									<div class="col-2">
-										<label>Processor: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.processor }}
-									</div>
-
-									<div class="col-2">
-										<label>Total Ram: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.total_ram }}
-									</div>
-									<div class="col-2">
-										<label>HDD Size: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.hdd_size }}
-									</div>
 								</div>
-
-								<div class="row">
-									<div class="col-2">
-										<label>Monitor Type: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.monitor_type }}
-									</div>
-									<div class="col-2">
-										<label>Monitor Brand: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.monitor_brand }}
-									</div>
-									<div class="col-2">
-										<label>Monitor Size: </label>
-									</div>
-									<div class="col-10">
-										{{ unit.monitor_size }}
-									</div>
-								</div>
-										{{ unit.remarks }}
-										{{ unit.active }}
-										{{ unit.created_at|date }}
-										{{ unit.updated_at|date }}
-										{{ unit.created_by }}
-										{{ unit.updated_by }}
-
-							</div>
 
                         </div>
                     </div>

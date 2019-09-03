@@ -2,9 +2,13 @@
 	<tr>
 		<td>{{ unit.business_unit.location }}</td>
 		<td>{{ unit.business_unit }}</td>
-		<td>{{ unit.business_unit.rc_code }}</td>
 		<td>
-			<button class="btn btn-sm btn-fill btn-info js-edit-unit" data-url="{% url 'unit-edit' unit.pk %}">Edit</button>
+			<a href="{% url 'unit-view' unit.pk  %}">
+				{{ unit.business_unit.rc_code }}
+			</a>
+		</td>
+		<td>
+			<!--<button class="btn btn-sm btn-fill btn-info js-edit-unit" data-url="{% url 'unit-edit' unit.pk %}">Edit</button>-->
 			<button class="btn btn-sm btn-fill btn-danger js-delete-unit" data-url="{% url 'unit-delete' unit.pk %}">Delete</button>
 		</td>
 	</tr>
