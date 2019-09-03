@@ -1,4 +1,4 @@
-$(document).ready(function () {
+jQuery(function($) {
 
   let loadForm = function () {
       let btn = $(this);
@@ -25,7 +25,7 @@ $(document).ready(function () {
         dataType: 'json',
         success: function (data) {
           if (data.form_is_valid) {
-            $("#unit-table tbody").html(data.html_unit_list);
+            $("#unit-data-table tbody").html(data.html_unit_list);
             $("#modal-unit").modal("hide");
           }
           else {
@@ -45,7 +45,7 @@ $(".js-edit-unit").click(loadForm);
 $("#modal-unit").on("submit", ".js-unit-edit-form", saveForm);
 
 // delete unit
-$("#unit-table").on("click", ".js-delete-unit", loadForm);
+$("#unit-data-table").on("click", ".js-delete-unit", loadForm);
 $("#modal-unit").on("submit", ".js-unit-delete-form", saveForm);
 
 

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import PasswordChangeForm
 from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
@@ -8,6 +9,8 @@ from django.template.loader import render_to_string
 
 from .models import Unit, PreventiveMaintenance, MachineType
 from .forms import PreventiveMaintenanceForm, UnitForm
+
+from django.conf import settings
 
 import datetime
 
@@ -21,7 +24,9 @@ class UnitListView(LoginRequiredMixin, ListView):
 	# see django docs on how to use generic CBV:ListView
 
 	# override login_url variable in LoginRequiredMixin class
-	login_url = '/accounts/login/'
+	login_url = settings.LOGOUT_REDIRECT_URL
+
+	template_name = 'inventory/unit/unit_list.html'
 
 	# change context name
 	# default is 'object_list'	
@@ -84,6 +89,17 @@ def unit_create(request):
 
 	return unit_save(request, form, render_create_html)
 
+class UnitDetailView(LoginRequiredMixin, DetailView):
+
+	login_url = settings.LOGOUT_REDIRECT_URL
+	template_name = 'inventory/unit/unit_view.html'
+	context_object_name = 'unit'
+
+	def get_object(self):
+		pk = self.kwargs.get('pk')
+		return get_object_or_404(Unit, pk=pk, active=True)
+
+
 def unit_edit(request, pk):
 
 	unit = get_object_or_404(Unit, pk=pk)
@@ -125,7 +141,9 @@ def unit_delete(request, pk):
 class PmListView(LoginRequiredMixin, ListView):
 
 	# override login_url variable in LoginRequiredMixin class
-	login_url = '/accounts/login/'
+	login_url = settings.LOGOUT_REDIRECT_URL
+
+	template_name = 'inventory/pm/pm_list.html'
 
 	context_object_name = 'pms'
 
@@ -136,7 +154,7 @@ class PmListView(LoginRequiredMixin, ListView):
 def pm_save(request, form, template_name):
 	data = dict()
 
-	render_table_html = 'inventory/includes/preventive_maintenance/partial_pm_list.html'
+	render_table_html = 'inventory/includes/pm/partial_pm_list.html'
 
 	if request.method == 'POST':
 		if form.is_valid():
@@ -162,7 +180,7 @@ def pm_save(request, form, template_name):
 
 def pm_create(request):
 
-	render_create_html = 'inventory/includes/preventive_maintenance/partial_pm_create.html'
+	render_create_html = 'inventory/includes/pm/partial_pm_create.html'
 
 	if request.method == 'POST':
 
@@ -178,7 +196,7 @@ def pm_edit(request, pk):
 
 	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
 
-	render_edit_html = 'inventory/includes/preventive_maintenance/partial_pm_edit.html'
+	render_edit_html = 'inventory/includes/pm/partial_pm_edit.html'
 
 	if request.method == 'POST':
 
@@ -194,8 +212,8 @@ def pm_delete(request, pk):
 	data = dict()
 	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
 
-	render_delete_html = 'inventory/includes/preventive_maintenance/partial_pm_delete.html'
-	render_table_html = 'inventory/includes/preventive_maintenance/partial_pm_list.html'
+	render_delete_html = 'inventory/includes/pm/partial_pm_delete.html'
+	render_table_html = 'inventory/includes/pm/partial_pm_list.html'
 
 	if request.method == 'POST':
 		pm.active = False
@@ -216,8 +234,8 @@ def tag_pm_done_or_undone(request, pk):
 	data = dict()
 	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
 
-	render_tag_html = 'inventory/includes/preventive_maintenance/partial_pm_tag.html'
-	render_table_html = 'inventory/includes/preventive_maintenance/partial_pm_list.html'
+	render_tag_html = 'inventory/includes/pm/partial_pm_tag.html'
+	render_table_html = 'inventory/includes/pm/partial_pm_list.html'
 
 	if request.method == 'POST':
 		pm.pm_done=True

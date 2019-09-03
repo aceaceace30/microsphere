@@ -4,7 +4,7 @@
     <h5 class="modal-title">Confirm Delete - Unit</h5>
   </div>
   <div class="modal-body">
-    <p class="lead">Are you sure you want to delete serial number: <strong>{{ unit.serial_number|upper }}</strong>?</p>
+    <p class="lead text-danger font-weight-bold">Are you sure you want to delete serial number: <span class="text-dark">{{ unit.serial_number|upper }}?</span></p> 
   </div>
   <div class="modal-footer">
      <button type="submit" class="btn btn-danger btn-fill">Delete Unit</button>

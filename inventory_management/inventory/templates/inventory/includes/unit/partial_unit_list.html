@@ -3,13 +3,10 @@
 		<td>{{ unit.business_unit.location }}</td>
 		<td>{{ unit.business_unit }}</td>
 		<td>{{ unit.business_unit.rc_code }}</td>
-		<td>{{ unit.machine_type }}</td>
-		<td>{{ unit.machine_brand }} - {{ unit.model }}</td>
-		<td>{{ unit.serial_number }}</td>
-		<td>{{ unit.mst_tag }}</td>
-		<td>{{ unit.user }}</td>
-		<td><button class="btn btn-sm btn-fill js-edit-unit" data-url="{% url 'unit-edit' unit.pk %}">Edit</button></td>
-		<td><button class="btn btn-sm btn-fill btn-danger js-delete-unit" data-url="{% url 'unit-delete' unit.pk %}">Delete</button></td>
+		<td>
+			<button class="btn btn-sm btn-fill btn-info js-edit-unit" data-url="{% url 'unit-edit' unit.pk %}">Edit</button>
+			<button class="btn btn-sm btn-fill btn-danger js-delete-unit" data-url="{% url 'unit-delete' unit.pk %}">Delete</button>
+		</td>
 	</tr>
 {% empty %}
 	<tr>
