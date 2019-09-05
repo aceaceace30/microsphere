@@ -1,12 +1,19 @@
 from django import forms
-from .models import Unit, PreventiveMaintenance
+from .models import Unit, PreventiveMaintenance, AREA
 
 class UnitForm(forms.ModelForm):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control form-control-sm'
+
+    area = forms.ChoiceField(choices=AREA)
+
     class Meta:
         model = Unit
-        #ields = ('business_unit', 'active')
         exclude = ('active','created_at', 'updated_at', 'created_by', 'updated_by')
+
 
 class PreventiveMaintenanceForm(forms.ModelForm):
 

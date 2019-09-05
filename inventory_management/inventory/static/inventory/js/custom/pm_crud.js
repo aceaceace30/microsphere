@@ -1,4 +1,4 @@
-$(document).ready(function () {
+jQuery(function($) {
 
   let loadForm = function () {
       let btn = $(this);

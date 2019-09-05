@@ -5,7 +5,8 @@ urlpatterns = [
     path('unit-list/', views.UnitListView.as_view(), name='unit-list'),
     path('unit-create/', views.unit_create, name='unit-create'),
     path('unit-view/<int:pk>/', views.UnitDetailView.as_view(), name='unit-view'),
-    path('unit-edit/<int:pk>/', views.unit_edit, name='unit-edit'),
+    path('unit-edit/<int:pk>/', views.UnitUpdateView.as_view(), name='unit-edit'),
+    #path('unit-edit/<int:pk>/', views.unit_edit, name='unit-edit'),
     path('unit-delete/<int:pk>/', views.unit_delete, name='unit-delete'),
 
     path('pm-list/', views.PmListView.as_view(), name='pm-list'),

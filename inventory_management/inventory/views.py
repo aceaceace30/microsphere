@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import PasswordChangeForm
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
@@ -37,6 +38,17 @@ class UnitListView(LoginRequiredMixin, ListView):
 
 	# override queryset variable
 	queryset = get_active_units()
+
+
+class UnitUpdateView(LoginRequiredMixin, UpdateView):
+	login_url = settings.LOGOUT_REDIRECT_URL
+
+	model = Unit
+
+	form_class = UnitForm
+
+	template_name = 'inventory/unit/unit_edit.html'
+
 
 def units_per_business_unit(request, pk):
 

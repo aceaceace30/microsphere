@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 from django.core.validators import RegexValidator
 from .validators import validate_mac_address
+from django.urls import reverse
 
 
 PM_COVERAGE = (
@@ -228,6 +229,9 @@ class Unit(models.Model):
 
     def __str__(self):
     	return self.serial_number
+
+    def get_absolute_url(self):
+        return reverse('unit-view', kwargs={'pk': self.pk})
 
 class UnitRemarks(models.Model):
 

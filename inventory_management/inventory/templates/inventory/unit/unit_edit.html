@@ -1,17 +1,16 @@
 {% extends 'inventory/base.html' %}
 
-{% block page_title %}
-	<a href="{% url 'unit-list' %}"> Unit List</a> > Details
-{% endblock %}
+{% block page_title %}<a href="{% url 'unit-list' %}"> Unit List</a> > <a href="{% url 'unit-view' unit.pk %}"> Details</a> > Edit {% endblock %}
 {% block page_title_second %} Unit List {% endblock %}
 
 {% block content %}
-
+<form method="POST">
+	{% csrf_token %}
 	<div class="breadcrumbs">
         <div class="col-sm-4">
             <div class="page-header float-left">
                 <div class="page-title pt-1">
-                    <h1>Serial Number: <span class="text-success">{{ unit.serial_number }}</span></h1>
+                    <h1>Serial Number: <a href="{% url 'unit-view' unit.pk %}" class="text-success">{{ unit.serial_number }}</a></h1>
                 </div>
             </div>
         </div>
@@ -19,17 +18,9 @@
             <div class="page-header float-right">
                 <div class="page-title">
                     <ol class="breadcrumb text-right">
-
                     	<div class="pr-2">
-                    		<a href="{% url 'unit-edit' unit.pk %}" class="btn btn-success" role="button" title="Edit Details">Edit</a>
+                    		<button type="submit" class="btn btn-success" role="button" title="Save Details">Save</button>
                     	</div>
-
-                        <button type="button" class="btn btn-info btn-sm js-create-unit" data-url="{% url 'unit-create' %}" data-toggle="modal" data-target="#modal-unit">
-                            Show PM History
-                        </button>
-                        <!--<li class="active">Unit List</li>
-                        <li><a href="#">Table</a></li>
-                        <li class="active">Data table</li>-->
                     </ol>
                 </div>
             </div>
@@ -40,12 +31,16 @@
         <div class="animated fadeIn">
             <div class="row">
 
+            	{% for errors in forms %}
+					{{ errors.errors }}
+            	{% endfor %}
+
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
                             <strong class="card-title">Client: <span class="text-success">{{ unit.business_unit.client|upper }}</span> | </strong>
-                            <strong class="card-title">Area: <span class="text-success">{{ unit.business_unit.area }}</span> | </strong>
-                            <strong class="card-title">Business Unit: <span class="text-success">{{ unit.business_unit }}</span></strong>
+                            <strong class="card-title">Area: <span class="text-success">{{ form.area }}</span> | </strong>
+                            <strong class="card-title">Business Unit: <span class="text-success">{{ form.business_unit }}</span></strong>
                         </div>
                         <div class="card-body">
                         	<div class="container-fluid">
@@ -71,41 +66,41 @@
 											<label>Brand: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.machine_brand }}</span>
+											<span class="text-success font-weight-bold">{{ form.machine_brand }}</span>
 										</div>
 
 										<div class="col-4">
 											<label>Model: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.model }}</span>
+											<span class="text-success font-weight-bold">{{ form.model }}</span>
 										</div>
 
 										<div class="col-4">
 											<label>Computer Tag: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.computer_tag }}</span>
+											<span class="text-success font-weight-bold">{{ form.computer_tag }}</span>
 										</div>
 
 										<div class="col-4">
 											<label>MST Tag: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.mst_tag }}</span>
+											<span class="text-success font-weight-bold">{{ form.mst_tag }}</span>
 										</div>
 
 										<div class="col-4">
 											<label>User: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.user }}</span>
+											<span class="text-success font-weight-bold">{{ form.user }}</span>
 										</div>
 										<div class="col-4">
 											<label>Designation: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.designation }}</span>
+											<span class="text-success font-weight-bold">{{ form.designation }}</span>
 										</div>
 									</div>
 
@@ -118,55 +113,55 @@
 											<label>Operating System: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.operating_system }}</span>
+											<span class="text-success font-weight-bold">{{ form.operating_system }}</span>
 										</div>
 
 										<div class="col-5">
 											<label>Office Application: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.office_application }}</span>
+											<span class="text-success font-weight-bold">{{ form.office_application }}</span>
 										</div>
 
 										<div class="col-5">
 											<label>Host Name: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.host_name }}</span>
+											<span class="text-success font-weight-bold">{{ form.host_name }}</span>
 										</div>
 
 										<div class="col-5">
 											<label>MAC Address: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.mac_address }}</span>
+											<span class="text-success font-weight-bold">{{ form.mac_address }}</span>
 										</div>
 
 										<div class="col-5">
 											<label>IP Address: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.ip_address }}</span>
+											<span class="text-success font-weight-bold">{{ form.ip_address }}</span>
 										</div>
 
 										<div class="col-5">
 											<label>Processor: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.processor }}</span>
+											<span class="text-success font-weight-bold">{{ form.processor }}</span>
 										</div>
 
 										<div class="col-5">
 											<label>Total Ram: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.total_ram }}</span>
+											<span class="text-success font-weight-bold">{{ form.total_ram }}</span>
 										</div>
 										<div class="col-5">
 											<label>HDD Size: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.hdd_size }}</span>
+											<span class="text-success font-weight-bold">{{ form.hdd_size }}</span>
 										</div>
 									</div>
 
@@ -179,19 +174,19 @@
 											<label>Monitor Type: </label>
 										</div>
 										<div class="col-8">
-											{{ unit.monitor_type }}
+											{{ form.monitor_type }}
 										</div>
 										<div class="col-4">
 											<label>Monitor Brand: </label>
 										</div>
 										<div class="col-8">
-											{{ unit.monitor_brand }}
+											{{ form.monitor_brand }}
 										</div>
 										<div class="col-4">
 											<label>Monitor Size: </label>
 										</div>
 										<div class="col-8">
-											{{ unit.monitor_size }}
+											{{ form.monitor_size }}
 										</div>
 									</div>
 
@@ -206,7 +201,7 @@
 											<label>Remarks: </label>
 										</div>
 										<div class="col-8">
-											{{ unit.remarks }}
+											{{ form.remarks }}
 										</div>
 									</div>
 
@@ -220,5 +215,6 @@
         </div><!-- .animated -->
     </div><!-- .content -->
 
+</form>
 
-{% endblock%}
+{% endblock %}
