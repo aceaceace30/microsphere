@@ -1,4 +1,5 @@
 {% extends 'inventory/base.html' %}
+{% load widget_tweaks %}
 
 {% block page_title %}<a href="{% url 'unit-list' %}"> Unit List</a> > <a href="{% url 'unit-view' unit.pk %}"> Details</a> > Edit {% endblock %}
 {% block page_title_second %} Unit List {% endblock %}
@@ -30,144 +31,167 @@
     <div class="content mt-3">
         <div class="animated fadeIn">
             <div class="row">
-
-            	{% for errors in forms %}
-					{{ errors.errors }}
-            	{% endfor %}
-
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <strong class="card-title">Client: <span class="text-success">{{ unit.business_unit.client|upper }}</span> | </strong>
-                            <strong class="card-title">Area: <span class="text-success">{{ form.area }}</span> | </strong>
-                            <strong class="card-title">Business Unit: <span class="text-success">{{ form.business_unit }}</span></strong>
+                        	<div class="form-row">
+                        		<div class="form-group col-md-1">
+                        			<strong class="card-title">Client: <span class="text-success">{{ unit.business_unit.client|upper }} </span> | </strong>
+                        		</div>
+
+                        		<div class="form-group col-md-1">
+                        			<strong class="card-title">Area:</strong>
+                        			{% render_field form.area class="form-control form-control-sm" %}
+                        		</div>
+                        		<div class="form-group col-md-1">
+                        			<strong class="card-title">Business Unit:</strong>
+                        			{% render_field form.business_unit class="form-control form-control-sm" %}
+                        		</div>
+                        	</div> 
                         </div>
                         <div class="card-body">
                         	<div class="container-fluid">
 
-                        		<div class="col-md-4">
+                        		{% if form.errors %}
+								    <div class="col-md-12 pl-0">
+	                        			<div class="sufee-alert alert with-close alert-danger alert-dismissible fade show">
+	                        				<div class="pl-4">
+	                        					{% for key, value in form.errors.items %}
+							                    	{{ value }}
+							                    {% endfor %}
+	                        				</div>
+						                
+						                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						                        <span aria-hidden="true">&times;</span>
+						                    </button>
+						                </div>
+	                        		</div>
+                        		{% endif %}
+
+                        		<div class="col-md-5">
 
                         			<div class="row border border-success">
-										<div class="col-4">
-											<label>Class: </label>
-										</div>
-										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.machine_type.machine_class }}</span>
-										</div>
 
 										<div class="col-4">
 											<label>Type: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.machine_type }}</span>
+											{{ form.machine_type }}
 										</div>
 
 										<div class="col-4">
 											<label>Brand: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ form.machine_brand }}</span>
+											{{ form.machine_brand }}
 										</div>
 
 										<div class="col-4">
 											<label>Model: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ form.model }}</span>
+											{{ form.model }}
+										</div>
+
+										<div class="col-4">
+											<label>Serial Number: </label>
+										</div>
+										<div class="col-8">
+											{{ form.serial_number }}
 										</div>
 
 										<div class="col-4">
 											<label>Computer Tag: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ form.computer_tag }}</span>
+											{{ form.computer_tag }}
 										</div>
 
 										<div class="col-4">
 											<label>MST Tag: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ form.mst_tag }}</span>
+											{{ form.mst_tag }}
 										</div>
 
 										<div class="col-4">
 											<label>User: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ form.user }}</span>
+											{{ form.user }}
 										</div>
 										<div class="col-4">
 											<label>Designation: </label>
 										</div>
 										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ form.designation }}</span>
+											{{ form.designation }}
 										</div>
 									</div>
 
 							    </div>
 
-						    	<div class="col-md-4 ml-1">
+						    	<div class="col-md-5 ml-1">
 
 							    	<div class="row border border-success">
 										<div class="col-5">
 											<label>Operating System: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ form.operating_system }}</span>
+											{{ form.operating_system }}
 										</div>
 
 										<div class="col-5">
 											<label>Office Application: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ form.office_application }}</span>
+											{{ form.office_application }}
 										</div>
 
 										<div class="col-5">
 											<label>Host Name: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ form.host_name }}</span>
+											{{ form.host_name }}
 										</div>
 
 										<div class="col-5">
 											<label>MAC Address: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ form.mac_address }}</span>
+											{{ form.mac_address }}
 										</div>
 
 										<div class="col-5">
 											<label>IP Address: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ form.ip_address }}</span>
+											{{ form.ip_address }}
 										</div>
 
 										<div class="col-5">
 											<label>Processor: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ form.processor }}</span>
+											{{ form.processor }}
 										</div>
 
 										<div class="col-5">
 											<label>Total Ram: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ form.total_ram }}</span>
+											{{ form.total_ram }}
 										</div>
 										<div class="col-5">
 											<label>HDD Size: </label>
 										</div>
 										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ form.hdd_size }}</span>
+											{{ form.hdd_size }}
 										</div>
 									</div>
 
 						    	</div>
 
-							    <div class="col-4 mt-1">
+							    <div class="col-5 mt-1">
 										
 									<div class="row border border-success">
 										<div class="col-4">
@@ -194,7 +218,7 @@
 
 								
 
-								<div class="col-4 mt-1 ml-1">
+								<div class="col-5 mt-1 ml-1">
 
 									<div class="row border border-success">
 										<div class="col-2">

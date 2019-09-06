@@ -31,16 +31,17 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'inventory',
+    'account',
+    'import_export',
+    'widget_tweaks',
+    'admin_reorder',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'import_export',
-    'widget_tweaks',
-    'admin_reorder',
-    'inventory',
 ]
 
 MIDDLEWARE = [

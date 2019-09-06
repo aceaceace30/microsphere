@@ -1,0 +1,131 @@
+{% extends 'inventory/base.html' %}
+
+{% block page_title %}
+	<a href="{% url 'pm-list' %}"> PM List</a> > Details
+{% endblock %}
+{% block page_title_second %} PM List {% endblock %}
+
+{% block content %}
+
+	<div class="breadcrumbs">
+        <div class="col-sm-3">
+            <div class="page-header float-left">
+                <div class="page-title pt-1">
+                    <h1>SR #: <span class="text-success">{{ pm.service_report_number }}</span></h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="page-header float-right">
+                <div class="page-title">
+                    <ol class="breadcrumb text-right">
+
+                    	<div class="pr-2">
+                    		<a href="{% url 'pm-edit' pm.pk %}" class="btn btn-success" role="button" title="Edit Details">Edit</a>
+                    	</div>
+                        <!--<li class="active">Unit List</li>
+                        <li><a href="#">Table</a></li>
+                        <li class="active">Data table</li>-->
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content mt-3">
+        <div class="animated fadeIn">
+            <div class="row">
+
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong class="card-title">Client: <span class="text-success">{{ pm.business_unit.client|upper }}</span> | </strong>
+                            <strong class="card-title">Area: <span class="text-success">{{ pm.business_unit.area }}</span> | </strong>
+                            <strong class="card-title">Business Unit: <span class="text-success">{{ pm.business_unit }}</span></strong>
+                        </div>
+                        <div class="card-body">
+                        	<div class="container-fluid">
+
+                        		{% if messages %}
+								    {% for message in messages %}
+								    <div class="col-md-12 pl-0">
+	                        			<div class="sufee-alert alert with-close alert-success alert-dismissible fade show">
+						                    <span class="badge badge-pill badge-success">Success</span>
+						                    {{ message }}
+						                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						                        <span aria-hidden="true">&times;</span>
+						                    </button>
+						                </div>
+	                        		</div>
+								    {% endfor %}
+								{% endif %}
+
+                        		<div class="col-md-5">
+
+                        			<div class="row border border-success">
+
+										<div class="col-4">
+											<label>Target Date: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ pm.target_date }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>Target Time: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ pm.target_time }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>Actual Date: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ pm.actual_date }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>Date Done: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ pm.pm_date_done }}</span>
+										</div>
+										<div class="col-4">
+											<label>Status: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">
+												{% if pm.pm_done %}
+													Done
+												{% else %}
+													Pending
+												{% endif %}
+											</span>
+										</div>
+										<div class="col-4">
+											<label>Created by: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ pm.created_by }}</span>
+										</div>
+										<div class="col-4">
+											<label>Created at: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ pm.created_at }}</span>
+										</div>
+									</div>
+
+							    </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div><!-- .animated -->
+    </div><!-- .content -->
+
+{% endblock %}

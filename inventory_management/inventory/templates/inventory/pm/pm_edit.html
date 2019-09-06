@@ -1,0 +1,121 @@
+{% extends 'inventory/base.html' %}
+{% load widget_tweaks %}
+
+{% block page_title %}<a href="{% url 'pm-list' %}"> PM List</a> > <a href="{% url 'pm-view' preventivemaintenance.pk %}"> Details</a> > Edit {% endblock %}
+{% block page_title_second %} PM List {% endblock %}
+
+{% block content %}
+<form method="POST">
+	{% csrf_token %}
+	<div class="breadcrumbs">
+        <div class="col-sm-3">
+            <div class="page-header float-left">
+                <div class="page-title pt-1">
+                    <h1>SR #: {{ form.service_report_number }}</a></h1>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="page-header float-right">
+                <div class="page-title">
+                    <ol class="breadcrumb text-right">
+						<div class="pr-2">
+                    		<button type="submit" class="btn btn-success" role="button" title="Save Details">Save</button>
+                    	</div>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content mt-3">
+        <div class="animated fadeIn">
+            <div class="row">
+
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong class="card-title">Client: <span class="text-success">{{ preventivemaintenance.business_unit.client|upper }}</span> | </strong>
+                            <strong class="card-title">Area: <span class="text-success">{{ preventivemaintenance.business_unit.area }}</span> | </strong>
+                            <strong class="card-title">Business Unit: <span class="text-success">{{ form.business_unit }}</span></strong>
+                        </div>
+                        <div class="card-body">
+                        	<div class="container-fluid">
+
+                        		{% if form.errors %}
+								    <div class="col-md-12 pl-0">
+	                        			<div class="sufee-alert alert with-close alert-danger alert-dismissible fade show">
+	                        				<div class="pl-4">
+	                        					{% for key, value in form.errors.items %}
+							                    	{{ value }}
+							                    {% endfor %}
+	                        				</div>
+						                
+						                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						                        <span aria-hidden="true">&times;</span>
+						                    </button>
+						                </div>
+	                        		</div>
+                        		{% endif %}
+
+                        		<div class="col-md-5">
+
+                        			<div class="row border border-success">
+
+										<div class="col-4">
+											<label>Target Date: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ form.target_date }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>Target Time: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ form.target_time }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>Actual Date: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ form.actual_date }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>Date Done: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ preventivemaintenance.pm_date_done }}</span>
+										</div>
+										<div class="col-4">
+											<label>Status: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">
+												{% if form.pm_done %}
+													Done
+												{% else %}
+													Pending
+												{% endif %}
+											</span>
+										</div>
+									</div>
+
+							    </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div><!-- .animated -->
+    </div><!-- .content -->
+
+</form>
+
+
+
+{% endblock %}

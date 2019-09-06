@@ -8,14 +8,14 @@
 {% block content %}
 
 	<div class="breadcrumbs">
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <div class="page-header float-left">
                 <div class="page-title pt-1">
-                    <h1>Serial Number: <span class="text-success">{{ unit.serial_number }}</span></h1>
+                    <h1>Serial: <span class="text-success">{{ unit.serial_number }}</span></h1>
                 </div>
             </div>
         </div>
-        <div class="col-sm-8">
+        <div class="col-sm-9">
             <div class="page-header float-right">
                 <div class="page-title">
                     <ol class="breadcrumb text-right">
@@ -50,20 +50,28 @@
                         <div class="card-body">
                         	<div class="container-fluid">
 
-                        		<div class="col-md-4">
+                        		{% if messages %}
+								    {% for message in messages %}
+								    <div class="col-md-12 pl-0">
+	                        			<div class="sufee-alert alert with-close alert-success alert-dismissible fade show">
+						                    <span class="badge badge-pill badge-success">Success</span>
+						                    {{ message }}
+						                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+						                        <span aria-hidden="true">&times;</span>
+						                    </button>
+						                </div>
+	                        		</div>
+								    {% endfor %}
+								{% endif %}
+
+                        		<div class="col-md-5">
 
                         			<div class="row border border-success">
-										<div class="col-4">
-											<label>Class: </label>
-										</div>
-										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.machine_type.machine_class }}</span>
-										</div>
 
-										<div class="col-4">
+										<div class="col-4 mt-2">
 											<label>Type: </label>
 										</div>
-										<div class="col-8">
+										<div class="col-8 mt-2">
 											<span class="text-success font-weight-bold">{{ unit.machine_type }}</span>
 										</div>
 
@@ -79,6 +87,13 @@
 										</div>
 										<div class="col-8">
 											<span class="text-success font-weight-bold">{{ unit.model }}</span>
+										</div>
+
+										<div class="col-4">
+											<label>Serial Number: </label>
+										</div>
+										<div class="col-8">
+											<span class="text-success font-weight-bold">{{ unit.serial_number }}</span>
 										</div>
 
 										<div class="col-4">
@@ -111,13 +126,13 @@
 
 							    </div>
 
-						    	<div class="col-md-4 ml-1">
+						    	<div class="col-md-5 ml-1">
 
 							    	<div class="row border border-success">
-										<div class="col-5">
+										<div class="col-5 mt-2">
 											<label>Operating System: </label>
 										</div>
-										<div class="col-7">
+										<div class="col-7 mt-2">
 											<span class="text-success font-weight-bold">{{ unit.operating_system }}</span>
 										</div>
 
@@ -172,13 +187,13 @@
 
 						    	</div>
 
-							    <div class="col-4 mt-1">
+							    <div class="col-5 mt-1">
 										
 									<div class="row border border-success">
-										<div class="col-4">
+										<div class="col-4 mt-2">
 											<label>Monitor Type: </label>
 										</div>
-										<div class="col-8">
+										<div class="col-8 mt-2">
 											{{ unit.monitor_type }}
 										</div>
 										<div class="col-4">
@@ -199,13 +214,13 @@
 
 								
 
-								<div class="col-4 mt-1 ml-1">
+								<div class="col-5 mt-1 ml-1">
 
 									<div class="row border border-success">
-										<div class="col-2">
+										<div class="col-2 mt-2">
 											<label>Remarks: </label>
 										</div>
-										<div class="col-8">
+										<div class="col-8 mt-2">
 											{{ unit.remarks }}
 										</div>
 									</div>

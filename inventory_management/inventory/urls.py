@@ -11,7 +11,8 @@ urlpatterns = [
 
     path('pm-list/', views.PmListView.as_view(), name='pm-list'),
     path('pm-create/', views.pm_create, name='pm-create'),
-    path('pm-edit/<int:pk>/', views.pm_edit, name='pm-edit'),
+    path('pm-view/<int:pk>/', views.PmDetailView.as_view(), name='pm-view'),
+    path('pm-edit/<int:pk>/', views.PmUpdateView.as_view(), name='pm-edit'),
     path('pm-delete/<int:pk>/', views.pm_delete, name='pm-delete'),
 
     path('<int:pk>/unit-list/', views.units_per_business_unit, name='get_list_per_businessunit'),

@@ -1,6 +1,6 @@
 {% for pm in pms %}
 	<tr>
-		<td>{{ pm.service_report_number }}</td>
+		<td><a href="{% url 'pm-view' pk=pm.pk %}">{{ pm.service_report_number }}</a></td>
 		<td><a href="{% url 'get_list_per_businessunit' pk=pm.business_unit.pk %}">{{ pm.business_unit.business_unit_name }}</a></td>
 		<td>{{ pm.target_date }}</td>
 		<td>{% if pm.pm_done %} 

@@ -29,5 +29,5 @@ class PreventiveMaintenanceForm(forms.ModelForm):
 
     class Meta:
         model = PreventiveMaintenance
-        #fields = ('business_unit', 'active')
+        #fields = ('target_date', 'target_time', 'actual_date', 'pm_date_done')
         exclude = ('pm_done', 'pm_date_done', 'status','active','created_at', 'updated_at', 'created_by', 'updated_by')
