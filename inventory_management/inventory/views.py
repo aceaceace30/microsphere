@@ -30,7 +30,7 @@ class UnitListView(LoginRequiredMixin, ListView):
 class UnitDetailView(LoginRequiredMixin, DetailView):
 	login_url = settings.LOGOUT_REDIRECT_URL
 	template_name = 'inventory/unit/unit_view.html'
-	context_object_name = 'unitwqe'
+	context_object_name = 'unit'
 
 	def get_object(self):
 		pk = self.kwargs.get('pk')

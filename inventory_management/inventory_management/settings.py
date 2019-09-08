@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'import_export',
     'widget_tweaks',
     'admin_reorder',
+    'simple_history',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

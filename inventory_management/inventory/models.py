@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from simple_history.models import HistoricalRecords
 
 from django.core.validators import RegexValidator
 from .validators import validate_mac_address
@@ -227,24 +228,13 @@ class Unit(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='unit_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='unit_updated')
 
+    history = HistoricalRecords()
+
     def __str__(self):
     	return self.serial_number
 
     def get_absolute_url(self):
         return reverse('unit-view', kwargs={'pk': self.pk})
-
-class UnitRemarks(models.Model):
-
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
-    remarks = models.TextField(max_length=500)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='unit_remarks_created')
-    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='unit_remarks_updated')
-
-    def __str__(self):
-        return self.default
 
 class PreventiveMaintenance(models.Model):
 
@@ -263,6 +253,8 @@ class PreventiveMaintenance(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pm_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pm_updated')
+
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.service_report_number

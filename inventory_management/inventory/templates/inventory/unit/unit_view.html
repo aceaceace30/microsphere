@@ -1,40 +1,13 @@
 {% extends 'inventory/base.html' %}
 
-{% block page_title %}
+
+{% block page_title %} Serial Number: <span class="text-success">{{ unit.serial_number }}</span> {% endblock %}
+{% block page_title_second %}
 	<a href="{% url 'unit-list' %}"> Unit List</a> > Details
 {% endblock %}
-{% block page_title_second %} Unit List {% endblock %}
+
 
 {% block content %}
-
-	<div class="breadcrumbs">
-        <div class="col-sm-3">
-            <div class="page-header float-left">
-                <div class="page-title pt-1">
-                    <h1>Serial: <span class="text-success">{{ unit.serial_number }}</span></h1>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-9">
-            <div class="page-header float-right">
-                <div class="page-title">
-                    <ol class="breadcrumb text-right">
-
-                    	<div class="pr-2">
-                    		<a href="{% url 'unit-edit' unit.pk %}" class="btn btn-success" role="button" title="Edit Details">Edit</a>
-                    	</div>
-
-                        <button type="button" class="btn btn-info btn-sm js-create-unit" data-url="{% url 'unit-create' %}" data-toggle="modal" data-target="#modal-unit">
-                            Show PM History
-                        </button>
-                        <!--<li class="active">Unit List</li>
-                        <li><a href="#">Table</a></li>
-                        <li class="active">Data table</li>-->
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div class="content mt-3">
         <div class="animated fadeIn">
@@ -43,9 +16,14 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <strong class="card-title">Client: <span class="text-success">{{ unit.business_unit.client|upper }}</span> | </strong>
+                        	<strong class="card-title">Client: <span class="text-success">{{ unit.business_unit.client|upper }}</span> | </strong>
                             <strong class="card-title">Area: <span class="text-success">{{ unit.business_unit.area }}</span> | </strong>
                             <strong class="card-title">Business Unit: <span class="text-success">{{ unit.business_unit }}</span></strong>
+
+                        	<div class="float-right">
+                        		<a href="{% url 'unit-edit' unit.pk %}" class="btn btn-success btn-sm" role="button" title="Edit Details">Edit</a>
+                        		<a href="{% url 'unit-edit' unit.pk %}" class="btn btn-dark btn-sm" role="button" title="Edit Details">Edit History</a>
+                        	</div>
                         </div>
                         <div class="card-body">
                         	<div class="container-fluid">

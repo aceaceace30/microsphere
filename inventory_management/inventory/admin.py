@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import ClientProfile, BusinessUnit, MachineType, Brand, Model, OperatingSystem,\
 OfficeApplication, Processor, TotalRam, HddSize, Unit, PreventiveMaintenance
+from simple_history.admin import SimpleHistoryAdmin
 
 class ClientProfileAdmin(admin.ModelAdmin):
 
@@ -84,7 +85,7 @@ class UnitAdmin(admin.ModelAdmin):
 					return obj.model.brand
 				get_machine_brand.short_description = 'Brand'"""
 
-admin.site.register(Unit, UnitAdmin)
+admin.site.register(Unit, SimpleHistoryAdmin)
 
 class MachineTypeAdmin(admin.ModelAdmin):
 
