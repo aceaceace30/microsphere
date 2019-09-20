@@ -1,0 +1,63 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %} Preventive Maintenance - {{ business_unit_name|upper }} {% endblock %}
+
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'inventory/vendors/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/vendors/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}">
+
+{% endblock %}
+
+{% block page_title %} Business Unit: <span class="text-success">{{ business_unit_name|upper }}</span> {% endblock %}
+{% block page_title_second %}
+	<a href="{% url 'inventory:pm-list' %}"> PM List</a> > <a href="#"> Details</a> > Units per branch
+{% endblock %}
+
+<!-- Dynamic content per module -->
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+    	
+		{% if perms.inventory.view_unit %}
+	    	<div class="card-body table-full-width table-responsive">
+		    	<table class="table table-hover" id="unit-pm-table">
+		    		<thead>
+		    			<tr>
+		    				<th>Serial Number</th>
+                            <th>Client</th>
+                            <th>Business Unit</th>
+                            <th>Status</th>
+		    			</tr>
+		    		</thead>
+		    		<tbody>
+		    			{% include 'inventory/includes/unit/partial_unit_list.html' %}
+		    		</tbody>
+		    	</table>
+		    </div>
+		{% endif %}
+      
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+
+    <script src="{% static 'inventory/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/jszip/dist/jszip.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+    <script src="{% static 'inventory/vendors/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
+    <script src="{% static 'inventory/assets/js/init-scripts/data-table/datatables-init.js' %}"></script>
+
+    <!-- custom javascript -->
+    <script src="{% static 'inventory/js/custom/unit_crud.js' %}"></script>
+
+{% endblock %}

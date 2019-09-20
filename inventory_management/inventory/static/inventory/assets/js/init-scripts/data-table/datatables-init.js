@@ -7,16 +7,18 @@
 
     $('#unit-data-table thead th').each( function () {
         var title = $(this).text();
-        $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+        if (title != 'Action') {
+            $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+        }
     } );
 
-    $('#bootstrap-data-table').DataTable({
-        lengthMenu: [[10, 20, 50, -1], [10, 20, 50, "All"]],
-    });
+    // $('#bootstrap-data-table').DataTable({
+    //     lengthMenu: [[10, 20, 50, -1], [10, 20, 50, "All"]],
+    // });
 
     var unit_table = $('#unit-data-table').DataTable({
         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+        //buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
     });
 
     unit_table.columns().every( function () {
@@ -33,7 +35,9 @@
 
     $('#pm-data-table thead th').each( function () {
         var title = $(this).text();
-        $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+        if (title != 'Status') {
+            $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+        }
     } );
 
     $('#bootstrap-data-table').DataTable({

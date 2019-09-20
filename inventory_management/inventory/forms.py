@@ -22,7 +22,9 @@ class PreventiveMaintenanceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs): 
         super(PreventiveMaintenanceForm, self).__init__(*args, **kwargs)
-        self.fields['service_report_number'].label = 'SR #'
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control form-control-sm'
+        #self.fields['service_report_number'].label = 'SR #'
         self.fields['target_date'].widget.attrs['placeholder'] = self.date_format
         self.fields['target_time'].widget.attrs['placeholder'] = self.time_format
         self.fields['actual_date'].widget.attrs['placeholder'] = self.date_format
@@ -30,4 +32,4 @@ class PreventiveMaintenanceForm(forms.ModelForm):
     class Meta:
         model = PreventiveMaintenance
         #fields = ('target_date', 'target_time', 'actual_date', 'pm_date_done')
-        exclude = ('pm_done', 'pm_date_done', 'status','active','created_at', 'updated_at', 'created_by', 'updated_by')
+        exclude = ('service_report_number', 'pm_done', 'pm_date_done', 'active','created_at', 'updated_at', 'created_by', 'updated_by')

@@ -15,8 +15,8 @@
     <meta name="description" content="Sufee Admin - HTML5 Admin Template">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!--<link rel="apple-touch-icon" href="apple-icon.png">
-    <link rel="shortcut icon" href="favicon.ico">-->
+    <!-- DISPLAY ICON -->
+    <link rel="icon" type="image/png" href="{% static 'inventory/images/microsphere_logo.ico' %}"/>
 
     <link rel="stylesheet" href="{% static 'inventory/vendors/bootstrap/dist/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'inventory/vendors/font-awesome/css/font-awesome.min.css' %}">
@@ -56,12 +56,17 @@
                     </li>
                     <h3 class="menu-title">Navigation</h3><!-- /.menu-title -->
                     <li class="active">
-                        <a href="{% url 'unit-list' %}"> <i class="menu-icon fa fa-laptop"></i>Units</a>
+                        <a href="{% url 'inventory:unit-list' %}"> <i class="menu-icon fa fa-laptop"></i>Units</a>
                     </li>
                     <li class="active">
-                        <a href="{% url 'pm-list' %}"> <i class="menu-icon fa fa-table"></i></i>Preventive Maintenance</a>
+                        <a href="{% url 'inventory:pm-list' %}"> <i class="menu-icon fa fa-table"></i></i>Preventive Maintenance</a>
                     </li>
                     
+                    {% if not request.user.clientprofile %}
+                    <li class="active">
+                        <a href="{% url 'inventory:report-main' %}"> <i class="menu-icon fa fa-table"></i></i>Reports</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div><!-- /.navbar-collapse -->
         </nav>
@@ -94,44 +99,25 @@
                 <div class="col-sm-5">
                     <div class="user-area dropdown float-right">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <img class="user-avatar rounded-circle" src="{% static 'inventory/images/admin.jpg' %}" alt="User Avatar">
+                            <img class="user-avatar rounded-circle" src="{% static 'inventory/images/microsphere_logo.jpg' %}" alt="Microsphere Logo">
                         </a>
 
                         <div class="user-menu dropdown-menu">
-                            <a class="nav-link" href="/admin/"><i class="fa fa-user"></i> Admin Page</a>
-
-                            <!--<a class="nav-link" href="#"><i class="fa fa-user"></i> Notifications <span class="count">13</span></a>-->
-
+                            {% if request.user.is_staff %}
+                                <a class="nav-link" href="/admin/"><i class="fa fa-user"></i> Admin Page</a>
+                            {% endif %}
                             <a class="nav-link" href="{% url 'account:password_change' %}"><i class="fa fa-cog"></i> Change Pass</a>
-
                             <a class="nav-link" href="{% url 'account:logout' %}"><i class="fa fa-power-off"></i> Logout</a>
                         </div>
                     </div>
 
-                    <div class="language-select dropdown" id="language-select">
-                        <a class="dropdown-toggle" href="#" data-toggle="dropdown"  id="language" aria-haspopup="true" aria-expanded="true">
-                            <i class="flag-icon flag-icon-us"></i>
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="language">
-                            <div class="dropdown-item">
-                                <span class="flag-icon flag-icon-fr"></span>
-                            </div>
-                            <div class="dropdown-item">
-                                <i class="flag-icon flag-icon-es"></i>
-                            </div>
-                            <div class="dropdown-item">
-                                <i class="flag-icon flag-icon-us"></i>
-                            </div>
-                            <div class="dropdown-item">
-                                <i class="flag-icon flag-icon-it"></i>
-                            </div>
-                        </div>
+                    <div class="display_username float-right pt-2 mr-2">
+                        Username: <span class="text-success font-weight-bold">{{ request.user.get_username }}</span>
                     </div>
-
                 </div>
             </div>
 
-        </header><!-- /header -->
+        </header>
         <!-- Header-->
 
         <div class="breadcrumbs">
@@ -155,7 +141,8 @@
             </div>
         </div>
 
-        {% block content %} {% endblock %}
+        {% block content %} 
+        {% endblock %}
 
     <script src="{% static 'inventory/vendors/jquery/dist/jquery.min.js' %}"></script>
     <script src="{% static 'inventory/vendors/popper.js/dist/umd/popper.min.js' %}"></script>

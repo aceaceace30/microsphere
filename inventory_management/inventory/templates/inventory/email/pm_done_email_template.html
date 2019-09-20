@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Microsphere Systems Technology</title>
+	<link rel="stylesheet" href="{% static 'inventory/vendors/bootstrap/dist/css/bootstrap.min.css' %}">
+	<style type="text/css">
+		table, th, td {
+		  width:100%;
+		  border: 1px solid green;
+		  border-collapse: collapse;
+		}
+		th, td {
+		  padding: 5px;
+		  text-align: left;
+		}
+		thead {
+		  color:green;
+		}
+		h3 {
+		  color:black;
+		}
+		p {
+		  color:black;
+		  font-weight: bold;
+		}
+		span {
+		  color:green;
+		}
+	</style>
+
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col">
+				<h3>{{ HEADER }}</h3>
+			</div>
+			<p>Business Unit: 	 <span>{{ pm.business_unit }}</span></p>
+			<p>Service Report #: <span>{{ pm.service_report_number }}</span></p>
+			<p>PM Type: 	     <span>{{ pm.pm_type }}</span></p>
+			<p>PM Date Done:     <span>{{ pm.pm_date_done}}</span></p>
+			<p>Remarks:          <span>{{ pm.remarks }}</span></p>
+		</div>
+		<table>
+			<thead>
+				<tr>
+					<th>Serial Number</th>
+					<th>Machine Type</th>
+					<th>Machine Brand</th>
+					<th>Model</th>
+					<th>Serial Number</th>					
+					<th>Computer Tag</th>
+					<th>MST Tag</th>
+					<th>User</th>
+					<th>Designation</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for unit in units %}
+					<tr>
+						<th>{{ unit.serial_number }}</th>
+						<th>{{ unit.machine_type }}</th>
+						<th>{{ unit.machine_brand }}</th>
+						<th>{{ unit.model }}</th>
+						<th>{{ unit.serial_number }}</th>
+						<th>{{ unit.computer_tag }}</th>
+						<th>{{ unit.mst_tag }}</th>
+						<th>{{ unit.user }}</th>
+						<th>{{ unit.designation }}</th>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		
+	</div>
+
+	
+</body>
+</html>

@@ -1,7 +1,13 @@
 {% for pm in pms %}
 	<tr>
-		<td><a href="{% url 'pm-view' pk=pm.pk %}">{{ pm.service_report_number }}</a></td>
-		<td><a href="{% url 'get_list_per_businessunit' pk=pm.business_unit.pk %}">{{ pm.business_unit.business_unit_name }}</a></td>
+		<td>
+			{% if perms.inventory.view_preventivemaintenance %}
+				<a href="{% url 'inventory:pm-view' pk=pm.pk %}">{{ pm.service_report_number }}</a>
+			{% else %}
+				{{ pm.service_report_number }}
+			{% endif %}
+		</td>
+		<td>{{ pm.business_unit.business_unit_name }}</td>
 		<td>{{ pm.target_date }}</td>
 		<td>{% if pm.pm_done %} 
 				<span class="badge badge-pill badge-success">Done</span>
@@ -9,9 +15,6 @@
 				<span class="badge badge-pill badge-danger">Pending</span>
 			{% endif %}
 		</td>
-		<!--<td><button class="btn btn-sm btn-fill btn-success js-tag-pm" data-url="{% url 'pm-tag' pm.pk %}">Done</button></td>
-		<td><button class="btn btn-sm btn-fill js-edit-pm" data-url="{% url 'pm-edit' pm.pk %}">Edit</button></td>
-		<td><button class="btn btn-sm btn-fill btn-danger js-delete-pm" data-url="{% url 'pm-delete' pm.pk %}">Delete</button></td>-->
 	</tr>
 {% empty %}
 	<tr>

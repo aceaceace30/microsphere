@@ -1,9 +1,10 @@
 {% extends 'inventory/base.html' %}
 
+{% block title %} Microsphere - Unit View {% endblock %}
 
 {% block page_title %} Serial Number: <span class="text-success">{{ unit.serial_number }}</span> {% endblock %}
 {% block page_title_second %}
-	<a href="{% url 'unit-list' %}"> Unit List</a> > Details
+	<a href="{% url 'inventory:unit-list' %}"> Unit List</a> > Details
 {% endblock %}
 
 
@@ -16,194 +17,311 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                        	<strong class="card-title">Client: <span class="text-success">{{ unit.business_unit.client|upper }}</span> | </strong>
-                            <strong class="card-title">Area: <span class="text-success">{{ unit.business_unit.area }}</span> | </strong>
-                            <strong class="card-title">Business Unit: <span class="text-success">{{ unit.business_unit }}</span></strong>
+                        	<strong class="card-title">Client: </strong><span class="text-success">{{ unit.business_unit.client|upper }}</span> | 
+                            <strong class="card-title">Area: </strong><span class="text-success">{{ unit.business_unit.area }}</span> |
+                            <strong class="card-title">Business Unit: </strong><span class="text-success">{{ unit.business_unit }}</span>
 
                         	<div class="float-right">
-                        		<a href="{% url 'unit-edit' unit.pk %}" class="btn btn-success btn-sm" role="button" title="Edit Details">Edit</a>
-                        		<a href="{% url 'unit-edit' unit.pk %}" class="btn btn-dark btn-sm" role="button" title="Edit Details">Edit History</a>
+                        		{% if perms.inventory.change_unit %}
+                        			<a href="{% url 'inventory:unit-edit' unit.pk %}" class="btn btn-success btn-sm" role="button" title="Edit Details">Edit</a>
+                        		{% endif %}
+
+                        		{% if perms.inventory.can_view_unit_history %}
+                        			<a href="{% url 'inventory:unit-history' unit.pk %}" class="btn btn-dark btn-sm" role="button" title="Edit History">Edit History</a>
+                        		{% endif %}
+
+                        		<a href="{% url 'inventory:unit-list' %}" class="btn btn-dark btn-sm">Back</a>
                         	</div>
                         </div>
                         <div class="card-body">
                         	<div class="container-fluid">
 
-                        		{% if messages %}
-								    {% for message in messages %}
-								    <div class="col-md-12 pl-0">
-	                        			<div class="sufee-alert alert with-close alert-success alert-dismissible fade show">
-						                    <span class="badge badge-pill badge-success">Success</span>
-						                    {{ message }}
-						                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-						                        <span aria-hidden="true">&times;</span>
-						                    </button>
-						                </div>
-	                        		</div>
-								    {% endfor %}
-								{% endif %}
+                        		{% include 'inventory/notifs/success.html' %}
 
-                        		<div class="col-md-5">
+								<div class="col-md-4">
+			                        <div class="card border border-success bg-success">
+			                            <div class="card-header bg-success">
+			                                <strong class="card-title text-white">Main Details</strong>
+			                            </div>
+			                            <div class="card-body bg-white">
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Type:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.machine_type }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Brand:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.machine_brand }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Model:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.model }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Serial Number:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.serial_number }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Computer Tag:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.computer_tag }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">MST Tag:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.mst_tag }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">User:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.user }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Designation:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.designation }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Remarks:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.remarks }}</p>
+			                            		</div>
+			                            	</div>
 
-                        			<div class="row border border-success">
+			                            </div>
+			                        </div>
+			                    </div>
 
-										<div class="col-4 mt-2">
-											<label>Type: </label>
-										</div>
-										<div class="col-8 mt-2">
-											<span class="text-success font-weight-bold">{{ unit.machine_type }}</span>
-										</div>
+			                    <div class="col-md-5">
+			                        <div class="card border border-success bg-success">
+			                            <div class="card-header bg-success">
+			                                <strong class="card-title text-white">Other Details</strong>
+			                            </div>
+			                            <div class="card-body bg-white">
+			                                <div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Operating System:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.operating_system }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Office Application:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.office_application }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Host Name:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.host_name }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">MAC Address:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.mac_address }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">IP Address:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.ip_address }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Processor:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.processor }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Total Ram:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.total_ram }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">HDD Size:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.hdd_size }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Monitor Type:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.monitor_type }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Monitor Brand:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.monitor_brand }}</p>
+			                            		</div>
+			                            	</div>
+			                            	<div class="row">
+			                            		<div class="col-5">
+			                            			<p class="text-dark">Monitor Size:</p>
+			                            		</div>
+			                            		<div class="col-7">
+			                            			<p class="text-success">{{ unit.monitor_size }}</p>
+			                            		</div>
+			                            	</div>
 
-										<div class="col-4">
-											<label>Brand: </label>
-										</div>
-										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.machine_brand }}</span>
-										</div>
+			                            </div>
+			                        </div>
+			                    </div>
 
-										<div class="col-4">
-											<label>Model: </label>
-										</div>
-										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.model }}</span>
-										</div>
+			                  
+			                    <div class="col-md-3">
+			                    	<div class="border">
+										{% for history in pm_history %}
+					                        <div class="card border border-success bg-success">
+					                            <div class="card-header bg-success text-white">
+					                                <strong class="card-title">Business Unit: {{ history.unit.business_unit }}</strong>
+					                                <div class="float-right">
+					                                	<strong class="card-title">
+					                                		<small>
+					                                		{% if history.preventive_maintenance.pm_done %}
+					                                			<span class="badge badge-pill badge-dark">Done</span>
+					                                		{% else %}
+					                                			<span class="badge badge-pill badge-danger">Pending</span>
+					                                		{% endif %}
+					                                		</small>
+					                                	</strong>
+					                                </div>
+					                                
+					                            </div>
+					                            <div class="card-body bg-white">
+					                            	<div class="row">
+					                            		{% if history.preventive_maintenance.pm_done %}
+						                            		<div class="col-5">
+						                            			<p class="card-text text-dark">
+								                                	SR #: 
+								                                </p>				      
+						                            		</div>
+					                            		
+						                            		<div class="col-7">
+						                            			<span class="text-success">{{ history.preventive_maintenance.service_report_number }}</span>
+						                            		</div>
+						                            	{% endif %}
+														
+														{% if history.remarks %}
+							                            	<div class="col-5">
+						                            			<p class="card-text text-dark">
+								                                	Remarks:
+								                                </p>				      
+						                            		</div>
+						                            		
+						                            		<div class="col-7">
+						                            			<span class="text-success">{{ history.remarks }}</span>
+						                            		</div>
+					                            		{% endif %}
 
-										<div class="col-4">
-											<label>Serial Number: </label>
-										</div>
-										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.serial_number }}</span>
-										</div>
+					                            		<div class="col-5">
+					                            			<p class="card-text text-dark">
+							                                	Target Date: 
+							                                </p>				      
+					                            		</div>
+					                            		
+					                            		<div class="col-7">
+					                            			<span class="text-success">{{ history.preventive_maintenance.target_date }}</span>
+					                            		</div>
 
-										<div class="col-4">
-											<label>Computer Tag: </label>
-										</div>
-										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.computer_tag }}</span>
-										</div>
+					                            		<div class="col-5">
+					                            			<p class="card-text text-dark">
+							                                	Target Time: 
+							                                </p>				      
+					                            		</div>
+					                            		<div class="col-7">
+					                            			<span class="text-success">{{ history.preventive_maintenance.target_time }}</span>
+					                            		</div>
+					                            		{% if history.preventive_maintenance.pm_done %}
+						                            		<div class="col-5">
+						                            			<p class="card-text text-dark">
+								                                	Date Done: 
+								                                </p>				      
+						                            		</div>
+						                            		<div class="col-7">
+						                            			<span class="text-success">				                      
+						                            				{{ history.preventive_maintenance.pm_date_done }}				                            				
+						                            			</span>
+						                            		</div>
+					                            		{% endif %}
 
-										<div class="col-4">
-											<label>MST Tag: </label>
-										</div>
-										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.mst_tag }}</span>
-										</div>
-
-										<div class="col-4">
-											<label>User: </label>
-										</div>
-										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.user }}</span>
-										</div>
-										<div class="col-4">
-											<label>Designation: </label>
-										</div>
-										<div class="col-8">
-											<span class="text-success font-weight-bold">{{ unit.designation }}</span>
-										</div>
-									</div>
-
-							    </div>
-
-						    	<div class="col-md-5 ml-1">
-
-							    	<div class="row border border-success">
-										<div class="col-5 mt-2">
-											<label>Operating System: </label>
-										</div>
-										<div class="col-7 mt-2">
-											<span class="text-success font-weight-bold">{{ unit.operating_system }}</span>
-										</div>
-
-										<div class="col-5">
-											<label>Office Application: </label>
-										</div>
-										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.office_application }}</span>
-										</div>
-
-										<div class="col-5">
-											<label>Host Name: </label>
-										</div>
-										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.host_name }}</span>
-										</div>
-
-										<div class="col-5">
-											<label>MAC Address: </label>
-										</div>
-										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.mac_address }}</span>
-										</div>
-
-										<div class="col-5">
-											<label>IP Address: </label>
-										</div>
-										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.ip_address }}</span>
-										</div>
-
-										<div class="col-5">
-											<label>Processor: </label>
-										</div>
-										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.processor }}</span>
-										</div>
-
-										<div class="col-5">
-											<label>Total Ram: </label>
-										</div>
-										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.total_ram }}</span>
-										</div>
-										<div class="col-5">
-											<label>HDD Size: </label>
-										</div>
-										<div class="col-7">
-											<span class="text-success font-weight-bold">{{ unit.hdd_size }}</span>
-										</div>
-									</div>
-
-						    	</div>
-
-							    <div class="col-5 mt-1">
-										
-									<div class="row border border-success">
-										<div class="col-4 mt-2">
-											<label>Monitor Type: </label>
-										</div>
-										<div class="col-8 mt-2">
-											{{ unit.monitor_type }}
-										</div>
-										<div class="col-4">
-											<label>Monitor Brand: </label>
-										</div>
-										<div class="col-8">
-											{{ unit.monitor_brand }}
-										</div>
-										<div class="col-4">
-											<label>Monitor Size: </label>
-										</div>
-										<div class="col-8">
-											{{ unit.monitor_size }}
-										</div>
-									</div>
-
-								</div>
-
-								
-
-								<div class="col-5 mt-1 ml-1">
-
-									<div class="row border border-success">
-										<div class="col-2 mt-2">
-											<label>Remarks: </label>
-										</div>
-										<div class="col-8 mt-2">
-											{{ unit.remarks }}
-										</div>
-									</div>
-
-								</div>
+					                            		{% if perms.inventory.can_add_remarks_per_pm %}
+						                            		<div class="col-12 pt-2">
+						                            			<form action="{% url 'inventory:add-pm-remarks' history.pk %}" method="POST">
+					                            				{% csrf_token %}
+						                            			<input type="text" name="remarks" class="form-control" value="{% if history.remarks %}{{ history.remarks }}{% endif %}" placeholder="Enter remarks">
+						                            			</textarea>
+						                            		</div>
+						                            		<div class="col offset-4 pt-2">
+						                            			<input type="submit" value="Save Remarks" class="btn btn-success btn-sm">
+						                            			</form>
+						                            		</div>
+					                            		{% endif %}
+													
+					                            		<div class="col-12 pt-2">
+					                            			<small class="float-right">
+					                            				By: {{ history.preventive_maintenance.created_by }} | {{ history.preventive_maintenance.created_at|date }}
+					                            			</small>
+					                            		</div>
+					                            			
+					                            	</div>
+					                            </div>
+					                        </div>
+					                    {% endfor %}
+				                    </div>
+				                </div>
 
                         </div>
                     </div>
@@ -212,6 +330,29 @@
             </div>
         </div><!-- .animated -->
     </div><!-- .content -->
+
+<!-- add pm-unit remarks modal -->
+<div class="modal fade" id="modal-add-pm-remarks" tabindex="-1" role="dialog" aria-labelledby="smallmodalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-sm" role="document">
+	    <div class="modal-content">
+	        <div class="modal-header">
+	            <h5 class="modal-title" id="smallmodalLabel">Add PM Remarks</h5>
+	            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	                <span aria-hidden="true">&times;</span>
+	            </button>
+	        </div>
+	        <div class="modal-body">
+	            <textarea class="form-control"></textarea>
+	        </div>
+	        <div class="modal-footer">
+	        	<button type="button" class="btn btn-success">Save</button>
+	            <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+	        </div>
+	    </div>
+	</div>
+</div>
+<!-- end modal-->
+
 
 
 {% endblock%}

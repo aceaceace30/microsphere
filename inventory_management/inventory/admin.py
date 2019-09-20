@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import ClientProfile, BusinessUnit, MachineType, Brand, Model, OperatingSystem,\
 OfficeApplication, Processor, TotalRam, HddSize, Unit, PreventiveMaintenance
+from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
 class ClientProfileAdmin(admin.ModelAdmin):
@@ -24,7 +25,7 @@ class ClientProfileAdmin(admin.ModelAdmin):
 
 admin.site.register(ClientProfile, ClientProfileAdmin)
 
-class BusinessUnitAdmin(admin.ModelAdmin):
+class BusinessUnitAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -45,13 +46,13 @@ class BusinessUnitAdmin(admin.ModelAdmin):
 
 admin.site.register(BusinessUnit, BusinessUnitAdmin)
 
-class UnitAdmin(admin.ModelAdmin):
+class UnitHistoryAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
 	list_display = ('get_client_code', 'business_unit', 'get_rc_code', 'machine_type', 'machine_brand',
 					'model', 'serial_number', 'computer_tag',
-					'mst_tag', 'user', 'designation', 'active')
+					'mst_tag', 'user', 'designation', 'active', 'created_by', 'created_at')
 
 	search_fields = ('business_unit__client__client_code', 'business_unit__business_unit_name',
 					 	'business_unit__rc_code', 'model__machine_type__machine_type_name', 'model__model_name',
@@ -85,9 +86,9 @@ class UnitAdmin(admin.ModelAdmin):
 					return obj.model.brand
 				get_machine_brand.short_description = 'Brand'"""
 
-admin.site.register(Unit, SimpleHistoryAdmin)
+admin.site.register(Unit, UnitHistoryAdmin)
 
-class MachineTypeAdmin(admin.ModelAdmin):
+class MachineTypeAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -106,7 +107,7 @@ class MachineTypeAdmin(admin.ModelAdmin):
 
 admin.site.register(MachineType, MachineTypeAdmin)
 
-class BrandAdmin(admin.ModelAdmin):
+class BrandAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -125,7 +126,7 @@ class BrandAdmin(admin.ModelAdmin):
 
 admin.site.register(Brand, BrandAdmin)
 
-class ModelAdmin(admin.ModelAdmin):
+class ModelAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -247,7 +248,7 @@ class HddSizeAdmin(admin.ModelAdmin):
 
 admin.site.register(HddSize, HddSizeAdmin)
 
-class PreventiveMaintenanceAdmin(admin.ModelAdmin):
+class PreventiveMaintenanceAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 

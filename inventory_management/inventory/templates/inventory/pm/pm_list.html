@@ -10,7 +10,7 @@
 
 {% endblock %}
 
-{% block page_title %} PM List {% endblock %}
+{% block page_title %} PM List | {{ status }} {% endblock %}
 {% block page_title_second %} PM List {% endblock %}
 
 {% block content %}
@@ -22,12 +22,25 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <button type="button" class="btn btn-success btn-sm js-create-pm" data-url="{% url 'pm-create' %}" data-toggle="modal" data-target="#modal-pm">
-                                Add PM
-                            </button>
+                            <a href="{% url 'inventory:pm-list' %}" class="btn btn-primary">
+                                    All 
+                            </a>
+                            <a href="{% url 'inventory:pm-list' %}?status=Done" class="btn btn-success">
+                                    Done
+                            </a>
+                            <a href="{% url 'inventory:pm-list' %}?status=Pending" class="btn btn-danger">
+                                    Pending
+                            </a>
+                            {% if perms.inventory.add_preventivemaintenance %}
+                                <div class="float-right">
+                                     <button type="button" class="btn btn-success js-create-pm" data-url="{% url 'inventory:pm-create' %}" data-toggle="modal" data-target="#modal-pm">
+                                        Add PM
+                                    </button>                               
+                                </div>
+                            {% endif %}
                         </div>
                         <div class="card-body">
-                            <table id="pm-table" class="table table-striped table-bordered">
+                            <table id="pm-data-table" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
                                         <th>SR #</th>

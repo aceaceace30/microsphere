@@ -1,0 +1,29 @@
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'error' %}
+            <div class="col-md-12">
+        		<div class="sufee-alert alert with-close alert-danger alert-dismissible fade show">
+                    <center>
+                    <span class="badge badge-pill badge-danger">Error</span>
+                    	{{ message }}
+                    </center>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+        	</div>
+        {% else %}
+            <div class="col-md-12">
+                <div class="sufee-alert alert with-close alert-success alert-dismissible fade show">
+                    <center>
+                    <span class="badge badge-pill badge-success">Success</span>
+                        {{ message }}
+                    </center>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}

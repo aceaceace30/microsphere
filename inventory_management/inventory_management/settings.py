@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
     'admin_reorder.middleware.ModelAdminReorder',
 ]
 
@@ -82,9 +83,17 @@ WSGI_APPLICATION = 'inventory_management.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'microsphere',
+        'USER': 'postgres',
+        'PASSWORD': 'admin',
+        'HOST': 'localhost',
+        'PORT': '5433',
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # }
 }
 
 
@@ -126,15 +135,25 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 
-
 # where users sent once successfull login
-LOGIN_REDIRECT_URL = 'unit-list'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = 'inventory:unit-list'
+LOGOUT_REDIRECT_URL = 'account:login'
 
 # same as the default LOGIN_URL for convention
-LOGIN_URL = '/accounts/login'
+LOGIN_URL = 'account:login'
+
+#email settings
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'aceaceace.test@gmail.com'
+EMAIL_HOST_PASSWORD = 'ace87654321!'
+EMAIL_PORT = 587
+
+EMAIL_HEADER_MESSAGE = 'Good Day! This is the updated list of units after the Preventive Maintenance.'
 
 # Docs: https://pypi.org/project/django-modeladmin-reorder/
+
+
 
 ADMIN_REORDER = (
     # Rename app
@@ -160,11 +179,7 @@ ADMIN_REORDER = (
         {'model': 'inventory.Model', 'label': 'Models'},
         {'model': 'inventory.OperatingSystem', 'label': 'Operating systems'},
         {'model': 'inventory.OfficeApplication', 'label': 'Office application'},
+        {'model': 'inventory.Processor', 'label': 'Processor'},
         {'model': 'inventory.TotalRam', 'label': 'RAM'},
         {'model': 'inventory.HddSize', 'label': 'HDD size'},)},
-
-
-
-    #{'app': 'inventory', 'label': 'Maintenance', 'models': (
-        #{'model': 'inventory.Group', 'label': 'Groups'},)},
 )

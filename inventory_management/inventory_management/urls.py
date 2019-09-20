@@ -4,8 +4,8 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     #TODO: overide the change password, change pass done, password reset, password reset done
-    path('accounts/', include('account.urls', namespace="accounts")),
-    path('inventory/', include('inventory.urls')),
+    path('accounts/', include('account.urls', namespace='accounts')),
+    path('inventory/', include('inventory.urls', namespace='inventory')),
 ]
 
 # django admin customization

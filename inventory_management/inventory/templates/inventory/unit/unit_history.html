@@ -1,0 +1,78 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %} Microsphere - Unit History {% endblock %}
+
+{% block page_title %} Serial Number: <span class="text-success">{{ unit.serial_number }}</span> {% endblock %}
+{% block page_title_second %}<a href="{% url 'inventory:unit-list' %}"> Unit List</a> > <a href="{% url 'inventory:unit-view' unit.pk %}"> Details</a> > History {% endblock %}
+
+{% block content %}
+
+	<div class="content mt-3">
+	    <div class="animated fadeIn">
+	    	<div class="row">
+	    		<div class="col-md-12">
+			        <div class="card">
+			            <div class="card-header">
+			            	<strong class="card-title">Client: </strong><span class="text-success">{{ unit.business_unit.client|upper }}</span> | 
+			                <strong class="card-title">Area: </strong><span class="text-success">{{ unit.business_unit.area }}</span> |
+			                <strong class="card-title">Business Unit: </strong><span class="text-success">{{ unit.business_unit }}</span>
+			            	<div class="float-right">
+			            		<a href="{% url 'inventory:unit-view' unit.pk %}" class="btn btn-success btn-sm" role="button" title="Unit Details">Back</a>
+			            	</div>
+			            </div>
+	    	
+				    	<div class="container">
+							<table class="table">
+								<thead>
+									<tr>
+							<!-- 			<th>Change ID</th> -->
+										<th>Updated Fields</th>
+										<th>Date</th>
+										<th>Time</th>
+										<th>Updated by</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for change in changes %}
+							            <tr>
+							<!--                 <td>{{ change.new_record.id }}</td> -->
+											<td>
+							                    {% if change.changed_fields|length > 1 %}
+							                    	<ul>
+								                        {% for change_by_id in change.changes %}
+								                        	{% if change_by_id.field|lower != 'updated_at' %}
+									                            <li><span class="text-success">{{ change_by_id.field|lower }}</span> was changed from:
+									                            {% if change_by_id.old %}
+									                               <span>{{ change_by_id.old }}</span>
+									                                {% else %}
+									                                <span>Blank Field</span>
+									                            {% endif %}
+									                            to <span class="text-success font-weight-bold">{{ change_by_id.new }}</span></li>
+									                        {% endif %}
+								                        {% endfor %}
+							                    	</ul>
+							                    {% else %}
+							                    	<span>No changes made.</span>
+							                    {% endif %}
+							                </td>
+							                <td>{{ change.new_record.history_date|date }}</td>
+							                <td>{{ change.new_record.history_date|time }}</td>
+							                
+							                <td>{{ change.new_record.history_user }} | {{ change.new_record.history_user.first_name }} </td>
+							              </tr>
+									{% endfor %}
+								</tbody>
+							</table>
+
+						</div>
+
+					</div>
+				</div>
+			</div>
+	    </div><!-- .animated -->
+	</div><!-- .content -->
+
+
+
+
+{% endblock %}

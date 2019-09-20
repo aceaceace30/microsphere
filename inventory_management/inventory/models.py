@@ -24,6 +24,13 @@ STATUS = (
     ('Not Covered by MA', 'Not Covered by MA'),
     )
 
+PM_TYPE = (
+    ('1st PM', '1st PM'),
+    ('2nd PM', '2nd PM'),
+    ('3rd PM', '3rd PM'),
+    ('4th PM', '4th PM'),
+    )
+
 #used to classify the display of forms
 MACHINE_CLASS = (
     ('Printer', 'Printer'),
@@ -219,8 +226,9 @@ class Unit(models.Model):
     monitor_type = models.CharField(choices=MONITOR_TYPE, max_length=10, blank=True, null=True)
     monitor_brand = models.ForeignKey(Brand, on_delete=models.PROTECT, blank=True, null=True, related_name='monitor_brand')
     monitor_size = models.PositiveIntegerField(blank=True, null=True)
-
     remarks = models.TextField(max_length=500, blank=True, null=True)
+    status = models.CharField(choices=STATUS, max_length=30)
+
     active = models.BooleanField(default=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -230,22 +238,30 @@ class Unit(models.Model):
 
     history = HistoricalRecords()
 
+    class Meta:
+        permissions = [
+            ('can_view_unit_list', 'Can view unit list'),
+            ('can_soft_delete_unit', 'Can soft delete unit'),
+            ('can_view_unit_history', 'Can view unit history')   
+        ]
+
     def __str__(self):
     	return self.serial_number
 
     def get_absolute_url(self):
-        return reverse('unit-view', kwargs={'pk': self.pk})
+        return reverse('inventory:unit-view', kwargs={'pk': self.pk})
+        
 
 class PreventiveMaintenance(models.Model):
 
     business_unit = models.ForeignKey(BusinessUnit, on_delete=models.CASCADE)
-    service_report_number = models.CharField(max_length=255, unique=True)
+    service_report_number = models.CharField(max_length=255, unique=True, null=True)
+    pm_type = models.CharField(choices=PM_TYPE, max_length=50)
     target_date = models.DateField()
     target_time = models.TimeField()
     actual_date = models.DateField()
     pm_date_done = models.DateField(blank=True, null=True)
     pm_done = models.BooleanField(default=False)
-    status = models.CharField(choices=STATUS, max_length=100)
     remarks = models.TextField(max_length=500, blank=True, null=True)
     active = models.BooleanField(default=True)
 
@@ -256,8 +272,25 @@ class PreventiveMaintenance(models.Model):
 
     history = HistoricalRecords()
 
+    class Meta:
+        permissions = [
+            ('can_view_pm_list', 'Can view pm list'),
+            ('can_view_units_per_pm', 'Can view units per pm')
+    ]
+
     def __str__(self):
-        return self.service_report_number
+        return self.business_unit.business_unit_name
 
     def get_absolute_url(self):
-        return reverse('pm-view', kwargs={'pk': self.pk})
+        return reverse('inventory:pm-view', kwargs={'pk': self.pk})
+
+class PmUnitHistory(models.Model):
+
+    preventive_maintenance = models.ForeignKey(PreventiveMaintenance, on_delete=models.PROTECT)
+    unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
+    remarks = models.TextField(max_length=500, blank=True, null=True)
+
+    class Meta:
+        permissions = [
+            ('can_add_remarks_per_pm', 'Can add extra remarks per pm')
+    ]
