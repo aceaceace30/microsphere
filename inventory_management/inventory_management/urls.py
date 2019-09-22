@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #TODO: overide the change password, change pass done, password reset, password reset done
     path('accounts/', include('account.urls', namespace='accounts')),
     path('inventory/', include('inventory.urls', namespace='inventory')),
 ]
@@ -11,7 +11,7 @@ urlpatterns = [
 # django admin customization
 
 # redirect page when clicking the 'view site' in django admin
-admin.site.site_url = "/inventory/unit-list/"
+admin.site.site_url = '/accounts/dashboard/'
 
 # overide header and title
 admin.site.site_header = 'Microsphere | Inventory Management'

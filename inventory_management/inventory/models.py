@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Count
 from django.contrib.auth.models import User
 from simple_history.models import HistoricalRecords
 
@@ -33,8 +34,9 @@ PM_TYPE = (
 
 #used to classify the display of forms
 MACHINE_CLASS = (
+    ('CPU', 'CPU'),
+    ('Laptop', 'Laptop'),
     ('Printer', 'Printer'),
-    ('PC', 'PC'),
     )
 
 MONITOR_TYPE = (
@@ -250,7 +252,12 @@ class Unit(models.Model):
 
     def get_absolute_url(self):
         return reverse('inventory:unit-view', kwargs={'pk': self.pk})
-        
+
+    def get_active_units():
+        return Unit.objects.filter(active=True)
+
+    def get_total_count():
+        return Unit.objects.filter(active=True).count()    
 
 class PreventiveMaintenance(models.Model):
 
@@ -283,6 +290,39 @@ class PreventiveMaintenance(models.Model):
 
     def get_absolute_url(self):
         return reverse('inventory:pm-view', kwargs={'pk': self.pk})
+
+    def get_active_pms(status=None, client=None):
+        if status == 'Done':
+            pm_done = True
+        elif status == 'Pending':
+            pm_done = False
+
+        if client and status:
+            return PreventiveMaintenance.objects.filter(active=True,
+                                                        pm_done=pm_done,
+                                                        business_unit__client=client)\
+                                                .order_by('-created_at')
+        elif status:
+            return PreventiveMaintenance.objects.filter(active=True,
+                                                        pm_done=pm_done)\
+                                                .order_by('-created_at')
+
+        elif client:
+            return PreventiveMaintenance.objects.filter(active=True,
+                                                        business_unit__client=client)\
+                                                .order_by('-created_at')
+        else:
+            return PreventiveMaintenance.objects.filter(active=True).order_by('-created_at')
+
+    def get_total_count():
+        return PreventiveMaintenance.objects.filter(active=True).count()
+
+    def get_total_count_per_status():
+        return PreventiveMaintenance.objects.values('pm_done')\
+                                            .filter(active=True)\
+                                            .order_by('pm_done')\
+                                            .annotate(status_count=Count('pm_done'))
+
 
 class PmUnitHistory(models.Model):
 

@@ -1,0 +1,86 @@
+{% extends 'inventory/base.html' %}
+{% block title %} Microsphere - Dashboard {% endblock %}
+
+{% block page_title %} Dashboard {% endblock %}
+{% block page_title_second %} Dashboard {% endblock %}
+
+{% block content %}
+
+<div class="content mt-3">
+    <div class="animated fadeIn">
+        <div class="row">
+
+			<div class="col-md-6">
+			    <div class="card bg-success h-75">
+			        <!-- <img class="card-img-top" src="images/placeholder.png" alt="Card image cap"> -->
+			        <div class="card-body">
+			            <h4 class="card-title text-light">Total count of Units: 
+			            	<a class="badge badge-primary" href="{% url 'inventory:unit-list' %}">{{ unit_count }}</a>
+			            </h4>
+			        </div>
+			    </div>
+			</div>
+
+			<div class="col-md-6">
+			    <div class="card bg-warning h-75">
+			        <!-- <img class="card-img-top" src="images/placeholder.png" alt="Card image cap"> -->
+			        <div class="card-body">
+			            <h4 class="card-title text-light">Total count of PM: <a class="badge badge-primary" href="{% url 'inventory:pm-list' %}">{{ pm_count }}</a></h4>
+			            <ul class="text-light offset-1">
+			            	{% for count in pm_count_status%}
+			            		{% if not count.pm_done %}
+			            			<li><span class="badge badge-danger"> Pending: {{ count.status_count }}</span></li>
+			            		{% else %}
+			            			<li><span class="badge badge-success">Done: {{ count.status_count }}</span></li>
+			            		{% endif %}
+			            	{% endfor %}
+			            </ul>
+			        </div>
+			    </div>
+			</div>
+
+			<div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Show Total Count needed</h4>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted m-b-15">Coming soon. Discuss with Microsphere.</p>
+
+                                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Menu 1</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Menu 2</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content pl-3 p-1" id="myTabContent">
+                                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                        <h3>Home</h3>
+                                        <p>Some content here.</p>
+                                    </div>
+                                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                                        <h3>Menu 1</h3>
+                                        <p>Some content here.</p>
+                                    </div>
+                                    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                                        <h3>Menu 2</h3>
+                                        <p>Some content here.</p>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+		</div>
+	</div>
+</div>
+
+
+{% endblock %}

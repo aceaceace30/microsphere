@@ -82,18 +82,18 @@ WSGI_APPLICATION = 'inventory_management.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'microsphere',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
-        'PORT': '5433',
-    }
     # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'microsphere',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'admin',
+    #     'HOST': 'localhost',
+    #     'PORT': '5433',
     # }
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
 }
 
 
@@ -135,8 +135,10 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 
+DASHBOARD_URL = 'account:dashboard'
+
 # where users sent once successfull login
-LOGIN_REDIRECT_URL = 'inventory:unit-list'
+LOGIN_REDIRECT_URL = DASHBOARD_URL
 LOGOUT_REDIRECT_URL = 'account:login'
 
 # same as the default LOGIN_URL for convention

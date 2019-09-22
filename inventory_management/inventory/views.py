@@ -18,29 +18,6 @@ from django.core.mail import send_mail
 
 import datetime
 
-def get_active_units():
-	return Unit.objects.filter(active=True)
-
-def get_active_pms(status=None, client=None):
-	if status == 'Done':
-		pm_done = True
-	elif status == 'Pending':
-		pm_done = False
-
-	if client and status:
-		return PreventiveMaintenance.objects.filter(active=True,
-													pm_done=pm_done,
-													business_unit__client=client).order_by('-created_at')
-	elif status:
-		return PreventiveMaintenance.objects.filter(active=True,
-													pm_done=pm_done).order_by('-created_at')
-
-	elif client:
-		return PreventiveMaintenance.objects.filter(active=True,
-													business_unit__client=client).order_by('-created_at')
-	else:
-		return PreventiveMaintenance.objects.filter(active=True).order_by('-created_at')
-
 class UnitListView(LoginRequiredMixin, ListView):
 	login_url = settings.LOGOUT_REDIRECT_URL
 	template_name = 'inventory/unit/unit_list.html'
@@ -52,7 +29,7 @@ class UnitListView(LoginRequiredMixin, ListView):
 		if ClientProfile.objects.filter(username=self.request.user).exists():
 			return Unit.objects.filter(active=True, business_unit__client=self.request.user.clientprofile)
 		else:
-			return get_active_units()
+			return Unit.get_active_units()
 
 #permission not working
 class UnitDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
@@ -143,10 +120,10 @@ class PmListView(LoginRequiredMixin, ListView):
 		status = self.request.GET.get('status', default=None)
 
 		if ClientProfile.objects.filter(username=self.request.user).exists():
-			return get_active_pms(status=status, client=self.request.user.clientprofile) if status\
-					else get_active_pms(client=self.request.user.clientprofile)
+			return PreventiveMaintenance.get_active_pms(status=status, client=self.request.user.clientprofile) if status\
+					else PreventiveMaintenance.get_active_pms(client=self.request.user.clientprofile)
 		else:
-			return get_active_pms(status=status) if status else get_active_pms()
+			return PreventiveMaintenance.get_active_pms(status=status) if status else PreventiveMaintenance.get_active_pms()
 		
 class PmDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 	permission_required = 'inventory.view_preventivemaintenance'
@@ -201,7 +178,7 @@ def unit_save(request, form, template_name):
 
 			data['form_is_valid'] = True
 
-			units = get_active_units()
+			units = Unit.get_active_units()
 			data['html_unit_list'] = render_to_string(render_table_html, {'units': units})
 		else:
 			data['form_is_valid'] = False
@@ -240,7 +217,7 @@ def unit_delete(request, pk):
 
 		data['form_is_valid'] = True
 
-		units = get_active_units()
+		units = Unit.get_active_units()
 		data['html_unit_list'] = render_to_string(render_table_html, {'units': units})
 	else:
 		context = {'unit':unit}
@@ -271,7 +248,7 @@ def pm_save(request, form, template_name):
 
 			data['form_is_valid'] = True
 
-			pms = get_active_pms()
+			pms = PreventiveMaintenance.get_active_pms()
 
 			data['html_pm_list'] = render_to_string(render_table_html, {'pms': pms})
 		else:
@@ -311,7 +288,7 @@ def pm_delete(request, pk):
 
 		data['form_is_valid'] = True
 
-		pms = get_active_pms()
+		pms = PreventiveMaintenance.get_active_pms()
 		data['html_pm_list'] = render_to_string(render_table_html, {'pms': pms})
 	else:
 		data['html_form'] = render_to_string(render_delete_html, {'pm':pm}, request=request)

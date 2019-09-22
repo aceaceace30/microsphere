@@ -1,10 +1,21 @@
+{% load static %}
+
 {% for unit in units %}
 	<tr>
 		<td>
 			{% if perms.inventory.view_unit %}
+				{% if unit.machine_type.machine_class|upper == 'CPU' %}
+					<img src="{% static 'inventory/images/CPU_ICON.ico' %}" alt="CPU Icon">
+				{% elif unit.machine_type.machine_class|upper == 'LAPTOP' %}
+					<img src="{% static 'inventory/images/LAPTOP_ICON.ico' %}" alt="LAPTOP Icon">
+				{% elif unit.machine_type.machine_class|upper == 'PRINTER' %}
+					<img src="{% static 'inventory/images/PRINTER_ICON.ico' %}" alt="PRINTER Icon">
+				{% endif %}
+
 				<a href="{% url 'inventory:unit-view' unit.pk  %}">
 					{{ unit.serial_number }}
 				</a>
+
 			{% else %}
 				{{ unit.serial_number }}
 			{% endif %}
