@@ -61,7 +61,7 @@
 			                            			<p class="text-dark">SR #:</p>
 			                            		</div>
 			                            		<div class="col-6">
-			                            			{% if not pm.service_report_number %}
+			                            			{% if not pm.service_report_number and perms.inventory.can_mark_as_done %}
 			                            				<input type="text" name="service_report_number" class="form-control form-control-sm" required>
 			                            			{% else %}
 			                            				<p class="text-success">{{ pm.service_report_number }}</p>
@@ -136,7 +136,7 @@
 				                            	</div>
 			                            	{% endif %}
 			                            	
-			                            	{% if not pm.pm_done %}
+			                            	{% if not pm.pm_done and perms.inventory.can_mark_as_done %}
 				                            	<div class="row">
 				                            		<div class="col-6">
 				                            			<p class="text-dark">Email Address:</p>

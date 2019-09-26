@@ -15,7 +15,6 @@
 				<a href="{% url 'inventory:unit-view' unit.pk  %}">
 					{{ unit.serial_number }}
 				</a>
-
 			{% else %}
 				{{ unit.serial_number }}
 			{% endif %}
@@ -23,11 +22,6 @@
 		<td>{{ unit.business_unit.client }}</td>
 		<td>{{ unit.business_unit }}</td>
 		<td>{{ unit.status }}</td>
-		<td>
-			{% if not request.user.clientprofile %}
-				<button class="btn btn-sm btn-fill btn-danger js-delete-unit" data-url="{% url 'inventory:unit-delete' unit.pk %}">Delete</button>
-			{% endif %}
-		</td>
 	</tr>
 {% empty %}
 	<tr>

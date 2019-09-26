@@ -1,9 +1,11 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from account import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.redirect_to_login),
     path('accounts/', include('account.urls', namespace='accounts')),
     path('inventory/', include('inventory.urls', namespace='inventory')),
 ]

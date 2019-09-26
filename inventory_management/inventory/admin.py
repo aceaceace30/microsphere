@@ -4,7 +4,7 @@ OfficeApplication, Processor, TotalRam, HddSize, Unit, PreventiveMaintenance
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
 
-class ClientProfileAdmin(admin.ModelAdmin):
+class ClientProfileAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -153,7 +153,7 @@ class ModelAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 admin.site.register(Model, ModelAdmin)
 
-class OperatingSystemAdmin(admin.ModelAdmin):
+class OperatingSystemAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -172,7 +172,7 @@ class OperatingSystemAdmin(admin.ModelAdmin):
 
 admin.site.register(OperatingSystem, OperatingSystemAdmin)
 
-class OfficeApplicationAdmin(admin.ModelAdmin):
+class OfficeApplicationAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -191,7 +191,7 @@ class OfficeApplicationAdmin(admin.ModelAdmin):
 
 admin.site.register(OfficeApplication, OfficeApplicationAdmin)
 
-class ProcessorAdmin(admin.ModelAdmin):
+class ProcessorAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -210,7 +210,7 @@ class ProcessorAdmin(admin.ModelAdmin):
 
 admin.site.register(Processor, ProcessorAdmin)
 
-class TotalRamAdmin(admin.ModelAdmin):
+class TotalRamAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -229,7 +229,7 @@ class TotalRamAdmin(admin.ModelAdmin):
 
 admin.site.register(TotalRam, TotalRamAdmin)
 
-class HddSizeAdmin(admin.ModelAdmin):
+class HddSizeAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 

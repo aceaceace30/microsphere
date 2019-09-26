@@ -208,22 +208,21 @@ def unit_delete(request, pk):
 	unit = get_object_or_404(Unit, pk=pk)
 
 	render_delete_html = 'inventory/includes/unit/partial_unit_delete.html'
-	render_table_html = 'inventory/includes/unit/partial_unit_list.html'
+	#render_table_html = 'inventory/includes/unit/partial_unit_list.html'
 
 	if request.method == 'POST':
 		unit.active = False
 		unit.updated_by = request.user
 		unit.save()
 
-		data['form_is_valid'] = True
-
-		units = Unit.get_active_units()
-		data['html_unit_list'] = render_to_string(render_table_html, {'units': units})
+		return redirect('inventory:unit-list')
+		#units = Unit.get_active_units()
+		#data['html_unit_list'] = render_to_string(render_table_html, {'units': units})
 	else:
 		context = {'unit':unit}
 		data['html_form'] = render_to_string(render_delete_html, context, request=request)
 
-	return JsonResponse(data)
+		return JsonResponse(data)
 
 
 def pm_save(request, form, template_name):
@@ -316,9 +315,12 @@ def mark_as_done(request, pk):
 		emails = request.POST.get('emails', default=None).replace(' ', '')
 		service_report_number = request.POST.get('service_report_number', default=None)
 
+		if not service_report_number:
+			messages.error(request, 'SR # cannot be blank.')
+			return redirect('inventory:pm-view', pk)
+
 		if PreventiveMaintenance.objects.filter(service_report_number=service_report_number).exists():
 			messages.error(request, 'SR # already exist. Please try a new one.')
-
 			return redirect('inventory:pm-view', pk)
 
 		pm.service_report_number = service_report_number

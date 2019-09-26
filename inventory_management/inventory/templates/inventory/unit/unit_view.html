@@ -1,4 +1,5 @@
 {% extends 'inventory/base.html' %}
+{% load static %}
 
 {% block title %} Microsphere - Unit View {% endblock %}
 
@@ -27,7 +28,11 @@
                         		{% endif %}
 
                         		{% if perms.inventory.can_view_unit_history %}
-                        			<a href="{% url 'inventory:unit-history' unit.pk %}" class="btn btn-dark btn-sm" role="button" title="Edit History">Edit History</a>
+                        			<a href="{% url 'inventory:unit-history' unit.pk %}" class="btn btn-primary btn-sm" role="button" title="Edit History">Edit History</a>
+                        		{% endif %}
+
+                        		{% if perms.inventory.can_soft_delete_unit %}
+                        			<button class="btn btn-sm btn-fill btn-danger js-delete-unit" data-url="{% url 'inventory:unit-delete' unit.pk %}">Delete</button>
                         		{% endif %}
 
                         		<a href="{% url 'inventory:unit-list' %}" class="btn btn-dark btn-sm">Back</a>
@@ -331,28 +336,19 @@
         </div><!-- .animated -->
     </div><!-- .content -->
 
-<!-- add pm-unit remarks modal -->
-<div class="modal fade" id="modal-add-pm-remarks" tabindex="-1" role="dialog" aria-labelledby="smallmodalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-sm" role="document">
-	    <div class="modal-content">
-	        <div class="modal-header">
-	            <h5 class="modal-title" id="smallmodalLabel">Add PM Remarks</h5>
-	            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-	                <span aria-hidden="true">&times;</span>
-	            </button>
-	        </div>
-	        <div class="modal-body">
-	            <textarea class="form-control"></textarea>
-	        </div>
-	        <div class="modal-footer">
-	        	<button type="button" class="btn btn-success">Save</button>
-	            <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-	        </div>
-	    </div>
-	</div>
+<div class="modal fade" id="modal-unit" tabindex="-1" role="dialog" aria-labelledby="scrollmodalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+        </div>
+    </div>
 </div>
-<!-- end modal-->
-
 
 
 {% endblock%}
+
+{% block js %}
+
+    <!-- custom javascript -->
+    <script src="{% static 'inventory/js/custom/unit_crud.js' %}"></script>
+
+{% endblock %}

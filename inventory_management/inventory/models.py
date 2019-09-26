@@ -282,7 +282,8 @@ class PreventiveMaintenance(models.Model):
     class Meta:
         permissions = [
             ('can_view_pm_list', 'Can view pm list'),
-            ('can_view_units_per_pm', 'Can view units per pm')
+            ('can_view_units_per_pm', 'Can view units per pm'),
+            ('can_mark_as_done', 'Can mark as done per pm')
     ]
 
     def __str__(self):
@@ -314,15 +315,31 @@ class PreventiveMaintenance(models.Model):
         else:
             return PreventiveMaintenance.objects.filter(active=True).order_by('-created_at')
 
-    def get_total_count():
-        return PreventiveMaintenance.objects.filter(active=True).count()
+    def get_total_count(client=None):
+        if not client:
+            return PreventiveMaintenance.objects.filter(active=True).count()
+        else:
+            return PreventiveMaintenance.objects.filter(bussiness_unit__client=client, active=True).count()
 
-    def get_total_count_per_status():
-        return PreventiveMaintenance.objects.values('pm_done')\
-                                            .filter(active=True)\
-                                            .order_by('pm_done')\
-                                            .annotate(status_count=Count('pm_done'))
+    def get_total_count_per_status(client=None):
+        if not client:
+            return PreventiveMaintenance.objects.values('pm_done')\
+                                                .filter(active=True)\
+                                                .order_by('pm_done')\
+                                                .annotate(status_count=Count('pm_done'))
+        else:
+            return PreventiveMaintenance.objects.values('pm_done')\
+                                                .filter(bussiness_unit__client=client, active=True)\
+                                                .order_by('pm_done')\
+                                                .annotate(status_count=Count('pm_done'))
 
+    def get_pending_pm(number_to_retrive=3, client=None):
+        if not client:
+            return PreventiveMaintenance.objects.filter(active=True, pm_done=False)\
+                                                .order_by('-target_date', '-target_time')[:number_to_retrive]
+        else:
+            return PreventiveMaintenance.objects.filter(active=True, pm_done=False)\
+                                                .order_by('-target_date', '-target_time')[:number_to_retrive]
 
 class PmUnitHistory(models.Model):
 
