@@ -1,5 +1,6 @@
 {% extends 'inventory/base.html' %}
 {% load widget_tweaks %}
+{% load static %}
 
 {% block title %} Microsphere - Unit Edit {% endblock %}
 
@@ -8,7 +9,7 @@
 
 {% block content %}
 
-<form method="POST">
+<form method="POST" id="create-inventory" data-url="{% url 'inventory:load_business_units' %}">
 {% csrf_token %}
 	<div class="content mt-3">
 	    <div class="animated fadeIn">
@@ -17,7 +18,7 @@
 			        <div class="card">
 			            <div class="card-header">
 			            	<strong class="card-title">Client: </strong><span class="text-success">{{ unit.business_unit.client|upper }}</span> | 
-			                <strong class="card-title">Area: </strong><span class="text-success">{{ unit.business_unit.area }}</span> |
+			                <strong class="card-title">Area: </strong><span class="text-success">{{ unit.area }}</span> |
 			                <strong class="card-title">Business Unit: </strong><span class="text-success">{{ unit.business_unit }}</span>
 			            	<div class="float-right">
 			            		<input type="submit" class="btn btn-success btn-sm" value="Save" title="Save Changes">
@@ -68,4 +69,8 @@
 	</div><!-- .content -->
 </form>
 
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'inventory/js/custom/unit_crud.js' %}"></script>
 {% endblock %}

@@ -32,6 +32,19 @@
     
     {% block css %} {% endblock %}
 
+    <style type="text/css">
+        #loader {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          width: 100%;
+          background: rgba(0,0,0,0.75) url('{% static 'inventory/images/micro_loading.gif' %}') no-repeat center center;
+          z-index: 10000;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -141,8 +154,12 @@
             </div>
         </div>
 
+
+
         {% block content %} 
         {% endblock %}
+
+    <div id="loader"></div>
 
     <script src="{% static 'inventory/vendors/jquery/dist/jquery.min.js' %}"></script>
     <script src="{% static 'inventory/vendors/popper.js/dist/umd/popper.min.js' %}"></script>
@@ -176,6 +193,16 @@
     </script>-->
 
     {% block js %} {% endblock %}
+
+    <script>
+        jQuery(function($) {
+           $(window).load(function() {
+                // Animate loader off screen
+                $("#loader").fadeOut("slow");
+            });
+        });
+    </script>
+    
 
 </body>
 

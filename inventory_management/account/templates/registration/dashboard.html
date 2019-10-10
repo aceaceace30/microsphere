@@ -11,11 +11,11 @@
         <div class="row">
 
             <div class="col-md-4">
-                <div class="card bg-warning h-75">
+                <div class="card bg-warning">
                     <!-- <img class="card-img-top" src="images/placeholder.png" alt="Card image cap"> -->
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-8">
                                 <h4 class="card-title">PM Count: <a class="badge badge-primary" href="{% url 'inventory:pm-list' %}">{{ pm_count }}</a></h4>
                             </div>
                             <div class="col">
@@ -44,20 +44,33 @@
                             </div>
                             
                         </div>
-
-                            
                         
                     </div>
                 </div>
             </div>
 
+            {% for a in pc_and_laptop_hardware_count %}
+                {{ a }}
+            {% endfor %}
+
 			<div class="col-md-4">
-			    <div class="card bg-success h-75">
+			    <div class="card bg-success">
 			        <!-- <img class="card-img-top" src="images/placeholder.png" alt="Card image cap"> -->
 			        <div class="card-body">
 			            <h4 class="card-title">Unit Count: 
 			            	<a class="badge badge-primary" href="{% url 'inventory:unit-list' %}">{{ unit_count }}</a>
 			            </h4>
+
+                        <h6 class="card-title font-weight-bold">Unit count per machine type: </h6>
+                        
+                        <ul class="offset-1">
+                            {% for mt in machine_type_count %}
+                                <li>{{ mt.machine_type__machine_type_name }} <span class="badge badge-primary">{{ mt.machine_type_count }}</span></li>
+                            {% empty %}
+                                <p class="text-danger"> No upcoming schedule.</p>
+                            {% endfor %}
+                        </ul>
+
 			        </div>
 			    </div>
 			</div>

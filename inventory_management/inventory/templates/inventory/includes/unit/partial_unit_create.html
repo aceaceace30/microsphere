@@ -1,4 +1,6 @@
-<form method="post" action="{% url 'inventory:unit-create' %}" class="js-unit-create-form">
+{% load static %}
+
+<form method="post" action="{% url 'inventory:unit-create' %}" id="create-inventory" class="js-unit-create-form" data-url="{% url 'inventory:load_business_units' %}">
   {% csrf_token %}
   <div class="modal-header">
     <h5 class="modal-title">Create Unit</h5>
@@ -13,3 +15,7 @@
     <button type="button" class="btn btn-danger btn-fill" data-dismiss="modal">Cancel</button>
   </div>
 </form>
+
+{% block js %}
+    <script src="{% static 'inventory/js/custom/unit_crud.js' %}"></script>
+{% endblock %}

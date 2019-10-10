@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.contrib.auth.models import User
 from simple_history.models import HistoricalRecords
 
@@ -46,6 +46,7 @@ MONITOR_TYPE = (
 
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Please enter alphanumeric characters.')
 
+
 class ClientProfile(models.Model):
 
     username = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -63,6 +64,9 @@ class ClientProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client_updated')
+
+    class Meta:
+        ordering = ['username']
 
     def __str__(self):
     	return self.client_code
@@ -85,6 +89,9 @@ class BusinessUnit(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='business_unit_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='business_unit_updated')
 
+    class Meta:
+        ordering = ['business_unit_name']
+
     def __str__(self):
     	return self.business_unit_name
 
@@ -100,6 +107,9 @@ class MachineType(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='machine_type_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='machine_type_updated')
 
+    class Meta:
+        ordering = ['machine_type_name']
+
     def __str__(self):
     	return self.machine_type_name
 
@@ -113,6 +123,9 @@ class Brand(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='brand_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='brand_updated')
+
+    class Meta:
+        ordering = ['brand_name']
 
     def __str__(self):
     	return self.brand_name
@@ -130,6 +143,9 @@ class Model(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='model_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='model_updated')
 
+    class Meta:
+        ordering = ['model_name']
+
     def __str__(self):
     	return self.model_name
 
@@ -143,6 +159,9 @@ class OperatingSystem(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='os_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='os_updated')
+
+    class Meta:
+        ordering = ['os_name']
 
     def __str__(self):
     	return self.os_name
@@ -158,6 +177,9 @@ class OfficeApplication(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='office_app_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='office_app_updated')
 
+    class Meta:
+        ordering = ['office_app_name']
+
     def __str__(self):
     	return self.office_app_name
 
@@ -171,6 +193,9 @@ class Processor(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='processor_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='processor_updated')
+
+    class Meta:
+        ordering = ['processor_name']
 
     def __str__(self):
     	return self.processor_name
@@ -186,6 +211,9 @@ class TotalRam(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='total_ram_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='total_ram_updated')
 
+    class Meta:
+        ordering = ['total_ram_name']
+
     def __str__(self):
     	return self.total_ram_name
 
@@ -200,12 +228,16 @@ class HddSize(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hdd_size_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hdd_size_updated')
 
+    class Meta:
+        ordering = ['hdd_size_name']
+
     def __str__(self):
     	return self.hdd_size_name
 
 
 class Unit(models.Model):
 
+    area = models.CharField(choices=AREA, max_length=50)
     business_unit = models.ForeignKey(BusinessUnit, on_delete=models.CASCADE)
     machine_type = models.ForeignKey(MachineType, on_delete=models.PROTECT)
     machine_brand = models.ForeignKey(Brand, on_delete=models.PROTECT, related_name='machine_brand')
@@ -241,6 +273,7 @@ class Unit(models.Model):
     history = HistoricalRecords()
 
     class Meta:
+        ordering = ['-created_at']
         permissions = [
             ('can_view_unit_list', 'Can view unit list'),
             ('can_soft_delete_unit', 'Can soft delete unit'),
@@ -256,8 +289,52 @@ class Unit(models.Model):
     def get_active_units():
         return Unit.objects.filter(active=True)
 
-    def get_total_count():
-        return Unit.objects.filter(active=True).count()    
+    def get_total_count(client=None):
+        if not client:
+            return Unit.objects.filter(active=True).count()
+        else:
+            return Unit.objects.filter(active=True, business_unit__client=client).count()
+
+    def get_machine_type_count_per_client(client=None):
+        if not client:
+            return Unit.objects.select_related('machine_type')\
+                               .values('machine_type__machine_type_name')\
+                               .filter(active=True)\
+                               .annotate(machine_type_count=Count('machine_type')) 
+        else:
+            return Unit.objects.select_related('machine_type')\
+                               .values('machine_type__machine_type_name')\
+                               .filter(active=True, business_unit__client=client)\
+                               .annotate(machine_type_count=Count('machine_type'))
+
+    def pc_and_laptop_hardware_count(client=None):
+        # query = '''SELECT * FROM inventory_unit as u
+        #            INNER JOIN inventory_processor as p
+        #            ON u.processor_id = p.id
+        #            INNER JOIN inventory_total_ram as t
+        #            ON u.total_ram_id = t.id
+        #            INNER JOIN inventory_hdd_size as h
+        #            ON u.hdd_size_id = h.id'''
+
+        query = 'SELECT u.id, m.machine_class, count(m.machine_class) as machine_count FROM inventory_unit as u\
+                 INNER JOIN inventory_machinetype as m\
+                 ON u.machine_type_id = m.id\
+                 WHERE u.active = 1\
+                 GROUP BY m.machine_class'
+
+        test = Unit.objects.raw(query)
+
+        for q in test:
+            print(q.machine_class, q.machine_count)
+
+        #return Unit.objects.raw(query)
+
+        # return Unit.objects.select_related('processor', 'total_ram', 'hdd_size')\
+        #                    .values('processor__processor_name', 'total_ram__total_ram_name', 'hdd_size__hdd_size_name')\
+        #                    .filter(active=True)\
+        #                    .annotate(processor_count=Count('processor'))\
+        #                    .annotate(total_ram_count=Count('total_ram'))\
+        #                    .annotate(hdd_size_count=Count('hdd_size'))
 
 class PreventiveMaintenance(models.Model):
 
@@ -280,6 +357,7 @@ class PreventiveMaintenance(models.Model):
     history = HistoricalRecords()
 
     class Meta:
+        ordering = ['-created_at']
         permissions = [
             ('can_view_pm_list', 'Can view pm list'),
             ('can_view_units_per_pm', 'Can view units per pm'),
@@ -301,25 +379,22 @@ class PreventiveMaintenance(models.Model):
         if client and status:
             return PreventiveMaintenance.objects.filter(active=True,
                                                         pm_done=pm_done,
-                                                        business_unit__client=client)\
-                                                .order_by('-created_at')
+                                                        business_unit__client=client)
         elif status:
             return PreventiveMaintenance.objects.filter(active=True,
-                                                        pm_done=pm_done)\
-                                                .order_by('-created_at')
+                                                        pm_done=pm_done)
 
         elif client:
             return PreventiveMaintenance.objects.filter(active=True,
-                                                        business_unit__client=client)\
-                                                .order_by('-created_at')
+                                                        business_unit__client=client)
         else:
-            return PreventiveMaintenance.objects.filter(active=True).order_by('-created_at')
+            return PreventiveMaintenance.objects.filter(active=True)
 
     def get_total_count(client=None):
         if not client:
             return PreventiveMaintenance.objects.filter(active=True).count()
         else:
-            return PreventiveMaintenance.objects.filter(bussiness_unit__client=client, active=True).count()
+            return PreventiveMaintenance.objects.filter(business_unit__client=client, active=True).count()
 
     def get_total_count_per_status(client=None):
         if not client:
@@ -329,7 +404,7 @@ class PreventiveMaintenance(models.Model):
                                                 .annotate(status_count=Count('pm_done'))
         else:
             return PreventiveMaintenance.objects.values('pm_done')\
-                                                .filter(bussiness_unit__client=client, active=True)\
+                                                .filter(business_unit__client=client, active=True)\
                                                 .order_by('pm_done')\
                                                 .annotate(status_count=Count('pm_done'))
 
@@ -346,6 +421,8 @@ class PmUnitHistory(models.Model):
     preventive_maintenance = models.ForeignKey(PreventiveMaintenance, on_delete=models.PROTECT)
     unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
     remarks = models.TextField(max_length=500, blank=True, null=True)
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pmhistory_updated', null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         permissions = [

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Unit, PreventiveMaintenance, AREA
+from .models import Unit, PreventiveMaintenance, AREA, BusinessUnit
 
 class UnitForm(forms.ModelForm):
 
@@ -8,7 +8,7 @@ class UnitForm(forms.ModelForm):
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control form-control-sm'
 
-    area = forms.ChoiceField(choices=AREA)
+    #area = forms.ChoiceField(choices=AREA)
 
     class Meta:
         model = Unit
@@ -28,8 +28,9 @@ class PreventiveMaintenanceForm(forms.ModelForm):
         self.fields['target_date'].widget.attrs['placeholder'] = self.date_format
         self.fields['target_time'].widget.attrs['placeholder'] = self.time_format
         self.fields['actual_date'].widget.attrs['placeholder'] = self.date_format
+        self.fields['service_report_number'].required = False
 
     class Meta:
         model = PreventiveMaintenance
         #fields = ('target_date', 'target_time', 'actual_date', 'pm_date_done')
-        exclude = ('service_report_number', 'pm_done', 'pm_date_done', 'active','created_at', 'updated_at', 'created_by', 'updated_by')
+        exclude = ('pm_done', 'pm_date_done', 'active','created_at', 'updated_at', 'created_by', 'updated_by')

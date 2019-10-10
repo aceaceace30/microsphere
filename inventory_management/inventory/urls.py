@@ -23,5 +23,8 @@ urlpatterns = [
     path('unit-history/<int:pk>/', views.unit_history, name='unit-history'),
 
     path('reports/', views.report_main, name='report-main'),
+
+    # ajax calls
+    path('ajax/load-business-units/', views.load_business_units, name='load_business_units')
     
 ]

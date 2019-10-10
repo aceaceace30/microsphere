@@ -36,6 +36,39 @@ jQuery(function($) {
       return false;
   };
 
+  $("#id_area").filter(function() {
+      var url = $("#create-inventory").attr("data-url");  // get the url of the `load_business_units` view
+      var area = $(this).val();                           // get the selected area from the HTML input
+      var business_unit = $("#id_business_unit").val();
+
+      $.ajax({                                            // initialize an AJAX request
+        url: url,                                         // set the url of the request
+        data: {
+          'area': area,                                   // add the area to the GET parameters
+          'business_unit': business_unit,
+        },
+        success: function (data) {                        // `data` is the return of the `load_business_units` view function
+          $("#id_business_unit").html(data);              // replace the contents of the business_unit input with the data that came from the server
+        }
+      });
+  });
+
+  $("#id_area").change(function () {
+      var url = $("#create-inventory").attr("data-url");  // get the url of the `load_business_units` view
+      var area = $(this).val();                           // get the selected area from the HTML input
+
+      $.ajax({                                            // initialize an AJAX request
+        url: url,                                         // set the url of the request
+        data: {
+          'area': area                                    // add the area to the GET parameters
+        },
+        success: function (data) {                        // `data` is the return of the `load_business_units` view function
+          $("#id_business_unit").html(data);              // replace the contents of the business_unit input with the data that came from the server
+        }
+      });
+  });
+
+
 // create unit
 $(".js-create-unit").click(loadForm);
 $("#modal-unit").on("submit", ".js-unit-create-form", saveForm);

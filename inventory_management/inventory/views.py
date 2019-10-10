@@ -1,15 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import render_to_string
 from django.contrib.messages.views import SuccessMessageMixin
 
-from .models import Unit, PreventiveMaintenance, MachineType, PmUnitHistory, ClientProfile
+from .models import Unit, PreventiveMaintenance, MachineType, PmUnitHistory, ClientProfile, BusinessUnit
 from django.db.models import Count
 from .forms import PreventiveMaintenanceForm, UnitForm
 
@@ -17,6 +17,22 @@ from django.conf import settings
 from django.core.mail import send_mail
 
 import datetime
+
+@login_required
+def load_business_units(request):
+	area = request.GET.get('area')
+	business_unit_id = request.GET.get('business_unit')
+	business_units = BusinessUnit.objects.filter(area=area)
+
+	if business_unit_id:
+		business_unit = business_units.get(pk=business_unit_id)
+
+	context = {
+		'business_units':business_units,
+		'business_unit':business_unit if business_unit_id else None
+	}
+
+	return render(request, 'inventory/includes/unit/partial_business_unit_dropdown.html', context)
 
 class UnitListView(LoginRequiredMixin, ListView):
 	login_url = settings.LOGOUT_REDIRECT_URL
@@ -204,25 +220,19 @@ def unit_create(request):
 	return unit_save(request, form, render_create_html)
 
 def unit_delete(request, pk):
-	data = dict()
-	unit = get_object_or_404(Unit, pk=pk)
-
-	render_delete_html = 'inventory/includes/unit/partial_unit_delete.html'
-	#render_table_html = 'inventory/includes/unit/partial_unit_list.html'
+	unit = get_object_or_404(Unit, pk=pk, active=True)
+	template_name = 'inventory/unit/unit_delete.html'
 
 	if request.method == 'POST':
 		unit.active = False
-		unit.updated_by = request.user
 		unit.save()
-
+		messages.error(request, 'Unit has been deleted.')
 		return redirect('inventory:unit-list')
-		#units = Unit.get_active_units()
-		#data['html_unit_list'] = render_to_string(render_table_html, {'units': units})
 	else:
-		context = {'unit':unit}
-		data['html_form'] = render_to_string(render_delete_html, context, request=request)
-
-		return JsonResponse(data)
+		context = {
+			'unit':unit
+		}
+	return render(request, template_name, context)
 
 
 def pm_save(request, form, template_name):
@@ -234,9 +244,8 @@ def pm_save(request, form, template_name):
 		if form.is_valid():
 
 			post = form.save(commit=False)
-
-			if not post.pk:
-				post.created_by = request.user
+			#if not post.pk:
+			post.created_by = request.user
 			post.updated_by = request.user
 			post.save()
 			
@@ -300,7 +309,10 @@ def add_pm_remarks(request, pk):
 	if request.method == 'POST':
 		remarks = request.POST.get('remarks', default=None)
 		pm_history.remarks = remarks
+		pm_history.updated_by = request.user
+		pm_history.updated_at = datetime.datetime.now()
 		pm_history.save()
+		messages.success(request, 'Remarks has been added.')
 
 	return redirect('inventory:unit-view', pm_history.unit.pk)
 
@@ -340,7 +352,8 @@ def mark_as_done(request, pk):
 
 			send_mail(SUBJECT, '', settings.EMAIL_HOST_USER, [emails], html_message=EMAIL_TEMPLATE)
 
-		messages.success(request, 'Marked as done. Email has been sent.')
+		messages.success(request, 'Marked as done')
+		messages.success(request, 'Email has been sent.')
 	return redirect('inventory:pm-view', pk)
 
 def report_main(request):
