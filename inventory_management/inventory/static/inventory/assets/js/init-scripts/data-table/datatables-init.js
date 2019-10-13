@@ -8,9 +8,9 @@
     $('#unit-data-table thead th').each( function () {
         var title = $(this).text();
         if (title != 'Action') {
-            $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+            $(this).html( '<input type="text" name="'+title+'" placeholder="'+title+'" />' );
         }
-    } );
+    } );    
 
     // $('#bootstrap-data-table').DataTable({
     //     lengthMenu: [[10, 20, 50, -1], [10, 20, 50, "All"]],
@@ -18,6 +18,10 @@
 
     var unit_table = $('#unit-data-table').DataTable({
         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        // ...
+        //"processing": true,
+        //"serverSide": true,
+        //"ajax": "/inventory/load-unit-datatable/"
         //buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
     });
 

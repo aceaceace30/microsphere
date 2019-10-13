@@ -25,6 +25,10 @@ urlpatterns = [
     path('reports/', views.report_main, name='report-main'),
 
     # ajax calls
-    path('ajax/load-business-units/', views.load_business_units, name='load_business_units')
+    path('ajax/load-business-units/', views.load_business_units, name='load_business_units'),
+    path('ajax/load-model-types/', views.load_model_types, name='load_model_types'),
+
+    # server side processing data table
+    path('load-unit-datatable/', views.UnitListJson.as_view(), name='unit_list_json'),
     
 ]

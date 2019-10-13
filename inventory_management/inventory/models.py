@@ -286,7 +286,9 @@ class Unit(models.Model):
     def get_absolute_url(self):
         return reverse('inventory:unit-view', kwargs={'pk': self.pk})
 
-    def get_active_units():
+    def get_active_units(request):
+        if ClientProfile.objects.filter(username=request.user).exists():
+            return Unit.objects.filter(active=True, business_unit__client=request.user.clientprofile)
         return Unit.objects.filter(active=True)
 
     def get_total_count(client=None):

@@ -50,17 +50,19 @@ class UnitHistoryAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
-	list_display = ('get_client_code', 'business_unit', 'get_rc_code', 'machine_type', 'machine_brand',
+	list_display = ('get_client_code', 'area', 'business_unit', 'get_rc_code', 'machine_type', 'machine_brand',
 					'model', 'serial_number', 'computer_tag',
 					'mst_tag', 'user', 'designation', 'active', 'created_by', 'created_at')
 
-	search_fields = ('business_unit__client__client_code', 'business_unit__business_unit_name',
+	search_fields = ('business_unit__client__client_code', 'area', 'business_unit__business_unit_name',
 					 	'business_unit__rc_code', 'model__machine_type__machine_type_name', 'model__model_name',
 					 	'model__brand__brand_name', 'serial_number', 'computer_tag', 'mst_tag', 'user',
 					 	'designation', 'active', 'operating_system__os_name', 'office_application__office_app_name',
 						'processor__processor_name', 'total_ram__total_ram_name', 'hdd_size__hdd_size_name',
 						'host_name', 'mac_address', 'ip_address', 'remarks',
 						'created_by__username', 'updated_by__username')
+
+	list_filter = ('business_unit__client', 'area', 'business_unit', 'machine_type', 'machine_brand', 'created_by')
 
 	def save_model(self, request, obj, form, change):
 
@@ -77,14 +79,6 @@ class UnitHistoryAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 	def get_rc_code(self, obj):
 		return obj.business_unit.rc_code
 	get_rc_code.short_description = 'RC Code'
-
-	"""def get_machine_type(self, obj):
-					return obj.model.machine_type
-				get_machine_type.short_description = 'Machine Type'
-			
-				def get_machine_brand(self, obj):
-					return obj.model.brand
-				get_machine_brand.short_description = 'Brand'"""
 
 admin.site.register(Unit, UnitHistoryAdmin)
 
@@ -252,12 +246,13 @@ class PreventiveMaintenanceAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
-	#list_display = ('business_unit', 'service_report_number', 'target_date', 'target_time', 'actual_date',
-					#'pm_date_done', 'status', 'created_at', 'active')
+	list_display = ('get_client_code', 'get_area', 'get_rc_code', 'business_unit', 'service_report_number', 'pm_type', 'target_date', 'target_time',
+					'actual_date', 'pm_date_done', 'pm_done', 'active', 'created_by')
 
-	#search_fields = ('business_unit__business_unit_name', 'service_report_number', 'target_date', 'target_time', 'actual_date',
-					#'pm_date_done', 'status', 'created_at', 'active',
-					#'created_by__username', 'updated_by__username')
+	search_fields = ('business_unit__client__client_code', 'business_unit__area', 'business_unit__rc_code',
+					 'business_unit__business_unit_name', 'service_report_number', 'pm_type')
+
+	list_filter = ('business_unit__client__client_code', 'business_unit__area', 'business_unit__rc_code', 'business_unit', 'pm_type', 'pm_done', 'created_by')
 
 	def save_model(self, request, obj, form, change):
 
@@ -266,5 +261,17 @@ class PreventiveMaintenanceAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 		obj.updated_by = request.user
 		obj.save()
+
+	def get_client_code(self, obj):
+		return obj.business_unit.client
+	get_client_code.short_description = 'Client'
+
+	def get_rc_code(self, obj):
+		return obj.business_unit.rc_code
+	get_rc_code.short_description = 'RC Code'
+
+	def get_area(self, obj):
+		return obj.business_unit.area
+	get_area.short_description = 'Area'
 
 admin.site.register(PreventiveMaintenance, PreventiveMaintenanceAdmin)

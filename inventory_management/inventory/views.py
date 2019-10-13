@@ -9,12 +9,15 @@ from django.http import JsonResponse, HttpResponse
 from django.template.loader import render_to_string
 from django.contrib.messages.views import SuccessMessageMixin
 
-from .models import Unit, PreventiveMaintenance, MachineType, PmUnitHistory, ClientProfile, BusinessUnit
-from django.db.models import Count
+from .models import Unit, PreventiveMaintenance, MachineType, PmUnitHistory, ClientProfile, BusinessUnit, Model
+from django.db.models import Count, Q
 from .forms import PreventiveMaintenanceForm, UnitForm
 
 from django.conf import settings
 from django.core.mail import send_mail
+
+from django_datatables_view.base_datatable_view import BaseDatatableView
+from django.utils.html import escape
 
 import datetime
 
@@ -22,7 +25,7 @@ import datetime
 def load_business_units(request):
 	area = request.GET.get('area')
 	business_unit_id = request.GET.get('business_unit')
-	business_units = BusinessUnit.objects.filter(area=area)
+	business_units = BusinessUnit.objects.filter(area=area, active=True)
 
 	if business_unit_id:
 		business_unit = business_units.get(pk=business_unit_id)
@@ -34,6 +37,87 @@ def load_business_units(request):
 
 	return render(request, 'inventory/includes/unit/partial_business_unit_dropdown.html', context)
 
+@login_required
+def load_model_types(request):
+
+	machine_type = request.GET.get('machine_type')
+	machine_brand = request.GET.get('machine_brand')
+
+	# filters = Q(active=True)
+	# if machine_type:
+	# 	filters &= Q(machine_type=machine_type)
+	# if machine_brand:
+	# 	filters &= Q(brand=machine_type)
+
+	# print(filters)
+	models = Model.objects.filter(machine_type=machine_type, brand=machine_brand, active=True)
+
+	print(models)
+	#model_id = request.GET.get('model')
+
+	#if model_id:
+		#model = models.get(pk=model_id)
+
+
+	context = {
+		'models':models,
+		#'model':model if model_id else None
+	}
+
+	return render(request, 'inventory/includes/unit/partial_model_dropdown.html', context)
+
+
+class UnitListJson(BaseDatatableView):
+	# The model we're going to show
+	model = Unit
+
+	# define the columns that will be returned
+	columns = ['client', 'business_unit', 'serial_number', 'status']
+
+	# define column names that will be used in sorting
+	# order is important and should be same as order of columns
+	# displayed by datatables. For non sortable columns use empty
+	# value like ''
+	order_columns = ['business_unit__client', 'business_unit', 'serial_number', 'status']
+
+	# set max limit of records returned, this is used to protect our site if someone tries to attack our site
+	# and make it return huge amount of data
+	max_display_length = 500
+
+	def get_initial_queryset(self):
+		return Unit.get_active_units(self.request)
+
+	def render_column(self, row, column):
+		# We want to render client as a custom column
+		if column == 'client':
+			# escape HTML for security reasons
+			return escape('{0}'.format(row.business_unit.client))
+		else:
+			return super(UnitListJson, self).render_column(row, column)
+
+	# def filter_queryset(self, qs):
+	# 	# use parameters passed in GET request to filter queryset
+
+	# 	# simple example:
+	# 	# search = self.request.GET.get('search[value]', None)
+	# 	# if search:
+	# 	# 	qs = qs.filter(name__istartswith=search)
+
+	# 	# more advanced example using extra parameters
+	# 	# filter_serial_number = self.request.GET.get('serial_number', None)
+
+	# 	# if filter_serial_number:
+	# 	# 	qs = qs.filter(serial_number=filter_serial_number)
+
+	# 	filter_client = self.request.GET.get('Client', None)
+
+	# 	print('Client:', filter_client)
+
+	# 	if filter_client:
+	# 		qs = qs.filter(business_unit__client_client_code__istartswith=upper(filter_client))
+
+	# 	return qs
+
 class UnitListView(LoginRequiredMixin, ListView):
 	login_url = settings.LOGOUT_REDIRECT_URL
 	template_name = 'inventory/unit/unit_list.html'
@@ -41,11 +125,7 @@ class UnitListView(LoginRequiredMixin, ListView):
 	ordering = ['business_unit__client', 'business_unit']
 
 	def get_queryset(self):
-		# checks if the user is a client else return all units
-		if ClientProfile.objects.filter(username=self.request.user).exists():
-			return Unit.objects.filter(active=True, business_unit__client=self.request.user.clientprofile)
-		else:
-			return Unit.get_active_units()
+		return Unit.get_active_units(self.request)
 
 #permission not working
 class UnitDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
@@ -171,11 +251,11 @@ class UnitPerBranch(LoginRequiredMixin, ListView):
 	def get_queryset(self):
 		pk = self.kwargs.get('pk')
 		return Unit.objects.filter(business_unit__pk=pk, active=True)
-	
-	# context = {'units': units,
-	# 		   'business_unit_name': units[0].business_unit if units else None} #fix this
 
-	# return render(request, template_name, context)
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['previous'] = self.request.META['HTTP_REFERER']
+		return context
 
 def unit_save(request, form, template_name):
 	data = dict()

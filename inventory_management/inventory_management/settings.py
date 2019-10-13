@@ -173,7 +173,7 @@ ADMIN_REORDER = (
         {'model': 'inventory.Unit', 'label': 'Units'},)},
 
     {'app': 'inventory', 'label': 'Preventive Maintenance', 'models': (
-        {'model': 'inventory.PreventiveMaintenance', 'label': 'Schedules'},)},
+        {'model': 'inventory.PreventiveMaintenance', 'label': 'PM Schedules'},)},
 
     {'app': 'inventory', 'label': 'Details Maintenance', 'models': (
         {'model': 'inventory.MachineType', 'label': 'Machine types'},
