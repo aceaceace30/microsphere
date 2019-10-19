@@ -363,7 +363,8 @@ class PreventiveMaintenance(models.Model):
         permissions = [
             ('can_view_pm_list', 'Can view pm list'),
             ('can_view_units_per_pm', 'Can view units per pm'),
-            ('can_mark_as_done', 'Can mark as done per pm')
+            ('can_mark_as_done', 'Can mark as done per pm'),
+            ('can_soft_delete_pm', 'Can soft delete pm'),
     ]
 
     def __str__(self):

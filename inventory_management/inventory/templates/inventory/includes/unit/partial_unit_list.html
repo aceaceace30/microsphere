@@ -14,7 +14,7 @@
 					<img src="{% static 'inventory/images/PRINTER_ICON.ico' %}" alt="PRINTER Icon">
 				{% endif %}
 
-				<a href="{% url 'inventory:unit-view' unit.pk  %}">
+				<a href="{% url 'inventory:unit-view' unit.pk  %}" title="View unit details">
 					{{ unit.serial_number }}
 				</a>
 			{% else %}

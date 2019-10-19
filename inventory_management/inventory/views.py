@@ -363,25 +363,19 @@ def pm_create(request):
 	return pm_save(request, form, render_create_html)
 
 def pm_delete(request, pk):
-	data = dict()
-	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
-
-	render_delete_html = 'inventory/includes/pm/partial_pm_delete.html'
-	render_table_html = 'inventory/includes/pm/partial_pm_list.html'
+	pm = get_object_or_404(PreventiveMaintenance, pk=pk, active=True)
+	template_name = 'inventory/pm/pm_delete.html'
 
 	if request.method == 'POST':
 		pm.active = False
-		pm.updated_by = request.user
 		pm.save()
-
-		data['form_is_valid'] = True
-
-		pms = PreventiveMaintenance.get_active_pms()
-		data['html_pm_list'] = render_to_string(render_table_html, {'pms': pms})
+		messages.error(request, 'PM has been deleted.')
+		return redirect('inventory:pm-list')
 	else:
-		data['html_form'] = render_to_string(render_delete_html, {'pm':pm}, request=request)
-
-	return JsonResponse(data)
+		context = {
+			'pm':pm
+		}
+	return render(request, template_name, context)
 
 def add_pm_remarks(request, pk):
 	pm_history = get_object_or_404(PmUnitHistory, pk=pk)
