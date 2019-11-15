@@ -2,10 +2,10 @@
 {% load widget_tweaks %}
 {% load static %}
 
-{% block title %} Microsphere - Unit Edit {% endblock %}
+{% block title %} Microsphere - Unit Create {% endblock %}
 
-{% block page_title %} Serial Number: <span class="text-success">{{ unit.serial_number }}</span> {% endblock %}
-{% block page_title_second %}<a href="{% url 'inventory:unit-list' %}"> Unit List</a> > <a href="{% url 'inventory:unit-view' unit.pk %}"> Details</a> > Edit {% endblock %}
+{% block page_title %} Create Unit {% endblock %}
+{% block page_title_second %}<a href="{% url 'inventory:unit-list' %}"> Unit List</a> > Create {% endblock %}
 
 {% block content %}
 
@@ -17,13 +17,11 @@
 	    		<div class="col-md-12">
 			        <div class="card">
 			            <div class="card-header">
-			            	<strong class="card-title">Client: </strong><span class="text-success">{{ unit.business_unit.client|upper }}</span> | 
-			                <strong class="card-title">Area: </strong><span class="text-success">{{ unit.area }}</span> |
-			                <strong class="card-title">Business Unit: </strong><span class="text-success">{{ unit.business_unit }}</span>
 			            	<div class="float-right">
-			            		<input type="submit" class="btn btn-success btn-sm" value="Save" title="Save Changes">
-			            		<a href="{% url 'inventory:unit-view' unit.pk %}" class="btn btn-dark btn-sm" role="button" title="Cancel Editing">Cancel</a>
-			            	</div>
+			            		<!-- <input type="submit" class="btn btn-primary btn-sm" value="Save and add another" title="Save and add another"> -->
+			            		<input type="submit" class="btn btn-success btn-sm" value="Save" title="Save Unit">
+			            		<a href="{% url 'inventory:unit-list' %}" class="btn btn-dark btn-sm" role="button" title="Cancel Add">Cancel</a>
+			            	</div> 
 			            </div>
 	    	
 				    	<div class="row pt-2 pl-2 pr-2">

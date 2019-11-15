@@ -1,0 +1,4 @@
+<option value="">-------</option>
+{% for b in brands %}
+<option value="{{ b.brand.pk }}" {% if b.brand.pk == brand.pk %}selected{% endif %}>{{ b.brand }}</option>
+{% endfor %}

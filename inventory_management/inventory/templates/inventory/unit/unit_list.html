@@ -26,9 +26,10 @@
                         <div class="card-header">
                             <div class="float-right">
                                 {% if perms.inventory.add_unit %}
-                                    <button type="button" class="btn btn-success js-create-unit" data-url="{% url 'inventory:unit-create' %}" data-toggle="modal" data-target="#modal-unit">
+                                    <!-- <button type="button" class="btn btn-success js-create-unit" data-url="{% url 'inventory:unit-create' %}" data-toggle="modal" data-target="#modal-unit">
                                         Add Unit
-                                    </button>
+                                    </button> -->
+                                    <a href="{% url 'inventory:unit-create' %}" class="btn btn-success">Add Unit</a>
                                 {% endif %}
                             </div>
                             

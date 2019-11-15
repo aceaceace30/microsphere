@@ -8,8 +8,6 @@ class UnitForm(forms.ModelForm):
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control form-control-sm'
 
-    #area = forms.ChoiceField(choices=AREA)
-
     class Meta:
         model = Unit
         exclude = ('active','created_at', 'updated_at', 'created_by', 'updated_by')

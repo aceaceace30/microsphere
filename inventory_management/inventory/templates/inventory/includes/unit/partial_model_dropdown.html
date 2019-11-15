@@ -1,4 +1,4 @@
 <option value="">-------</option>
-{% for model in models %}
-<option value="{{ model.pk }}">{{ model.model_name }}</option>
+{% for m in models %}
+<option value="{{ m.pk }}" {% if m.pk == model.pk %}selected{% endif %}>{{ m.model_name }}</option>
 {% endfor %}

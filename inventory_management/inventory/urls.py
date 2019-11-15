@@ -5,7 +5,7 @@ app_name = 'inventory'
 
 urlpatterns = [
     path('unit-list/', views.UnitListView.as_view(), name='unit-list'),
-    path('unit-create/', views.unit_create, name='unit-create'),
+    path('unit-create/', views.UnitCreateView.as_view(), name='unit-create'),
     path('unit-view/<int:pk>/', views.unit_details, name='unit-view'),
     path('unit-edit/<int:pk>/', views.UnitUpdateView.as_view(), name='unit-edit'),
     #path('unit-edit/<int:pk>/', views.unit_edit, name='unit-edit'),
@@ -26,7 +26,8 @@ urlpatterns = [
 
     # ajax calls
     path('ajax/load-business-units/', views.load_business_units, name='load_business_units'),
-    path('ajax/load-model-types/', views.load_model_types, name='load_model_types'),
+    path('ajax/load-model-choices/', views.load_model_choices, name='load_model_choices'),
+    path('ajax/load-brand-choices/', views.load_brand_choices, name='load_brand_choices'),
 
     # server side processing data table
     path('load-unit-datatable/', views.UnitListJson.as_view(), name='unit_list_json'),

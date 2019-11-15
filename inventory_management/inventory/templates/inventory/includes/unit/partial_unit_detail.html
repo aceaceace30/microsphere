@@ -2,13 +2,17 @@
     <div class="card">
         <div class="card-header">
         	<strong class="card-title">Client: </strong><span class="text-success">{{ unit.business_unit.client|upper }}</span> | 
-            <strong class="card-title">Area: </strong><span class="text-success">{{ unit.business_unit.area }}</span> |
+            <strong class="card-title">Area: </strong><span class="text-success">{{ unit.area }}</span> |
             <strong class="card-title">Business Unit: </strong><span class="text-success">{{ unit.business_unit }}</span>
 
         	<div class="float-right">
 
+                {% if perms.inventory.add_unit %}
+                    <a href="{% url 'inventory:unit-create' %}" class="btn btn-success btn-sm">Add another unit</a>
+                {% endif %}
+
         		{% if perms.inventory.change_unit %}
-        			<a href="{% url 'inventory:unit-edit' unit.pk %}" class="btn btn-success btn-sm" role="button" title="Edit Details">Edit</a>
+        			<a href="{% url 'inventory:unit-edit' unit.pk %}" class="btn btn-warning btn-sm" role="button" title="Edit Details">Edit</a>
         		{% endif %}
 
         		{% if perms.inventory.can_view_unit_history %}
@@ -218,20 +222,16 @@
                         <div class="card border border-success bg-success">
                             <div class="card-header bg-success text-white">
                                 <strong class="card-title">
-                                    <a href="{% url 'inventory:pm-view' history.preventive_maintenance.pk %}" class="text-light"><u>Business Unit: {{ history.unit.business_unit }}</u></a>
+                                    <a href="{% url 'inventory:pm-view' history.preventive_maintenance.pk %}" class="text-light"><u>Business Unit: {{ history.unit.business_unit }}</u></a> | 
+                                    <small>
+                                        {% if history.preventive_maintenance.pm_done %}
+                                            <span class="badge badge-pill badge-primary">Done</span>
+                                        {% else %}
+                                            <span class="badge badge-pill badge-danger">Pending</span>
+                                        {% endif %}
+                                    </small>
                                 </strong>
-                                <div class="float-right">
-                                	<strong class="card-title">
-                                		<small>
-                                		{% if history.preventive_maintenance.pm_done %}
-                                			<span class="badge badge-pill badge-primary">Done</span>
-                                		{% else %}
-                                			<span class="badge badge-pill badge-danger">Pending</span>
-                                		{% endif %}
-                                		</small>
-                                	</strong>
-                                </div>
-                                
+                                <p class="text-dark font-weight-bold">Remarks: {{ history.preventive_maintenance.remarks }}</p>
                             </div>
                             <div class="card-body bg-white">
                             	<div class="row">
@@ -246,26 +246,16 @@
 	                            			<span class="text-success">{{ history.preventive_maintenance.service_report_number }}</span>
 	                            		</div>
 	                            	{% endif %}
-
-	                            	<div class="col-5">
-                            			<p class="card-text text-dark">
-		                                	Remarks:
-		                                </p>				      
-                            		</div>
-                            		
-                            		<div class="col-7">
-                            			<span class="text-success">{{ history.preventive_maintenance.remarks }}</span>
-                            		</div>
 									
 									{% if history.remarks %}
 		                            	<div class="col-5">
 	                            			<p class="card-text text-dark">
-			                                	PM Remarks:
+			                                	PM Notes:
 			                                </p>				      
 	                            		</div>
 	                            		
 	                            		<div class="col-7">
-	                            			<span class="text-success">{{ history.remarks }} <br/><small>- {{ history.preventive_maintenance.updated_by }} on {{ history.preventive_maintenance.updated_at }}</small></span>
+	                            			<span class="text-success">{{ history.remarks }} <!-- <br/><small>- {{ history.preventive_maintenance.updated_by }} on {{ history.preventive_maintenance.updated_at }}</small> --></span>
 	                            		</div>
                             		{% endif %}
 
@@ -308,7 +298,7 @@
 	                            			</textarea>
 	                            		</div>
 	                            		<div class="col offset-4 pt-2">
-	                            			<input type="submit" value="Save Remarks" class="btn btn-success btn-sm">
+	                            			<input type="submit" value="Save PM Notes" class="btn btn-success btn-sm">
 	                            			</form>
 	                            		</div>
                             		{% endif %}

@@ -38,34 +38,52 @@ def load_business_units(request):
 	return render(request, 'inventory/includes/unit/partial_business_unit_dropdown.html', context)
 
 @login_required
-def load_model_types(request):
+def load_brand_choices(request):
 
 	machine_type = request.GET.get('machine_type')
-	machine_brand = request.GET.get('machine_brand')
+	machine_brand_id = request.GET.get('machine_brand')
+	brands = None
 
-	# filters = Q(active=True)
-	# if machine_type:
-	# 	filters &= Q(machine_type=machine_type)
-	# if machine_brand:
-	# 	filters &= Q(brand=machine_type)
+	if machine_brand_id:
+		brand = Brand.objects.get(pk=machine_brand_id, active=True)
 
-	# print(filters)
-	models = Model.objects.filter(machine_type=machine_type, brand=machine_brand, active=True)
+	if machine_type:
+		query = "SELECT id, model.brand_id, brand.brand_name FROM\
+				(SELECT DISTINCT brand_id FROM inventory_model WHERE machine_type_id={0} and active=1) AS model\
+				INNER JOIN inventory_brand AS brand\
+				ON model.brand_id = brand.id".format(machine_type)
 
-	print(models)
-	#model_id = request.GET.get('model')
+		brands = Model.objects.raw(query)
 
-	#if model_id:
-		#model = models.get(pk=model_id)
 
 
 	context = {
+		'brands':brands,
+		'brand':brand if machine_brand_id else None
+	}
+
+	return render(request, 'inventory/includes/unit/partial_brand_dropdown.html', context)
+
+@login_required
+def load_model_choices(request):
+
+	machine_type = request.GET.get('machine_type')
+	machine_brand = request.GET.get('machine_brand')
+	model_id = request.GET.get('model')
+	models = None
+
+	if model_id:
+		model = Model.objects.get(pk=model_id, active=True)
+
+	if machine_type and machine_brand:
+		models = Model.objects.filter(machine_type=machine_type, brand=machine_brand, active=True)
+
+	context = {
 		'models':models,
-		#'model':model if model_id else None
+		'model':model if model_id else None
 	}
 
 	return render(request, 'inventory/includes/unit/partial_model_dropdown.html', context)
-
 
 class UnitListJson(BaseDatatableView):
 	# The model we're going to show
@@ -127,6 +145,31 @@ class UnitListView(LoginRequiredMixin, ListView):
 	def get_queryset(self):
 		return Unit.get_active_units(self.request)
 
+class UnitCreateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+	permission_required = 'inventory.add_unit'
+	login_url = settings.LOGOUT_REDIRECT_URL
+	template_name = 'inventory/unit/unit_create.html'
+	model = Unit
+	form_class = UnitForm
+	success_message = 'Unit has been added.'
+
+	def form_valid(self, form):
+		form.instance.created_by = self.request.user
+		form.instance.updated_by = self.request.user
+		return super(UnitCreateView, self).form_valid(form)
+
+class UnitUpdateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
+	permission_required = 'inventory.change_unit'
+	login_url = settings.LOGOUT_REDIRECT_URL
+	model = Unit
+	form_class = UnitForm
+	template_name = 'inventory/unit/unit_edit.html'
+	success_message = 'Your changes has been save.'
+
+	def get_object(self):
+		pk = self.kwargs.get('pk')
+		return get_object_or_404(Unit, pk=pk, active=True)
+
 #permission not working
 class UnitDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 	permission_required = 'inventory.view_unit'
@@ -186,17 +229,7 @@ def unit_details(request, pk):
 
 		return render(request, template_name, context)
 
-class UnitUpdateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, UpdateView):
-	permission_required = 'inventory.change_unit'
-	login_url = settings.LOGOUT_REDIRECT_URL
-	model = Unit
-	form_class = UnitForm
-	template_name = 'inventory/unit/unit_edit.html'
-	success_message = 'Your changes has been save.'
 
-	def get_object(self):
-		pk = self.kwargs.get('pk')
-		return get_object_or_404(Unit, pk=pk, active=True)
 
 ####################################################################################
 
@@ -257,47 +290,47 @@ class UnitPerBranch(LoginRequiredMixin, ListView):
 		context['previous'] = self.request.META['HTTP_REFERER']
 		return context
 
-def unit_save(request, form, template_name):
-	data = dict()
+# def unit_save(request, form, template_name):
+# 	data = dict()
 
-	render_table_html = 'inventory/includes/unit/partial_unit_list.html'
+# 	render_table_html = 'inventory/includes/unit/partial_unit_list.html'
 
-	if request.method == 'POST':
-		if form.is_valid():
+# 	if request.method == 'POST':
+# 		if form.is_valid():
 
-			post = form.save(commit=False)
+# 			post = form.save(commit=False)
 
-			if not post.pk:
-				post.created_by = request.user
-			post.updated_by = request.user
-			post.save()
+# 			if not post.pk:
+# 				post.created_by = request.user
+# 			post.updated_by = request.user
+# 			post.save()
 
-			data['form_is_valid'] = True
+# 			data['form_is_valid'] = True
 
-			units = Unit.get_active_units()
-			data['html_unit_list'] = render_to_string(render_table_html, {'units': units})
-		else:
-			data['form_is_valid'] = False
+# 			units = Unit.get_active_units()
+# 			data['html_unit_list'] = render_to_string(render_table_html, {'units': units})
+# 		else:
+# 			data['form_is_valid'] = False
 
-	context = {'form': form}
-	data['html_form'] = render_to_string(template_name, context, request=request)
+# 	context = {'form': form}
+# 	data['html_form'] = render_to_string(template_name, context, request=request)
 
-	return JsonResponse(data)
+# 	return JsonResponse(data)
 
-@permission_required('inventory.add_unit')
-def unit_create(request):
+# @permission_required('inventory.add_unit')
+# def unit_create(request):
 
-	render_create_html = 'inventory/includes/unit/partial_unit_create.html'
+# 	render_create_html = 'inventory/includes/unit/partial_unit_create.html'
 
-	if request.method == 'POST':
+# 	if request.method == 'POST':
 
-		form = UnitForm(request.POST)
+# 		form = UnitForm(request.POST)
 
-	else:
+# 	else:
 
-		form = UnitForm()
+# 		form = UnitForm()
 
-	return unit_save(request, form, render_create_html)
+# 	return unit_save(request, form, render_create_html)
 
 def unit_delete(request, pk):
 	unit = get_object_or_404(Unit, pk=pk, active=True)
