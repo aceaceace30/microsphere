@@ -355,25 +355,33 @@ def pm_save(request, form, template_name):
 	render_table_html = 'inventory/includes/pm/partial_pm_list.html'
 
 	if request.method == 'POST':
+
+		# checks if to send an email or not
+		sendmail = request.POST.get('sendmail', default=None)
+
 		if form.is_valid():
+
 			emails = form.cleaned_data['emails']
 			post = form.save(commit=False)
 			post.created_by = request.user
 			post.updated_by = request.user
 
-			email_message = 'Good Day! This is from Microsphere systems technology.<br/>'
-			email_message += 'There will be a scheduled preventive maintenance on {0} at {1}'.format(post.target_date, post.target_time)
+			format_email = EmailTemplate.objects.get(pk=1)
+			email_message = 'There will be a scheduled preventive maintenance on {0} at {1}.'.format(post.target_date, post.target_time)
 
 			split_emails = []
-			SUBJECT = 'Microsphere Systems Technology'
 
-			if emails:
+			if emails and sendmail:
 				if ',' in emails:
 					split_emails = emails.split(',')
 				else:
 					split_emails.append(emails)
 
-				send_mail(SUBJECT, '', settings.EMAIL_HOST_USER, split_emails, html_message=email_message)
+				EMAIL_TEMPLATE = render_to_string('inventory/email/pm_create_email_template.html', 
+												 {'email_message': email_message,
+												  'format_email':format_email,})
+
+				send_mail(format_email.subject, '', settings.EMAIL_HOST_USER, split_emails, html_message=EMAIL_TEMPLATE)
 
 			post.save()
 			
@@ -442,7 +450,6 @@ def mark_as_done(request, pk):
 	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
 	units = Unit.objects.filter(active=True, business_unit__pk=pm.business_unit.pk)
 	SUBJECT = 'Microsphere Systems Technology'
-	#HEADER = settings.EMAIL_HEADER_MESSAGE
 
 	if request.method == 'POST':
 

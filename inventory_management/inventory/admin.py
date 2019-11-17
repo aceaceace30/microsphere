@@ -1,11 +1,20 @@
 from django.contrib import admin
 from .models import ClientProfile, BusinessUnit, MachineType, Brand, Model, OperatingSystem,\
 OfficeApplication, Processor, TotalRam, HddSize, Unit, PreventiveMaintenance, EmailTemplate
-from import_export.admin import ImportExportModelAdmin
+
+# import export library
+from import_export.admin import ImportExportModelAdmin, ExportActionMixin
+from .resources import BusinessUnitResource, ClientProfileResource
+
+# simple history library
 from simple_history.admin import SimpleHistoryAdmin
+
+# summernote library
 from django_summernote.admin import SummernoteModelAdmin
 
-class ClientProfileAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class ClientProfileAdmin(ImportExportModelAdmin):
+
+	resource_class = ClientProfileResource
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -26,7 +35,9 @@ class ClientProfileAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 admin.site.register(ClientProfile, ClientProfileAdmin)
 
-class BusinessUnitAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class BusinessUnitAdmin(ImportExportModelAdmin):
+
+	resource_class = BusinessUnitResource
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -83,7 +94,7 @@ class UnitHistoryAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 
 admin.site.register(Unit, UnitHistoryAdmin)
 
-class MachineTypeAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class MachineTypeAdmin(ImportExportModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -102,7 +113,7 @@ class MachineTypeAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 admin.site.register(MachineType, MachineTypeAdmin)
 
-class BrandAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class BrandAdmin(ImportExportModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -121,7 +132,7 @@ class BrandAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 admin.site.register(Brand, BrandAdmin)
 
-class ModelAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class ModelAdmin(ImportExportModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -148,7 +159,7 @@ class ModelAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 admin.site.register(Model, ModelAdmin)
 
-class OperatingSystemAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class OperatingSystemAdmin(ImportExportModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -167,7 +178,7 @@ class OperatingSystemAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 admin.site.register(OperatingSystem, OperatingSystemAdmin)
 
-class OfficeApplicationAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class OfficeApplicationAdmin(ImportExportModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -186,7 +197,7 @@ class OfficeApplicationAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 admin.site.register(OfficeApplication, OfficeApplicationAdmin)
 
-class ProcessorAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class ProcessorAdmin(ImportExportModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -205,7 +216,7 @@ class ProcessorAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 admin.site.register(Processor, ProcessorAdmin)
 
-class TotalRamAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class TotalRamAdmin(ImportExportModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -224,7 +235,7 @@ class TotalRamAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 admin.site.register(TotalRam, TotalRamAdmin)
 
-class HddSizeAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class HddSizeAdmin(ImportExportModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -243,7 +254,7 @@ class HddSizeAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
 admin.site.register(HddSize, HddSizeAdmin)
 
-class PreventiveMaintenanceAdmin(ImportExportModelAdmin, admin.ModelAdmin):
+class PreventiveMaintenanceAdmin(ImportExportModelAdmin):
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -293,6 +304,17 @@ class EmailTemplateAdmin(SummernoteModelAdmin):  # instead of ModelAdmin
 
 		obj.updated_by = request.user
 		obj.save()
+
+	# remove delete selected action
+	def get_actions(self, request):
+		actions = super().get_actions(request)
+		if 'delete_selected' in actions:
+			del actions['delete_selected']
+		return actions
+
+	# remove the delete action
+	def has_delete_permission(self, request, obj=None):
+		return False
 
 admin.site.register(EmailTemplate, EmailTemplateAdmin)
 

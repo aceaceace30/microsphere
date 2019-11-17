@@ -50,7 +50,7 @@ alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Please enter alphanumeric char
 class ClientProfile(models.Model):
 
     username = models.OneToOneField(User, on_delete=models.CASCADE)
-    client_code = models.CharField(max_length=255)
+    client_code = models.CharField(max_length=255, unique=True)
     client_name = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     pm_coverage = models.CharField(choices=PM_COVERAGE, max_length=50)
@@ -434,7 +434,7 @@ class PmUnitHistory(models.Model):
 
 class EmailTemplate(models.Model):
 
-    used_for = models.CharField(max_length=255)
+    used_for = models.CharField(max_length=255, unique=True)
     subject = models.CharField(max_length=255)
     body = models.TextField(max_length=1500, blank=True, null=True)
 
