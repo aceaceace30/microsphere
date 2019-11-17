@@ -2,7 +2,79 @@
 
 <div class="container-fluid">
 	<div class="row">
-		{% for field in form %}
+		
+		<div class="col-md-6">
+			<div class="form-group {% if form.business_unit.errors %} has-error {% endif %}">
+				<label for="{{ form.business_unit.id_for_label }}">{{ form.business_unit.label }}:</label>
+				{{ form.business_unit }}
+				{% if form.business_unit.errors %}
+					<p class="text-danger help-block">{{ form.business_unit.errors }}</p>
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-6">
+			<div class="form-group {% if form.pm_type.errors %} has-error {% endif %}">
+				<label for="{{ form.pm_type.id_for_label }}">{{ form.pm_type.label }}:</label>
+				{{ form.pm_type }}
+				{% if form.pm_type.errors %}
+					<p class="text-danger help-block">{{ form.pm_type.errors }}</p>
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-4">
+			<div class="form-group {% if form.target_date.errors %} has-error {% endif %}">
+				<label for="{{ form.target_date.id_for_label }}">{{ form.target_date.label }}:</label>
+				{{ form.target_date }}
+				{% if form.target_date.errors %}
+					<p class="text-danger help-block">{{ form.target_date.errors }}</p>
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-4">
+			<div class="form-group {% if form.target_time.errors %} has-error {% endif %}">
+				<label for="{{ form.target_time.id_for_label }}">{{ form.target_time.label }}:</label>
+				{{ form.target_time }}
+				{% if form.target_time.errors %}
+					<p class="text-danger help-block">{{ form.target_time.errors }}</p>
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-4">
+			<div class="form-group {% if form.actual_date.errors %} has-error {% endif %}">
+				<label for="{{ form.actual_date.id_for_label }}">{{ form.actual_date.label }}:</label>
+				{{ form.actual_date }}
+				{% if form.actual_date.errors %}
+					<p class="text-danger help-block">{{ form.actual_date.errors }}</p>
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-6">
+			<div class="form-group {% if form.remarks.errors %} has-error {% endif %}">
+				<label for="{{ form.remarks.id_for_label }}">{{ form.remarks.label }}:</label>
+				{{ form.remarks }}
+				{% if form.remarks.errors %}
+					<p class="text-danger help-block">{{ form.remarks.errors }}</p>
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-6">
+			<div class="form-group {% if form.emails.errors %} has-error {% endif %}">
+				<label for="{{ form.emails.id_for_label }}">{{ form.emails.label }}:</label>
+				<small class="text-danger">( Please use comma(,) for multiple emails. )</small>
+				{{ form.emails }}
+				{% if form.emails.errors %}
+					<p class="text-danger help-block">{{ form.emails.errors }}</p>
+				{% endif %}
+			</div>
+		</div>
+
+		<!-- {% for field in form %}
 			<div class="col-md-4">
 				<div class="form-group{% if field.errors %} has-error{% endif %}">
 				    <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
@@ -13,6 +85,6 @@
 				</div>
 			</div>
 				
-		{% endfor %}
+		{% endfor %} -->
 	</div>
 </div>

@@ -35,7 +35,7 @@
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col">
-				<h3>{{ HEADER }}</h3>
+				<h3>{{ format_email.body|safe }}</h3>
 			</div>
 			<p>Business Unit: 	 <span>{{ pm.business_unit }}</span></p>
 			<p>Service Report #: <span>{{ pm.service_report_number }}</span></p>

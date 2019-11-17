@@ -15,6 +15,9 @@ class UnitForm(forms.ModelForm):
 
 class PreventiveMaintenanceForm(forms.ModelForm):
 
+    # add extra field for emails
+    emails = forms.CharField(widget=forms.Textarea(), required=False)
+
     date_format = 'mm/dd/yyyy'
     time_format = 'hh:mm'
 
@@ -26,9 +29,8 @@ class PreventiveMaintenanceForm(forms.ModelForm):
         self.fields['target_date'].widget.attrs['placeholder'] = self.date_format
         self.fields['target_time'].widget.attrs['placeholder'] = self.time_format
         self.fields['actual_date'].widget.attrs['placeholder'] = self.date_format
-        self.fields['service_report_number'].required = False
 
     class Meta:
         model = PreventiveMaintenance
         #fields = ('target_date', 'target_time', 'actual_date', 'pm_date_done')
-        exclude = ('pm_done', 'pm_date_done', 'active','created_at', 'updated_at', 'created_by', 'updated_by')
+        exclude = ('service_report_number', 'pm_done', 'pm_date_done', 'active','created_at', 'updated_at', 'created_by', 'updated_by')

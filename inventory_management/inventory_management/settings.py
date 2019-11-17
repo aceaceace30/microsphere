@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'admin_reorder',
     'simple_history',
+    'django_summernote',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -129,9 +130,15 @@ USE_L10N = True
 
 USE_TZ = False
 
+#SUMMER NOTE THEME (can use bs3 for bootstrap 3)
+SUMMERNOTE_THEME = 'bs4'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 STATIC_URL = '/static/'
 
@@ -151,12 +158,9 @@ EMAIL_HOST_USER = 'aceaceace.test@gmail.com'
 EMAIL_HOST_PASSWORD = 'ace87654321!'
 EMAIL_PORT = 587
 
-EMAIL_HEADER_MESSAGE = 'Good Day! This is the updated list of units after the Preventive Maintenance.'
+# EMAIL_HEADER_MESSAGE = 'Good Day! This is the updated list of units after the Preventive Maintenance.'
 
 # Docs: https://pypi.org/project/django-modeladmin-reorder/
-
-
-
 ADMIN_REORDER = (
     # Rename app
     {'app': 'auth', 'label': 'Accounts', 'models': (
@@ -184,4 +188,7 @@ ADMIN_REORDER = (
         {'model': 'inventory.Processor', 'label': 'Processor'},
         {'model': 'inventory.TotalRam', 'label': 'RAM'},
         {'model': 'inventory.HddSize', 'label': 'HDD size'},)},
+
+    {'app': 'inventory', 'label': 'Email Templates', 'models': (
+        {'model': 'inventory.EmailTemplate', 'label': 'Templates'},)},
 )

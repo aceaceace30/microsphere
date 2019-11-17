@@ -431,3 +431,17 @@ class PmUnitHistory(models.Model):
         permissions = [
             ('can_add_remarks_per_pm', 'Can add extra remarks per pm')
     ]
+
+class EmailTemplate(models.Model):
+
+    used_for = models.CharField(max_length=255)
+    subject = models.CharField(max_length=255)
+    body = models.TextField(max_length=1500, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='email_created')
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='email_updated')
+
+    def __str__(self):
+        return self.used_for

@@ -1,8 +1,9 @@
 from django.contrib import admin
 from .models import ClientProfile, BusinessUnit, MachineType, Brand, Model, OperatingSystem,\
-OfficeApplication, Processor, TotalRam, HddSize, Unit, PreventiveMaintenance
+OfficeApplication, Processor, TotalRam, HddSize, Unit, PreventiveMaintenance, EmailTemplate
 from import_export.admin import ImportExportModelAdmin
 from simple_history.admin import SimpleHistoryAdmin
+from django_summernote.admin import SummernoteModelAdmin
 
 class ClientProfileAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 
@@ -275,3 +276,23 @@ class PreventiveMaintenanceAdmin(ImportExportModelAdmin, admin.ModelAdmin):
 	get_area.short_description = 'Area'
 
 admin.site.register(PreventiveMaintenance, PreventiveMaintenanceAdmin)
+
+
+# Apply summernote to all TextField in model.
+class EmailTemplateAdmin(SummernoteModelAdmin):  # instead of ModelAdmin
+
+	summernote_fields = '__all__'
+
+	list_display = ('used_for', 'subject', 'updated_at', 'updated_by')
+
+	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
+
+	def save_model(self, request, obj, form, change):
+		if not obj.pk:
+			obj.created_by = request.user
+
+		obj.updated_by = request.user
+		obj.save()
+
+admin.site.register(EmailTemplate, EmailTemplateAdmin)
+

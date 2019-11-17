@@ -9,7 +9,8 @@ from django.http import JsonResponse, HttpResponse
 from django.template.loader import render_to_string
 from django.contrib.messages.views import SuccessMessageMixin
 
-from .models import Unit, PreventiveMaintenance, MachineType, PmUnitHistory, ClientProfile, BusinessUnit, Model
+from .models import Unit, PreventiveMaintenance, MachineType, PmUnitHistory, ClientProfile,\
+BusinessUnit, Model, EmailTemplate
 from django.db.models import Count, Q
 from .forms import PreventiveMaintenanceForm, UnitForm
 
@@ -181,6 +182,21 @@ class UnitDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 		pk = self.kwargs.get('pk')
 		return get_object_or_404(Unit, pk=pk, active=True)
 
+def unit_delete(request, pk):
+	unit = get_object_or_404(Unit, pk=pk, active=True)
+	template_name = 'inventory/unit/unit_delete.html'
+
+	if request.method == 'POST':
+		unit.active = False
+		unit.save()
+		messages.error(request, 'Unit has been deleted.')
+		return redirect('inventory:unit-list')
+	else:
+		context = {
+			'unit':unit
+		}
+	return render(request, template_name, context)
+
 @permission_required('inventory.can_view_unit_history')
 def unit_history(request, pk):
 	template_name = 'inventory/unit/unit_history.html'
@@ -332,21 +348,6 @@ class UnitPerBranch(LoginRequiredMixin, ListView):
 
 # 	return unit_save(request, form, render_create_html)
 
-def unit_delete(request, pk):
-	unit = get_object_or_404(Unit, pk=pk, active=True)
-	template_name = 'inventory/unit/unit_delete.html'
-
-	if request.method == 'POST':
-		unit.active = False
-		unit.save()
-		messages.error(request, 'Unit has been deleted.')
-		return redirect('inventory:unit-list')
-	else:
-		context = {
-			'unit':unit
-		}
-	return render(request, template_name, context)
-
 
 def pm_save(request, form, template_name):
 	data = dict()
@@ -355,11 +356,25 @@ def pm_save(request, form, template_name):
 
 	if request.method == 'POST':
 		if form.is_valid():
-
+			emails = form.cleaned_data['emails']
 			post = form.save(commit=False)
-			#if not post.pk:
 			post.created_by = request.user
 			post.updated_by = request.user
+
+			email_message = 'Good Day! This is from Microsphere systems technology.<br/>'
+			email_message += 'There will be a scheduled preventive maintenance on {0} at {1}'.format(post.target_date, post.target_time)
+
+			split_emails = []
+			SUBJECT = 'Microsphere Systems Technology'
+
+			if emails:
+				if ',' in emails:
+					split_emails = emails.split(',')
+				else:
+					split_emails.append(emails)
+
+				send_mail(SUBJECT, '', settings.EMAIL_HOST_USER, split_emails, html_message=email_message)
+
 			post.save()
 			
 			units_per_branch = Unit.objects.values('pk').filter(active=True, business_unit=post.business_unit)
@@ -427,40 +442,61 @@ def mark_as_done(request, pk):
 	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
 	units = Unit.objects.filter(active=True, business_unit__pk=pm.business_unit.pk)
 	SUBJECT = 'Microsphere Systems Technology'
-	HEADER = settings.EMAIL_HEADER_MESSAGE
+	#HEADER = settings.EMAIL_HEADER_MESSAGE
 
 	if request.method == 'POST':
 
 		emails = request.POST.get('emails', default=None).replace(' ', '')
 		service_report_number = request.POST.get('service_report_number', default=None)
 
+		# validation for sr field if blank
 		if not service_report_number:
 			messages.error(request, 'SR # cannot be blank.')
 			return redirect('inventory:pm-view', pk)
 
+		# validation for sr field if exist in database
 		if PreventiveMaintenance.objects.filter(service_report_number=service_report_number).exists():
 			messages.error(request, 'SR # already exist. Please try a new one.')
 			return redirect('inventory:pm-view', pk)
 
+		# if validations passed
 		pm.service_report_number = service_report_number
 		pm.pm_done = True
 		pm.pm_date_done = datetime.datetime.now()
 		pm.save()
 
+		# declared empty list to append if the user input a single email
+		split_emails = []
+
+		""" if emails exist check if the email field has a comma ',' character to determine if it has
+			more than one email to send if it has more than one use the split function to transform it into
+			a list else append the single email to the empty list because the send_mail function needed a list
+			on the recipient """
 		if emails:
 			if ',' in emails:
-				split_email = emails.split(',')
-				emails = ','.join(split_email)
+				split_emails = emails.split(',')
+			else:
+				split_emails.append(emails)
+
+			format_email = EmailTemplate.objects.get(pk=2)
 
 			EMAIL_TEMPLATE = render_to_string('inventory/email/pm_done_email_template.html', 
 											 {'units':units,
 											  'pm':pm,
-											  'HEADER':HEADER})
+											  'format_email':format_email,})
 
-			send_mail(SUBJECT, '', settings.EMAIL_HOST_USER, [emails], html_message=EMAIL_TEMPLATE)
+			test_emails = ['michaelababao200@gmail.com', 'marcababao@gmail.com']
+			mail_check = send_mail(format_email.subject, '', settings.EMAIL_HOST_USER, split_emails, html_message=EMAIL_TEMPLATE)
 
-		messages.success(request, 'Marked as done')
-		messages.success(request, 'Email has been sent.')
+			if mail_check:
+				messages.success(request, 'Email has been sent.')
+			else:
+				messages.danger(request, 'There was an issue while trying to send the email. Please check your internet connection.')
+		else:
+			messages.danger(request, 'There was no email input.')
+
+		messages.success(request, 'Preventive maintenance has marked as done.')
+
 	return redirect('inventory:pm-view', pk)
 
 def report_main(request):
