@@ -3,7 +3,7 @@
 <div class="container-fluid">
 	<div class="row">
 		
-		<div class="col-md-6">
+		<div class="col-md-4">
 			<div class="form-group {% if form.business_unit.errors %} has-error {% endif %}">
 				<label for="{{ form.business_unit.id_for_label }}">{{ form.business_unit.label }}:</label>
 				{{ form.business_unit }}
@@ -13,12 +13,22 @@
 			</div>
 		</div>
 
-		<div class="col-md-6">
+		<div class="col-md-4">
 			<div class="form-group {% if form.pm_type.errors %} has-error {% endif %}">
 				<label for="{{ form.pm_type.id_for_label }}">{{ form.pm_type.label }}:</label>
 				{{ form.pm_type }}
 				{% if form.pm_type.errors %}
 					<p class="text-danger help-block">{{ form.pm_type.errors }}</p>
+				{% endif %}
+			</div>
+		</div>
+
+		<div class="col-md-4">
+			<div class="form-group {% if form.assigned_personnel.errors %} has-error {% endif %}">
+				<label for="{{ form.assigned_personnel.id_for_label }}">{{ form.assigned_personnel.label }}:</label>
+				{{ form.assigned_personnel }}
+				{% if form.assigned_personnel.errors %}
+					<p class="text-danger help-block">{{ form.assigned_personnel.errors }}</p>
 				{% endif %}
 			</div>
 		</div>

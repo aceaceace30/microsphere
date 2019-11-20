@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView
@@ -6,13 +7,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
-from django.template.loader import render_to_string
+from django.template.loader import render_to_string, get_template
 from django.contrib.messages.views import SuccessMessageMixin
 
 from .models import Unit, PreventiveMaintenance, MachineType, PmUnitHistory, ClientProfile,\
 BusinessUnit, Model, EmailTemplate
 from django.db.models import Count, Q
-from .forms import PreventiveMaintenanceForm, UnitForm
+from .forms import PreventiveMaintenanceForm, UnitForm, PreventiveMaintenanceEditForm
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -21,6 +22,8 @@ from django_datatables_view.base_datatable_view import BaseDatatableView
 from django.utils.html import escape
 
 import datetime
+
+from .utils import Render
 
 @login_required
 def load_business_units(request):
@@ -223,7 +226,7 @@ def historical_changes(history):
 			last = old_record
 
 	for c in changes:
-		#print('Fields:', c.changes)
+		print('Fields:', c.changes)
 		for field in c.changes:
 			#print(field.field)
 			print(field.old, field.new)
@@ -284,7 +287,7 @@ class PmUpdateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMi
 	permission_required = 'inventory.change_preventivemaintenance'
 	login_url = settings.LOGOUT_REDIRECT_URL
 	model = PreventiveMaintenance
-	form_class = PreventiveMaintenanceForm
+	form_class = PreventiveMaintenanceEditForm
 	template_name = 'inventory/pm/pm_edit.html'
 	success_message = 'Your changes has been save.'
 
@@ -299,11 +302,16 @@ class UnitPerBranch(LoginRequiredMixin, ListView):
 
 	def get_queryset(self):
 		pk = self.kwargs.get('pk')
-		return Unit.objects.filter(business_unit__pk=pk, active=True)
+		units = Unit.objects.filter(business_unit__pk=pk, active=True)
+		self.business_unit_name = units[0].business_unit
+		self.client = units[0].business_unit.client
+		return units
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['previous'] = self.request.META['HTTP_REFERER']
+		context['business_unit_name'] = self.business_unit_name
+		context['client'] = self.client
 		return context
 
 # def unit_save(request, form, template_name):
@@ -367,7 +375,10 @@ def pm_save(request, form, template_name):
 			post.updated_by = request.user
 
 			format_email = EmailTemplate.objects.get(pk=1)
-			email_message = 'There will be a scheduled preventive maintenance on {0} at {1}.'.format(post.target_date, post.target_time)
+			email_message = 'Please be informed that the Preventive Maintenance Activity for\
+							 PC and Printers enrolled in <br/>Maintenance Agreement and assigned\
+							 to your branch will be scheduled on <u>{0} at {1}</u>.<br/>\
+							 Assigned MST Personnel will be: <u>{2}</u>'.format(post.target_date, post.target_time, post.assigned_personnel)
 
 			split_emails = []
 
@@ -509,6 +520,22 @@ def mark_as_done(request, pk):
 def report_main(request):
 
 	return render(request, 'inventory/report/report_main.html')
+
+class GeneratePdf(View):
+
+	def get(self, request):
+		#print('self: ', self.kwargs)
+		#pk = self.kwargs.get('pk')
+		#pk=2
+		units = Unit.objects.filter(active=True)
+		today = datetime.datetime.now()
+		params = {
+			'today': today,
+			'units': units,
+			'request': request
+		}
+		return Render.render('inventory/pdf/preventive_maintenance_certification_form.html', params)
+
 
 
 	

@@ -5,18 +5,13 @@
 	<meta charset="UTF-8">
 	<title>Microsphere Systems Technology</title>
 	<link rel="stylesheet" href="{% static 'inventory/vendors/bootstrap/dist/css/bootstrap.min.css' %}">
-	<style type="text/css">
-		h3 {
-		  color:black;
-		}
-		h2 {
-		  color:green;
-		}
-	</style>
 
 </head>
 <body>
 	<div class="container-fluid">
+
+		<p>Dear Sir/Madam,</p><br/>
+
 		<div class="row">
 			<div class="col">
 				<h3>{{ format_email.body|safe }}</h3>
@@ -24,8 +19,13 @@
 		</div>
 		<div class="row">
 			<div class="col">
-				<h2><strong>{{ email_message }}</strong></h2>
+				<p><strong>{{ email_message|safe }}</strong></p>
 			</div>
+		</div>
+
+		<div class="remarks">
+			<p>Respectfully,</p>
+			<p>Microsphere System Technology</p>
 		</div>
 	</div>
 

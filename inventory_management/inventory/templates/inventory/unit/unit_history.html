@@ -58,7 +58,11 @@
 							                <td>{{ change.new_record.history_date|date }}</td>
 							                <td>{{ change.new_record.history_date|time }}</td>
 							                
-							                <td>{{ change.new_record.history_user }} | {{ change.new_record.history_user.first_name }} </td>
+							                <td>{{ change.new_record.history_user }} 
+							                {% if change.new_record.history_user.first_name %}
+							                	| {{ change.new_record.history_user.first_name }}
+							                {% endif %}
+							                </td>
 							              </tr>
 									{% endfor %}
 								</tbody>

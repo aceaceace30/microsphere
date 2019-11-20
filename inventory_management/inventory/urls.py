@@ -31,5 +31,8 @@ urlpatterns = [
 
     # server side processing data table
     path('load-unit-datatable/', views.UnitListJson.as_view(), name='unit_list_json'),
+
+    # generate pdf
+    path('form/', views.GeneratePdf.as_view(), name='generate_preventive_maintenance_form')
     
 ]

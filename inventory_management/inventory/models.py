@@ -348,6 +348,7 @@ class PreventiveMaintenance(models.Model):
     actual_date = models.DateField()
     pm_date_done = models.DateField(blank=True, null=True)
     pm_done = models.BooleanField(default=False)
+    assigned_personnel = models.CharField(max_length=100)
     remarks = models.TextField(max_length=500, blank=True, null=True)
     active = models.BooleanField(default=True)
 

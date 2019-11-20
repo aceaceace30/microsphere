@@ -24,8 +24,8 @@ class BusinessUnitResource(resources.ModelResource):
 		fields = ('client', 'business_unit_name', 'rc_code', 'area', 'location', 'description', 'created_by', 'updated_by')
 		export_order = fields
 		import_id_fields = ['rc_code',]
-		skip_unchange=True
-		report_skipped=False
+		skip_unchange = True
+		report_skipped = False
 
 	# def before_import_row(self, row, **kwargs):
 	# 	business_unit = BusinessUnit.objects.filter(client=row['rc_code']).exists()

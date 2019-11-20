@@ -6,6 +6,9 @@
             <strong class="card-title">Business Unit: </strong><span class="text-success">{{ pm.business_unit }}</span>
 
             <div class="float-right">
+
+                <a href="{% url 'inventory:generate_preventive_maintenance_form' pm.business_unit.pk %}" class="btn btn-primary btn-sm">Generate Form</a>
+               
             	{% if perms.inventory.can_view_units_per_pm %}
             	<a href="{% url 'inventory:get_list_per_businessunit' pm.business_unit.pk %}" class="btn btn-primary btn-sm">Show Units</a>
             	{% endif %}
@@ -116,6 +119,14 @@
                         			<p class="text-success">{{ pm.actual_date }}</p>
                         		</div>
                         	</div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <p class="text-dark">Assigned Personnel:</p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="text-success">{{ pm.assigned_personnel }}</p>
+                                </div>
+                            </div>
                         	<div class="row">
                         		<div class="col-6">
                         			<p class="text-dark">Remarks:</p>
