@@ -297,46 +297,24 @@ class Unit(models.Model):
         else:
             return Unit.objects.filter(active=True, business_unit__client=client).count()
 
-    def get_machine_type_count_per_client(client=None):
-        if not client:
-            return Unit.objects.select_related('machine_type')\
-                               .values('machine_type__machine_type_name')\
-                               .filter(active=True)\
-                               .annotate(machine_type_count=Count('machine_type')) 
-        else:
-            return Unit.objects.select_related('machine_type')\
-                               .values('machine_type__machine_type_name')\
-                               .filter(active=True, business_unit__client=client)\
-                               .annotate(machine_type_count=Count('machine_type'))
+    def get_unit_num_per_branch(client=None):
+        units = Unit.objects.values('business_unit')\
+                            .filter(active=True, business_unit__client=client)\
+                            .annotate(unit_per_bu=Count('business_unit'))
 
-    def pc_and_laptop_hardware_count(client=None):
-        # query = '''SELECT * FROM inventory_unit as u
-        #            INNER JOIN inventory_processor as p
-        #            ON u.processor_id = p.id
-        #            INNER JOIN inventory_total_ram as t
-        #            ON u.total_ram_id = t.id
-        #            INNER JOIN inventory_hdd_size as h
-        #            ON u.hdd_size_id = h.id'''
+        return units
 
-        query = 'SELECT u.id, m.machine_class, count(m.machine_class) as machine_count FROM inventory_unit as u\
-                 INNER JOIN inventory_machinetype as m\
-                 ON u.machine_type_id = m.id\
-                 WHERE u.active = 1\
-                 GROUP BY m.machine_class'
+# set as base dynamic filtering for class PreventiveMaintenance
+def dynamic_filter_pm(client, business_unit):
 
-        test = Unit.objects.raw(query)
+    filter_ = Q(active=True)
 
-        for q in test:
-            print(q.machine_class, q.machine_count)
+    if client:
+        filter_ &= Q(business_unit__client=client)
+    if business_unit:
+        filter_ &= Q(business_unit=business_unit)
 
-        #return Unit.objects.raw(query)
-
-        # return Unit.objects.select_related('processor', 'total_ram', 'hdd_size')\
-        #                    .values('processor__processor_name', 'total_ram__total_ram_name', 'hdd_size__hdd_size_name')\
-        #                    .filter(active=True)\
-        #                    .annotate(processor_count=Count('processor'))\
-        #                    .annotate(total_ram_count=Count('total_ram'))\
-        #                    .annotate(hdd_size_count=Count('hdd_size'))
+    return filter_
 
 class PreventiveMaintenance(models.Model):
 
@@ -394,31 +372,22 @@ class PreventiveMaintenance(models.Model):
         else:
             return PreventiveMaintenance.objects.filter(active=True)
 
-    def get_total_count(client=None):
-        if not client:
-            return PreventiveMaintenance.objects.filter(active=True).count()
-        else:
-            return PreventiveMaintenance.objects.filter(business_unit__client=client, active=True).count()
+    def get_total_count(client=None, business_unit=None):
+        return PreventiveMaintenance.objects.filter(dynamic_filter_pm(client, business_unit)).count()
 
-    def get_total_count_per_status(client=None):
-        if not client:
-            return PreventiveMaintenance.objects.values('pm_done')\
-                                                .filter(active=True)\
-                                                .order_by('pm_done')\
-                                                .annotate(status_count=Count('pm_done'))
-        else:
-            return PreventiveMaintenance.objects.values('pm_done')\
-                                                .filter(business_unit__client=client, active=True)\
-                                                .order_by('pm_done')\
-                                                .annotate(status_count=Count('pm_done'))
+    def get_total_count_per_status(client=None, business_unit=None):
+        return PreventiveMaintenance.objects.values('pm_done')\
+                                            .filter(dynamic_filter_pm(client, business_unit))\
+                                            .order_by('pm_done')\
+                                            .annotate(status_count=Count('pm_done'))
 
-    def get_pending_pm(number_to_retrive=3, client=None):
-        if not client:
-            return PreventiveMaintenance.objects.filter(active=True, pm_done=False)\
-                                                .order_by('-target_date', '-target_time')[:number_to_retrive]
-        else:
-            return PreventiveMaintenance.objects.filter(active=True, pm_done=False)\
-                                                .order_by('-target_date', '-target_time')[:number_to_retrive]
+    def get_pending_pm(number_to_retrive=3, client=None, business_unit=None):
+
+        filter_ = dynamic_filter_pm(client, business_unit)
+        filter_ &= Q(pm_done=False)
+
+        return PreventiveMaintenance.objects.filter(filter_)\
+                                            .order_by('-target_date', '-target_time')[:number_to_retrive]
 
 class PmUnitHistory(models.Model):
 

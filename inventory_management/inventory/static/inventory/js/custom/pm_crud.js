@@ -25,7 +25,9 @@ jQuery(function($) {
         dataType: 'json',
         success: function (data) {
           if (data.form_is_valid) {
-            $("#pm-table tbody").html(data.html_pm_list);
+            window.location.reload();
+            //$("#pm-data-table").DataTable().ajax.reload();
+            //$("#pm-data-table tbody").html(data.html_pm_list);
             $("#modal-pm").modal("hide");
           }
           else {
@@ -45,7 +47,7 @@ jQuery(function($) {
         dataType: 'json',
         success: function (data) {
           if (data.form_is_valid) {
-            $("#pm-table tbody").html(data.html_pm_list);
+            $("#pm-data-table tbody").html(data.html_pm_list);
             $("#modal-tag-pm").modal("hide");
           }
           else {

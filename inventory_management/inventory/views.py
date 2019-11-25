@@ -24,6 +24,9 @@ from django.utils.html import escape
 import datetime
 
 from .utils import Render
+from xhtml2pdf import pisa
+
+import os
 
 @login_required
 def load_business_units(request):
@@ -374,7 +377,16 @@ def pm_save(request, form, template_name):
 			post.created_by = request.user
 			post.updated_by = request.user
 
-			format_email = EmailTemplate.objects.get(pk=1)
+			""" Dynamic part of the email sending. needed to use try catch to handle errors if their is no available 
+				data from the database """
+			try:
+				format_email = EmailTemplate.objects.get(used_for='create pm')
+				subject = format_email.subject
+			except:
+				format_email = None
+				subject = 'Microshphere Systems Technology'
+
+
 			email_message = 'Please be informed that the Preventive Maintenance Activity for\
 							 PC and Printers enrolled in <br/>Maintenance Agreement and assigned\
 							 to your branch will be scheduled on <u>{0} at {1}</u>.<br/>\
@@ -392,10 +404,14 @@ def pm_save(request, form, template_name):
 												 {'email_message': email_message,
 												  'format_email':format_email,})
 
-				send_mail(format_email.subject, '', settings.EMAIL_HOST_USER, split_emails, html_message=EMAIL_TEMPLATE)
+				send_mail(subject, '',
+					      settings.COMPANY_NAME + ' <' + settings.EMAIL_HOST_USER + '>',
+					      split_emails,
+					      html_message=EMAIL_TEMPLATE)
 
 			post.save()
-			
+
+			# loop all units to create pm history instance to have a display on pm remarks
 			units_per_branch = Unit.objects.values('pk').filter(active=True, business_unit=post.business_unit)
 
 			for unit in units_per_branch:
@@ -460,7 +476,6 @@ def add_pm_remarks(request, pk):
 def mark_as_done(request, pk):
 	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
 	units = Unit.objects.filter(active=True, business_unit__pk=pm.business_unit.pk)
-	SUBJECT = 'Microsphere Systems Technology'
 
 	if request.method == 'POST':
 
@@ -496,7 +511,14 @@ def mark_as_done(request, pk):
 			else:
 				split_emails.append(emails)
 
-			format_email = EmailTemplate.objects.get(pk=2)
+			""" Dynamic part of the email sending. needed to use try catch to handle errors if their is no available 
+				data from the database """
+			try:
+				format_email = EmailTemplate.objects.get(used_for='done pm')
+				subject = format_email.subject
+			except:
+				format_email = None
+				subject = settings.COMPANY_NAME
 
 			EMAIL_TEMPLATE = render_to_string('inventory/email/pm_done_email_template.html', 
 											 {'units':units,
@@ -504,7 +526,7 @@ def mark_as_done(request, pk):
 											  'format_email':format_email,})
 
 			test_emails = ['michaelababao200@gmail.com', 'marcababao@gmail.com']
-			mail_check = send_mail(format_email.subject, '', settings.EMAIL_HOST_USER, split_emails, html_message=EMAIL_TEMPLATE)
+			mail_check = send_mail(subject, '', settings.EMAIL_HOST_USER, split_emails, html_message=EMAIL_TEMPLATE)
 
 			if mail_check:
 				messages.success(request, 'Email has been sent.')
@@ -521,6 +543,38 @@ def report_main(request):
 
 	return render(request, 'inventory/report/report_main.html')
 
+
+# def render_pdf_view(request):
+# 	template_path = 'inventory/pdf/preventive_maintenance_certification_form.html'
+
+# 	units = Unit.objects.filter(active=True)
+# 	today = datetime.datetime.today()
+
+# 	context = {
+# 		'units': units,
+# 		'request': request,
+# 		'today': today,
+# 		'rc_code': units[0].business_unit.rc_code,
+# 		'remarks': 'test_remarks',
+# 		'company': settings.COMPANY_NAME.upper(),
+# 		'address': settings.COMPANY_ADDRESS,
+# 		'contact': settings.COMPANY_CONTACT,
+# 	}
+# 	# Create a Django response object, and specify content_type as pdf
+# 	response = HttpResponse(content_type='application/pdf')
+# 	response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+# 	# find the template and render it.
+# 	template = get_template(template_path)
+# 	html = template.render(context)
+
+# 	# create a pdf
+# 	pisaStatus = pisa.CreatePDF(
+# 	html, dest=response, link_callback=link_callback)
+# 	# if error then show some funy view
+# 	if pisaStatus.err:
+# 		return HttpResponse('We had some errors <pre>' + html + '</pre>')
+# 	return response
+
 class GeneratePdf(View):
 
 	def get(self, request):
@@ -529,12 +583,17 @@ class GeneratePdf(View):
 		#pk=2
 		units = Unit.objects.filter(active=True)
 		today = datetime.datetime.now()
-		params = {
-			'today': today,
+		context = {
 			'units': units,
-			'request': request
+			'request': request,
+			'today': today,
+			'rc_code': units[0].business_unit.rc_code,
+			'remarks': 'test_remarks',
+			'company': settings.COMPANY_NAME.upper(),
+			'address': settings.COMPANY_ADDRESS,
+			'contact': settings.COMPANY_CONTACT,
 		}
-		return Render.render('inventory/pdf/preventive_maintenance_certification_form.html', params)
+		return Render.render('inventory/pdf/preventive_maintenance_certification_form.html', context)
 
 
 

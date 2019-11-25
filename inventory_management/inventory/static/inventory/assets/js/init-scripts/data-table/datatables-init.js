@@ -17,6 +17,7 @@
     // });
 
     var unit_table = $('#unit-data-table').DataTable({
+        order: [[0, "asc"], [1, "asc"]],
         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         // ...
         //"processing": true,
@@ -49,6 +50,8 @@
     });
 
     var pm_table = $('#pm-data-table').DataTable({
+        columnDefs: [{ type: "date", "targets": [2] }],
+        order: [[3, "desc"], [2, "asc"]],
         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
     });

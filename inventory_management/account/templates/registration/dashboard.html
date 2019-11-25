@@ -8,17 +8,37 @@
 
 <div class="content mt-3">
     <div class="animated fadeIn">
-        <div class="row">
+        <div class="row pt-2">
 
-            <div class="col-md-4">
-                <div class="card bg-warning">
+            <div class="col-md-3 text-center">
+                <form method="POST">
+                    {% csrf_token %}
+                    {% for field in filter_form %}
+
+                        <div class="col-md-12">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            <span class="text-danger">{{ field.errors }}</span>
+                        </div>
+                        
+                    {% endfor %}
+
+                    <div class="col-md-12 pt-3">
+                        <button type="submit" class="btn btn-success w-100">Filter</button>
+                    </div>
+                    
+                </form>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card bg-flat-color-5 border border-dark h-100">
                     <!-- <img class="card-img-top" src="images/placeholder.png" alt="Card image cap"> -->
                     <div class="card-body">
                         <div class="row">
                             <div class="col-8">
                                 <h4 class="card-title">PM Count: <a class="badge badge-primary" href="{% url 'inventory:pm-list' %}">{{ pm_count }}</a></h4>
                             </div>
-                            <div class="col">
+                            <div class="col-4">
                                 {% for count in pm_count_status%}
                                     {% if not count.pm_done %}
                                         <span class="badge badge-danger"> Pending: {{ count.status_count }}</span>
@@ -29,16 +49,16 @@
                             </div>
                         </div>
                         
-                        <div class="row">
+                        <div class="row pt-3">
                             <div class="col">
                                 
                                 <h6 class="card-title font-weight-bold">Upcoming Preventive Maintenance: </h6>
-                                <ul class="offset-1">
+                                <ul class="offset-1 text-dark">
 
                                     {% for pm in pms %}
-                                        <li><a href="{% url 'inventory:pm-view' pm.pk %}" class="text-dark">{{ pm }} | {{ pm.target_date }} | {{ pm.target_time }}</a></li>
+                                        <li><a href="{% url 'inventory:pm-view' pm.pk %}" class="text-danger">{{ pm }} | {{ pm.target_date }} | {{ pm.target_time }}</a></li>
                                     {% empty %}
-                                        <p class="text-danger"> No upcoming schedule.</p>
+                                        <p class="text-danger">No upcoming schedule.</p>
                                     {% endfor %}
                                 </ul>
                             </div>
@@ -49,45 +69,189 @@
                 </div>
             </div>
 
-            {% for a in pc_and_laptop_hardware_count %}
-                {{ a }}
-            {% endfor %}
+		</div>
 
-			<div class="col-md-4">
-			    <div class="card bg-success">
-			        <!-- <img class="card-img-top" src="images/placeholder.png" alt="Card image cap"> -->
-			        <div class="card-body">
-			            <h4 class="card-title">Unit Count: 
-			            	<a class="badge badge-primary" href="{% url 'inventory:unit-list' %}">{{ unit_count }}</a>
-			            </h4>
+        <div class="row pt-4">
 
-                        <h6 class="card-title font-weight-bold">Unit count per machine type: </h6>
-                        
+            <div class="col-md-3">
+                <div class="card bg-warning border border-dark h-100">
+                    <!-- <img class="card-img-top" src="images/placeholder.png" alt="Card image cap"> -->
+                    <div class="card-body">
+                        <!-- <h4 class="card-title">Total Unit Count: 
+                            <a class="badge badge-primary" href="{% url 'inventory:unit-list' %}">{{ unit_count }}</a>
+                        </h4> -->
+
+                        <h6 class="card-title font-weight-bold">Total # of unit count per business unit: </h6>
+
                         <ul class="offset-1">
-                            {% for mt in machine_type_count %}
-                                <li>{{ mt.machine_type__machine_type_name }} <span class="badge badge-primary">{{ mt.machine_type_count }}</span></li>
+                            {% for bu in unit_count_per_bu %}
+                            <li>{{ bu.business_unit_name }} <span class="badge badge-primary">{{ bu.unit_count }}</span></li>
                             {% empty %}
-                                <p class="text-danger"> No upcoming schedule.</p>
+                                <p class="text-danger">No count available.</p>
                             {% endfor %}
                         </ul>
+                    </div>
+                </div>
+            </div>
 
-			        </div>
-			    </div>
-			</div>
+            <div class="col-md-3">
+                <div class="card bg-info border border-dark h-100">
+                    <div class="card-body">
+                        <!-- <h4 class="card-title">Total Machine Type Count: 
+                            <a class="badge badge-primary" href="{% url 'inventory:unit-list' %}">{{ unit_count }}</a>
+                        </h4> -->
 
+                        <h6 class="card-title font-weight-bold">Total # per machine type: </h6>
 
+                        <ul class="offset-1">
+                            {% for count in machine_type_count %}
+                            <li>{{ count.machine_type_name }} <span class="badge badge-primary">{{ count.machine_count }}</span></li>
+                            {% empty %}
+                                <p class="text-danger">No count available.</p>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
 
-			<div class="col-lg-12">
+            <div class="col-md-3">
+                <div class="card bg-secondary border border-dark h-100">
+                    <div class="card-body">
+                       <!--  <h4 class="card-title">Total Processor Count: 
+                            <a class="badge badge-primary" href="{% url 'inventory:unit-list' %}">{{ unit_count }}</a>
+                        </h4> -->
+
+                        <h6 class="card-title font-weight-bold">Total # per processor: </h6>
+
+                        <ul class="offset-1">
+                            {% for count in processor_count %}
+                            <li>{{ count.processor_name }} <span class="badge badge-primary">{{ count.processor_count }}</span></li>
+                            {% empty %}
+                                <p class="text-danger">No count available.</p>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-flat-color-2 border border-dark h-100">
+                    <div class="card-body">
+                        <!-- <h4 class="card-title">Total OS Count: 
+                            <a class="badge badge-primary" href="{% url 'inventory:unit-list' %}">{{ unit_count }}</a>
+                        </h4> -->
+
+                        <h6 class="card-title font-weight-bold">Total # per OS: </h6>
+
+                        <ul class="offset-1">
+                            {% for count in os_count %}
+                            <li>{{ count.os_name }} <span class="badge badge-primary">{{ count.os_count }}</span></li>
+                            {% empty %}
+                                <p class="text-danger">No count available.</p>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row pt-4">
+             <div class="col-md-3">
+                <div class="card bg-flat-color-4 border border-dark h-100">
+                    <div class="card-body">
+                        <!-- <h4 class="card-title">Total OS Count: 
+                            <a class="badge badge-primary" href="{% url 'inventory:unit-list' %}">{{ unit_count }}</a>
+                        </h4> -->
+
+                        <h6 class="card-title font-weight-bold">Total # per RAM: </h6>
+
+                        <ul class="offset-1">
+                            {% for count in ram_count %}
+                            <li>{{ count.total_ram_name }} <span class="badge badge-primary">{{ count.ram_count }}</span></li>
+                            {% empty %}
+                                <p class="text-danger">No count available.</p>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-flat-color-6 border border-dark h-100">
+                    <div class="card-body">
+                        <!-- <h4 class="card-title">Total OS Count: 
+                            <a class="badge badge-primary" href="{% url 'inventory:unit-list' %}">{{ unit_count }}</a>
+                        </h4> -->
+
+                        <h6 class="card-title font-weight-bold">Total # per HDD: </h6>
+
+                        <ul class="offset-1">
+                            {% for count in hdd_count %}
+                            <li>{{ count.hdd_size_name }} <span class="badge badge-primary">{{ count.hdd_count }}</span></li>
+                            {% empty %}
+                                <p class="text-danger">No count available.</p>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-success border border-dark h-100">
+                    <div class="card-body">
+                        <!-- <h4 class="card-title">Total OS Count: 
+                            <a class="badge badge-primary" href="{% url 'inventory:unit-list' %}">{{ unit_count }}</a>
+                        </h4> -->
+
+                        <h6 class="card-title font-weight-bold">Total # per Monitor Type: </h6>
+
+                        <ul class="offset-1">
+                            {% for count in monitor_type_count %}
+                            <li>{{ count.monitor_type }} <span class="badge badge-primary">{{ count.monitor_type_count }}</span></li>
+                            {% empty %}
+                                <p class="text-danger">No count available.</p>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-primary border border-dark h-100">
+                    <div class="card-body">
+                        <!-- <h4 class="card-title">Total OS Count: 
+                            <a class="badge badge-primary" href="{% url 'inventory:unit-list' %}">{{ unit_count }}</a>
+                        </h4> -->
+
+                        <h6 class="card-title font-weight-bold">Total # per Office Application: </h6>
+
+                        <ul class="offset-1">
+                            {% for count in office_app_count %}
+                            <li>{{ count.office_app_name }} <span class="badge badge-primary">{{ count.office_app_count }}</span></li>
+                            {% empty %}
+                                <p class="text-danger">No count available.</p>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+	</div>
+</div>
+
+            <!-- <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Show Total Count needed</h4>
+                                <h4>Data</h4>
                             </div>
                             <div class="card-body">
-                                <p class="text-muted m-b-15">Coming soon. Discuss with Microsphere.</p>
+                                <p class="text-muted m-b-15">Here are reliable informations. You can filter from the list.</p>
 
                                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                                     <li class="nav-item">
-                                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
+                                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Machine type count</a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Menu 1</a>
@@ -98,8 +262,24 @@
                                 </ul>
                                 <div class="tab-content pl-3 p-1" id="myTabContent">
                                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                                        <h3>Home</h3>
-                                        <p>Some content here.</p>
+                                        <div class="container">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <h3>Machine type count</h3>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col">
+                                                    <ul>
+                                                        {% for count in machine_type_count %}
+                                                            <li>{{ count.machine_type_name }} <span class="badge badge-primary">{{ count.machine_count }}</span>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                                         <h3>Menu 1</h3>
@@ -114,11 +294,7 @@
 
                             </div>
                         </div>
-                    </div>
-
-		</div>
-	</div>
-</div>
+                    </div> -->
 
 
 {% endblock %}

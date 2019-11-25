@@ -33,6 +33,7 @@ urlpatterns = [
     path('load-unit-datatable/', views.UnitListJson.as_view(), name='unit_list_json'),
 
     # generate pdf
+    #path('form/', views.render_pdf_view, name='generate_preventive_maintenance_form'),
     path('form/', views.GeneratePdf.as_view(), name='generate_preventive_maintenance_form')
     
 ]

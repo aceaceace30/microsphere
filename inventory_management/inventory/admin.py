@@ -74,7 +74,7 @@ class UnitHistoryAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 						'host_name', 'mac_address', 'ip_address', 'remarks',
 						'created_by__username', 'updated_by__username')
 
-	list_filter = ('business_unit__client', 'area', 'business_unit', 'machine_type', 'machine_brand', 'created_by')
+	list_filter = ('active', 'business_unit__client', 'area', 'business_unit', 'machine_type', 'machine_brand', 'created_by')
 
 	def save_model(self, request, obj, form, change):
 

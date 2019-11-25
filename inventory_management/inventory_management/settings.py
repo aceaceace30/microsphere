@@ -141,6 +141,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 STATIC_URL = '/static/'
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'),
+# ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, '../mystatic/')
 
 DASHBOARD_URL = 'account:dashboard'
 
@@ -159,6 +164,10 @@ EMAIL_HOST_PASSWORD = 'ace87654321!'
 EMAIL_PORT = 587
 
 # EMAIL_HEADER_MESSAGE = 'Good Day! This is the updated list of units after the Preventive Maintenance.'
+
+COMPANY_NAME = 'Microsphere System Technology'
+COMPANY_ADDRESS = '53B Acacia St., Cembo Makati City'
+COMPANY_CONTACT = 'Tel. no. 882-8638 / 556-2398'
 
 # Docs: https://pypi.org/project/django-modeladmin-reorder/
 ADMIN_REORDER = (

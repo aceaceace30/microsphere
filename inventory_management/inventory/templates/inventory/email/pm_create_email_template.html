@@ -10,13 +10,15 @@
 <body>
 	<div class="container-fluid">
 
-		<p>Dear Sir/Madam,</p><br/>
-
-		<div class="row">
-			<div class="col">
-				<h3>{{ format_email.body|safe }}</h3>
+		<p>Dear Sir/Madam,</p>
+		
+		{% if format_email.body %}
+			<div class="row">
+				<div class="col">
+					<p>{{ format_email.body|safe }}</p>
+				</div>
 			</div>
-		</div>
+		{% endif %}
 		<div class="row">
 			<div class="col">
 				<p><strong>{{ email_message|safe }}</strong></p>
