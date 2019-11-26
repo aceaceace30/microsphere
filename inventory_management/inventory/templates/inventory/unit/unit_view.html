@@ -27,11 +27,85 @@
 </div>
 
 
+<!-- modal for entering notes to be saved -->
+<div class="modal fade" id="notes_modal" tabindex="-1" role="dialog" aria-labelledby="notesmodalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-light">
+                <h5 class="modal-title" id="notesmodalLabel">Please enter your notes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="notes_remarks" class="form-control" cols="30" rows="10" required></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="add_remarks_btn">Confirm</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- modal for notifications -->
+<div class="modal fade" id="notification_modal" tabindex="-1" role="dialog" aria-labelledby="notificationmodalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-light">
+                <h5 class="modal-title" id="notificationmodalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal">Okay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock%}
+
 
 {% block js %}
 
     <!-- custom javascript -->
     <script src="{% static 'inventory/js/custom/unit_crud.js' %}"></script>
+
+    <script>
+        jQuery(function($) {
+
+            let pm_history_url;
+
+            $('#notes_modal').on('show.bs.modal', function (e){
+                pm_history_url = $(e.relatedTarget).data('url');
+            });
+
+            $('#add_remarks_btn').click(function(){
+
+                let remarks = $('#notes_remarks').val();
+
+                $.ajax({
+                    url: pm_history_url,
+                    type: 'POST',
+                    datatype: 'json',
+                    data: {csrfmiddlewaretoken: '{{ csrf_token }}',
+                           'remarks': remarks},
+                    success:function(data){
+                        if (data.is_valid) {
+                            $('#pm_history_list').html(data.pm_history_list);
+                            $('#notes_modal').modal('hide');
+                            $('#notes_remarks').val('');
+                            $('#notification_modal').modal('show');
+                            $('#notificationmodalLabel').html(data.message);
+                        }
+                    }
+
+                });
+            });
+
+        });
+    </script>
 
 {% endblock %}

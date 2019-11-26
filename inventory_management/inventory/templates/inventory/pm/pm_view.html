@@ -3,11 +3,6 @@
 
 {% block title %} Microsphere - PM View {% endblock %}
 
-{% block css %}
-<style>
-
-</style>
-{% endblock %}
 
 {% block page_title %} Service Report Number: <span class="text-success">{{ pm.service_report_number }}</span> {% endblock %}
 {% block page_title_second %}
@@ -25,13 +20,5 @@
             </div>
         </div><!-- .animated -->
     </div><!-- .content -->
-
-    <div id="form_loader"></div>
-
-{% endblock %}
-
-{% block js %}
-
-	<script src="{% static 'inventory/loader/loader.js' %}"></script>
 
 {% endblock %}

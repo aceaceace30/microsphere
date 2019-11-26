@@ -1,4 +1,6 @@
 {% extends 'inventory/base.html' %}
+{% load static%}
+
 {% block title %} Microsphere - Dashboard {% endblock %}
 
 {% block page_title %} Dashboard {% endblock %}
@@ -11,7 +13,7 @@
         <div class="row pt-2">
 
             <div class="col-md-3 text-center">
-                <form method="POST">
+                <form method="POST" id="create-inventory" data-url="{% url 'inventory:load_business_units' %}">
                     {% csrf_token %}
                     {% for field in filter_form %}
 
@@ -24,26 +26,38 @@
                     {% endfor %}
 
                     <div class="col-md-12 pt-3">
-                        <button type="submit" class="btn btn-success w-100">Filter</button>
+                        <button type="submit" class="btn btn-success w-100">FILTER</button>
                     </div>
                     
                 </form>
             </div>
+
+            <div class="col-md-3">
+                <div class="card bg-flat-color-5 border border-dark h-100">
+                    <div class="card-body text-center">
+                        <h2 class="mt-2">Total # of Units:</h2>
+                        <h1 class="mt-4" style="font-size: 5rem;">
+                            <span class="badge badge-primary">
+                                <a href="{% url 'inventory:pm-list' %}" class="text-light">{{ unit_count }}</a>
+                            </span>
+                        </h1>
+                    </div>
+                </div>
+            </div>
             
             <div class="col-md-6">
                 <div class="card bg-flat-color-5 border border-dark h-100">
-                    <!-- <img class="card-img-top" src="images/placeholder.png" alt="Card image cap"> -->
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-8">
-                                <h4 class="card-title">PM Count: <a class="badge badge-primary" href="{% url 'inventory:pm-list' %}">{{ pm_count }}</a></h4>
+                            <div class="col-7">
+                                <h2 class="card-title">PM Count: <a class="badge badge-primary" href="{% url 'inventory:pm-list' %}">{{ pm_count }}</a></h2>
                             </div>
-                            <div class="col-4">
+                            <div class="col-5">
                                 {% for count in pm_count_status%}
                                     {% if not count.pm_done %}
-                                        <span class="badge badge-danger"> Pending: {{ count.status_count }}</span>
+                                        <h3><span class="badge badge-danger w-100"> Pending: {{ count.status_count }}</span></h3>
                                     {% else %}
-                                        <span class="badge badge-success">Done: {{ count.status_count }}</span>
+                                        <h3><span class="badge badge-success w-100">Done: {{ count.status_count }}</span></h3>
                                     {% endif %}
                                 {% endfor %}
                             </div>
@@ -241,60 +255,8 @@
 	</div>
 </div>
 
-            <!-- <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Data</h4>
-                            </div>
-                            <div class="card-body">
-                                <p class="text-muted m-b-15">Here are reliable informations. You can filter from the list.</p>
-
-                                <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                    <li class="nav-item">
-                                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Machine type count</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Menu 1</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Menu 2</a>
-                                    </li>
-                                </ul>
-                                <div class="tab-content pl-3 p-1" id="myTabContent">
-                                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                                        <div class="container">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <h3>Machine type count</h3>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col">
-                                                    <ul>
-                                                        {% for count in machine_type_count %}
-                                                            <li>{{ count.machine_type_name }} <span class="badge badge-primary">{{ count.machine_count }}</span>
-                                                            </li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                                        <h3>Menu 1</h3>
-                                        <p>Some content here.</p>
-                                    </div>
-                                    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                                        <h3>Menu 2</h3>
-                                        <p>Some content here.</p>
-                                    </div>
-                                </div>
-
-
-                            </div>
-                        </div>
-                    </div> -->
-
-
 {% endblock %}
+
+{% block js %}
+    <script src="{% static 'inventory/js/custom/unit_ajax_dropdown.js' %}"></script>
+{% endblock%}

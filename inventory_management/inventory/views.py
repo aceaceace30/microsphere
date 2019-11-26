@@ -30,9 +30,22 @@ import os
 
 @login_required
 def load_business_units(request):
+	client = request.GET.get('client')
 	area = request.GET.get('area')
 	business_unit_id = request.GET.get('business_unit')
-	business_units = BusinessUnit.objects.filter(area=area, active=True)
+
+	print('Client: ', client)
+	print('Area: ', area)
+
+	business_units = None
+
+	filter_ = Q(active=True)
+
+	if client:
+		filter_ &= Q(client=client)
+	if area:
+		filter_ &= Q(area=area)
+		business_units = BusinessUnit.objects.filter(filter_)
 
 	if business_unit_id:
 		business_unit = business_units.get(pk=business_unit_id)
@@ -61,8 +74,6 @@ def load_brand_choices(request):
 				ON model.brand_id = brand.id".format(machine_type)
 
 		brands = Model.objects.raw(query)
-
-
 
 	context = {
 		'brands':brands,
@@ -359,7 +370,6 @@ class UnitPerBranch(LoginRequiredMixin, ListView):
 
 # 	return unit_save(request, form, render_create_html)
 
-
 def pm_save(request, form, template_name):
 	data = dict()
 
@@ -445,6 +455,7 @@ def pm_create(request):
 
 	return pm_save(request, form, render_create_html)
 
+@login_required
 def pm_delete(request, pk):
 	pm = get_object_or_404(PreventiveMaintenance, pk=pk, active=True)
 	template_name = 'inventory/pm/pm_delete.html'
@@ -460,19 +471,34 @@ def pm_delete(request, pk):
 		}
 	return render(request, template_name, context)
 
+@login_required
 def add_pm_remarks(request, pk):
+	data = dict()
 	pm_history = get_object_or_404(PmUnitHistory, pk=pk)
 
 	if request.method == 'POST':
+		data['is_valid'] = False
 		remarks = request.POST.get('remarks', default=None)
-		pm_history.remarks = remarks
-		pm_history.updated_by = request.user
-		pm_history.updated_at = datetime.datetime.now()
-		pm_history.save()
-		messages.success(request, 'Remarks has been added.')
 
-	return redirect('inventory:unit-view', pm_history.unit.pk)
+		if remarks:
+			pm_history.remarks = remarks
+			pm_history.updated_by = request.user
+			pm_history.updated_at = datetime.datetime.now()
+			pm_history.save()
 
+			pm_history_list = PmUnitHistory.objects.select_related('preventive_maintenance')\
+					.filter(unit=pm_history.unit, unit__active=True)\
+					.order_by('-preventive_maintenance__target_date')
+
+			data['pm_history_list'] = render_to_string('inventory/includes/unit/partial_pm_history.html', {'pm_history':pm_history_list})
+			data['message'] = 'Notes has been saved.'
+			data['is_valid'] = True
+
+		#messages.success(request, 'Remarks has been added.')
+		return JsonResponse(data)
+	#return redirect('inventory:unit-view', pm_history.unit.pk)
+
+@login_required
 def mark_as_done(request, pk):
 	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
 	units = Unit.objects.filter(active=True, business_unit__pk=pm.business_unit.pk)

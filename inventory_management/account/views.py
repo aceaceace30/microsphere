@@ -15,9 +15,9 @@ def dashboard(request):
 
 	# checks if account login is a client else microsphere account
 	client = request.user.clientprofile if ClientProfile.objects.filter(username=request.user).exists() else None
-
 	# set business_unit value to None to avoid errors on filter on get request
 	business_unit = None
+	area = None
 
 	if request.method == 'POST':
 
@@ -27,17 +27,18 @@ def dashboard(request):
 		if filter_form.is_valid():
 			business_unit = filter_form.cleaned_data['business_unit']
 			client = filter_form.cleaned_data['client']
+			area = filter_form.cleaned_data['area']
 	else:
 		# kwargs initial - to set initial value of dropdown for client else display default
 		filter_form = DashboardFilterForm(client, initial = {'client': client.pk if client else None})
 
 	# get total unit count
-	unit_count = Unit.get_total_count(client=client)
+	unit_count = Unit.get_total_count(client=client, business_unit=business_unit, area=area)
 
 	# get pm status
-	pm_count = PreventiveMaintenance.get_total_count(client=client, business_unit=business_unit)
-	pm_count_status = PreventiveMaintenance.get_total_count_per_status(client=client, business_unit=business_unit)
-	pms = PreventiveMaintenance.get_pending_pm(number_to_retrive=5, client=client, business_unit=business_unit)
+	pm_count = PreventiveMaintenance.get_total_count(client=client, business_unit=business_unit, area=area)
+	pm_count_status = PreventiveMaintenance.get_total_count_per_status(client=client, business_unit=business_unit, area=area)
+	pms = PreventiveMaintenance.get_pending_pm(number_to_retrive=5, client=client, business_unit=business_unit, area=area)
 
 	# set base value for filtering
 	# did this way because different queryset needs different filtering
@@ -56,6 +57,12 @@ def dashboard(request):
 		filter_business_unit &= Q(business_unit_name=business_unit)
 		filter_base &= Q(unit__business_unit=business_unit)
 		filter_static &= Q(business_unit=business_unit)
+
+	# checks if area is not None and concat filtering
+	if area:
+		filter_business_unit &= Q(area=area)
+		filter_base &= Q(unit__business_unit__area=area)
+		filter_static &= Q(area=area)
 
 	# define queryset to display on each card
 	unit_count_per_bu = BusinessUnit.objects.filter(filter_business_unit).annotate(unit_count=Count('unit'))

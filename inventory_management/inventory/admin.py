@@ -4,7 +4,9 @@ OfficeApplication, Processor, TotalRam, HddSize, Unit, PreventiveMaintenance, Em
 
 # import export library
 from import_export.admin import ImportExportModelAdmin, ExportActionMixin
-from .resources import BusinessUnitResource, ClientProfileResource
+from .resources import BusinessUnitResource, ClientProfileResource, UnitResource, MachineTypeResource,\
+BrandResource, ModelResource, OperatingSystemResource, OfficeApplicationResource, ProcessorResource,\
+TotalRamResource, HddSizeResource
 
 # simple history library
 from simple_history.admin import SimpleHistoryAdmin
@@ -24,6 +26,8 @@ class ClientProfileAdmin(ImportExportModelAdmin):
 	search_fields = ('username__username', 'client_code', 'client_name', 'pm_coverage',
 					'email', 'contact_no', 'date_started', 'active',
 					'created_by__username', 'updated_by__username')
+
+	list_filter = ('active', 'pm_coverage')
 
 	def save_model(self, request, obj, form, change):
 
@@ -48,6 +52,8 @@ class BusinessUnitAdmin(ImportExportModelAdmin):
 					'rc_code', 'area', 'location', 'active',
 					'created_by__username', 'updated_by__username')
 
+	list_filter = ('active', 'client', 'area', 'location')
+
 	def save_model(self, request, obj, form, change):
 
 		if not obj.pk:
@@ -59,6 +65,8 @@ class BusinessUnitAdmin(ImportExportModelAdmin):
 admin.site.register(BusinessUnit, BusinessUnitAdmin)
 
 class UnitHistoryAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
+
+	resource_class = UnitResource
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -74,7 +82,10 @@ class UnitHistoryAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 						'host_name', 'mac_address', 'ip_address', 'remarks',
 						'created_by__username', 'updated_by__username')
 
-	list_filter = ('active', 'business_unit__client', 'area', 'business_unit', 'machine_type', 'machine_brand', 'created_by')
+	list_filter = ('active', 'business_unit__client', 'area',
+				   'business_unit', 'machine_type', 'machine_brand',
+				   'model', 'operating_system', 'office_application',
+				   'processor', 'total_ram', 'hdd_size', 'monitor_type', 'created_by')
 
 	def save_model(self, request, obj, form, change):
 
@@ -96,6 +107,8 @@ admin.site.register(Unit, UnitHistoryAdmin)
 
 class MachineTypeAdmin(ImportExportModelAdmin):
 
+	resource_class = MachineTypeResource
+
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
 	list_display = ('machine_type_name', 'machine_class', 'active', 'created_at')
@@ -115,6 +128,8 @@ admin.site.register(MachineType, MachineTypeAdmin)
 
 class BrandAdmin(ImportExportModelAdmin):
 
+	resource_class = BrandResource
+
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
 	list_display = ('brand_name', 'active', 'created_at')
@@ -133,6 +148,8 @@ class BrandAdmin(ImportExportModelAdmin):
 admin.site.register(Brand, BrandAdmin)
 
 class ModelAdmin(ImportExportModelAdmin):
+
+	resource_class = ModelResource
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -161,6 +178,8 @@ admin.site.register(Model, ModelAdmin)
 
 class OperatingSystemAdmin(ImportExportModelAdmin):
 
+	resource_class = OperatingSystemResource
+
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
 	list_display = ('os_name', 'active', 'created_at')
@@ -179,6 +198,8 @@ class OperatingSystemAdmin(ImportExportModelAdmin):
 admin.site.register(OperatingSystem, OperatingSystemAdmin)
 
 class OfficeApplicationAdmin(ImportExportModelAdmin):
+
+	resource_class = OfficeApplicationResource
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
@@ -199,6 +220,8 @@ admin.site.register(OfficeApplication, OfficeApplicationAdmin)
 
 class ProcessorAdmin(ImportExportModelAdmin):
 
+	resource_class = ProcessorResource
+
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
 	list_display = ('processor_name', 'active', 'created_at')
@@ -218,6 +241,8 @@ admin.site.register(Processor, ProcessorAdmin)
 
 class TotalRamAdmin(ImportExportModelAdmin):
 
+	resource_class = TotalRamResource
+
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
 	list_display = ('total_ram_name', 'active', 'created_at')
@@ -236,6 +261,8 @@ class TotalRamAdmin(ImportExportModelAdmin):
 admin.site.register(TotalRam, TotalRamAdmin)
 
 class HddSizeAdmin(ImportExportModelAdmin):
+
+	resource_class = HddSizeResource
 
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 

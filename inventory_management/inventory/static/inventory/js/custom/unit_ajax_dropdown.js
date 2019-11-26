@@ -5,12 +5,14 @@ jQuery(function($) {
       var url = $("#create-inventory").attr("data-url");  // get the url of the `load_business_units` view
       var area = $(this).val();                           // get the selected area from the HTML input
       var business_unit = $("#id_business_unit").val();
+      var client = $('#id_client').val();
 
       $.ajax({                                            // initialize an AJAX request
         url: url,                                         // set the url of the request
         data: {
           'area': area,                                   // add the area to the GET parameters
           'business_unit': business_unit,
+          'client': client,
         },
         success: function (data) {                        // `data` is the return of the `load_business_units` view function
           $("#id_business_unit").html(data);              // replace the contents of the business_unit input with the data that came from the server
@@ -22,14 +24,54 @@ jQuery(function($) {
   $("#id_area").change(function () {
       var url = $("#create-inventory").attr("data-url");  // get the url of the `load_business_units` view
       var area = $(this).val();                           // get the selected area from the HTML input
+      var client = $('#id_client').val();
+
+      console.log(area);
+      console.log(client);
 
       $.ajax({                                            // initialize an AJAX request
         url: url,                                         // set the url of the request
         data: {
-          'area': area                                    // add the area to the GET parameters
+          'area': area,                                    // add the area to the GET parameters
+          'client': client,
         },
         success: function (data) {                        // `data` is the return of the `load_business_units` view function
           $("#id_business_unit").html(data);              // replace the contents of the business_unit input with the data that came from the server
+        }
+      });
+  });
+
+// auto load the choices
+  $("#id_client").filter(function () {
+      var url = $("#create-inventory").attr("data-url");
+      var client = $(this).val();
+      var area = $('#id_area').val();
+
+      $.ajax({
+        url: url,
+        data: {
+          'client': client,
+          'area': area,
+        },
+        success: function (data) {
+          $("#id_business_unit").html(data);
+        }
+      });
+  });
+
+  $("#id_client").change(function () {
+      var url = $("#create-inventory").attr("data-url");
+      var client = $(this).val();
+      var area = $('#id_area').val();
+
+      $.ajax({
+        url: url,
+        data: {
+          'client': client,
+          'area': area,
+        },
+        success: function (data) {
+          $("#id_business_unit").html(data);
         }
       });
   });

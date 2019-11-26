@@ -24,7 +24,7 @@
 
         		{% include 'inventory/notifs/message.html' %}
 
-				<form method="POST" action="{% url 'inventory:mark-as-done' pm.pk %}">
+				<form method="POST" action="{% url 'inventory:mark-as-done' pm.pk %}" id="mark_done_form">
                 	{% csrf_token %}
 
 				<div class="col-md-5 offset-md-3">

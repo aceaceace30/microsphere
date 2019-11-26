@@ -1,6 +1,6 @@
 jQuery(function($) {
-	var spinner = $('#form_loader');
-  	$("form").on("submit", function(){
-    	spinner.show();
-  	});//submit
-});//document ready
+	var spinner = $('#loader');
+  	$("#mark_done_form").on("submit", function(){
+    	spinner.fadeIn();
+  	});
+});

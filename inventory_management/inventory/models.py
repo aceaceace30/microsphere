@@ -14,11 +14,11 @@ PM_COVERAGE = (
 	('Quarterly', 'Quarterly'),
 	)
 
-AREA = (
+AREA = [
 	('Provincial', 'Provincial'),
 	('Metro Manila', 'Metro Manila'),
 	('Head Office', 'Head Office'),
-	)
+	]
 
 STATUS = (
     ('Covered by MA', 'Covered by MA'),
@@ -42,6 +42,11 @@ MACHINE_CLASS = (
 MONITOR_TYPE = (
     ('LCD', 'LCD'),
     ('CRT', 'CRT'),
+    )
+
+WORKING_CHOICES = (
+    ('Y', 'Y'),
+    ('N', 'N')
     )
 
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Please enter alphanumeric characters.')
@@ -261,6 +266,7 @@ class Unit(models.Model):
     monitor_brand = models.ForeignKey(Brand, on_delete=models.PROTECT, blank=True, null=True, related_name='monitor_brand')
     monitor_size = models.PositiveIntegerField(blank=True, null=True)
     remarks = models.TextField(max_length=500, blank=True, null=True)
+    working = models.CharField(choices=WORKING_CHOICES, max_length=1, default='Y')
     status = models.CharField(choices=STATUS, max_length=30)
 
     active = models.BooleanField(default=True)
@@ -270,7 +276,7 @@ class Unit(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='unit_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='unit_updated')
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -291,11 +297,8 @@ class Unit(models.Model):
             return Unit.objects.filter(active=True, business_unit__client=request.user.clientprofile)
         return Unit.objects.filter(active=True)
 
-    def get_total_count(client=None):
-        if not client:
-            return Unit.objects.filter(active=True).count()
-        else:
-            return Unit.objects.filter(active=True, business_unit__client=client).count()
+    def get_total_count(client=None, business_unit=None, area=None):
+        return Unit.objects.filter(dynamic_filter_pm(client, business_unit, area)).count()
 
     def get_unit_num_per_branch(client=None):
         units = Unit.objects.values('business_unit')\
@@ -305,7 +308,7 @@ class Unit(models.Model):
         return units
 
 # set as base dynamic filtering for class PreventiveMaintenance
-def dynamic_filter_pm(client, business_unit):
+def dynamic_filter_pm(client, business_unit, area):
 
     filter_ = Q(active=True)
 
@@ -313,6 +316,8 @@ def dynamic_filter_pm(client, business_unit):
         filter_ &= Q(business_unit__client=client)
     if business_unit:
         filter_ &= Q(business_unit=business_unit)
+    if area:
+        filter_ &= Q(business_unit__area=area)
 
     return filter_
 
@@ -358,32 +363,27 @@ class PreventiveMaintenance(models.Model):
         elif status == 'Pending':
             pm_done = False
 
-        if client and status:
-            return PreventiveMaintenance.objects.filter(active=True,
-                                                        pm_done=pm_done,
-                                                        business_unit__client=client)
-        elif status:
-            return PreventiveMaintenance.objects.filter(active=True,
-                                                        pm_done=pm_done)
+        filter_ = Q(active=True)
 
-        elif client:
-            return PreventiveMaintenance.objects.filter(active=True,
-                                                        business_unit__client=client)
-        else:
-            return PreventiveMaintenance.objects.filter(active=True)
+        if client:
+            filter_ &= Q(business_unit__client=client)
+        if status:
+            filter_ &= Q(pm_done=pm_done)
+            
+        return PreventiveMaintenance.objects.filter(filter_)
 
-    def get_total_count(client=None, business_unit=None):
-        return PreventiveMaintenance.objects.filter(dynamic_filter_pm(client, business_unit)).count()
+    def get_total_count(client=None, business_unit=None, area=None):
+        return PreventiveMaintenance.objects.filter(dynamic_filter_pm(client, business_unit, area)).count()
 
-    def get_total_count_per_status(client=None, business_unit=None):
+    def get_total_count_per_status(client=None, business_unit=None, area=None):
         return PreventiveMaintenance.objects.values('pm_done')\
-                                            .filter(dynamic_filter_pm(client, business_unit))\
+                                            .filter(dynamic_filter_pm(client, business_unit, area))\
                                             .order_by('pm_done')\
                                             .annotate(status_count=Count('pm_done'))
 
-    def get_pending_pm(number_to_retrive=3, client=None, business_unit=None):
+    def get_pending_pm(number_to_retrive=3, client=None, business_unit=None, area=None):
 
-        filter_ = dynamic_filter_pm(client, business_unit)
+        filter_ = dynamic_filter_pm(client, business_unit, area)
         filter_ &= Q(pm_done=False)
 
         return PreventiveMaintenance.objects.filter(filter_)\

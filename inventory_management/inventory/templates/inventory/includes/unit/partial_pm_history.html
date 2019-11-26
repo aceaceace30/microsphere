@@ -1,0 +1,117 @@
+{% for history in pm_history %}
+    <div class="card border border-success bg-success">
+        <div class="card-header bg-success text-white">
+            <strong class="card-title">
+                
+                <a href="{% url 'inventory:pm-view' history.preventive_maintenance.pk %}" class="text-dark">Business Unit: <span class="text-light">{{ history.unit.business_unit }}</span></a>
+
+                <div class="float-right">
+                    {% if history.preventive_maintenance.pm_done %}
+                        <span class="badge badge-pill badge-primary">Done</span>
+                    {% else %}
+                        <span class="badge badge-pill badge-danger">Pending</span>
+                    {% endif %}
+                </div>
+                
+            </strong>
+            {% if history.preventive_maintenance.remarks %}
+                <p class="text-dark font-weight-bold">Remarks: <span class="text-light">{{ history.preventive_maintenance.remarks }}</span></p>
+            {% endif %}
+        </div>
+        <div class="card-body bg-white">
+            <div class="row">
+                {% if history.preventive_maintenance.pm_done %}
+                    <div class="col-5">
+                        <p class="card-text text-dark">
+                            SR #: 
+                        </p>                      
+                    </div>
+                
+                    <div class="col-7">
+                        <span class="text-success">{{ history.preventive_maintenance.service_report_number }}</span>
+                    </div>
+                {% endif %}
+                
+                {% if history.remarks %}
+                    <div class="col-5">
+                        <p class="card-text text-dark">
+                            PM Notes:
+                        </p>                      
+                    </div>
+                    
+                    <div class="col-7">
+                        <span class="text-success">{{ history.remarks }}</span>
+                    </div>
+                {% endif %}
+
+                <div class="col-5">
+                    <p class="card-text text-dark">
+                        Target Date: 
+                    </p>                      
+                </div>
+                
+                <div class="col-7">
+                    <span class="text-success">{{ history.preventive_maintenance.target_date }}</span>
+                </div>
+
+                <div class="col-5">
+                    <p class="card-text text-dark">
+                        Target Time: 
+                    </p>                      
+                </div>
+                <div class="col-7">
+                    <span class="text-success">{{ history.preventive_maintenance.target_time }}</span>
+                </div>
+                {% if history.preventive_maintenance.pm_done %}
+                    <div class="col-5">
+                        <p class="card-text text-dark">
+                            Date Done: 
+                        </p>                      
+                    </div>
+                    <div class="col-7">
+                        <span class="text-success">                                   
+                            {{ history.preventive_maintenance.pm_date_done }}                                                           
+                        </span>
+                    </div>
+                {% endif %}
+
+                {% if perms.inventory.can_add_remarks_per_pm %}
+                    <!-- <div class="col-12 pt-2">
+                        <form action="{% url 'inventory:add-pm-remarks' history.pk %}" method="POST">
+                        {% csrf_token %}
+                        <input type="text" name="remarks" class="form-control" value="{% if history.remarks %}{{ history.remarks }}{% endif %}" placeholder="Enter remarks">
+                        </textarea>
+                    </div> -->
+                    <!-- <div class="col pt-2"> -->
+                        <!-- <input type="submit" value="Save PM Notes" class="btn btn-success btn-sm"> -->
+
+                        
+                        <!-- </form> -->
+                    <!-- </div> -->
+                {% endif %}
+            
+                <div class="col-12 pt-2">
+                    <div class="float-left">
+                        <button type="button" data-url="{% url 'inventory:add-pm-remarks' history.pk %}" class="btn btn-success btn-sm" data-toggle="modal" data-target="#notes_modal">
+                            Edit notes
+                        </button>
+                    </div>
+                    <small class="float-right">
+                        By: {{ history.preventive_maintenance.created_by }} | {{ history.preventive_maintenance.created_at|date }}
+                    </small>
+                </div>
+                    
+            </div>
+        </div>
+    </div>
+{% empty %}
+    <div class="card border border-success bg-success">
+        <div class="card-header bg-success text-white">
+            <strong class="card-title">Preventive Maintenance Info.</strong>
+        </div>
+        <div class="card-body bg-light">
+            No preventive maintenance yet...
+        </div>
+    </div>
+
+{% endfor %}
