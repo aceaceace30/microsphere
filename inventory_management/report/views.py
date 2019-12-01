@@ -6,8 +6,7 @@ from django.views.generic import View, TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from .forms import ReportFilterForm
-from account.forms import DashboardFilterForm
+from .forms import ReportFilterForm, CertficateFilterForm
 
 from inventory.models import MachineType, Processor, TotalRam, HddSize, Unit
 from django.db.models import Count, Q
@@ -190,7 +189,7 @@ class CertificationFormView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 	def post(self, request, *args, **kwargs):
 
-		form = DashboardFilterForm(None, request.POST)
+		form = CertficateFilterForm(request.POST)
 
 		if form.is_valid():
 			business_unit_id = request.POST['business_unit']
@@ -203,7 +202,7 @@ class CertificationFormView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
 	def get(self, request, *args, **kwargs):
 
-		form = DashboardFilterForm(None)
+		form = CertficateFilterForm()
 
 		context = {
 			'form':form

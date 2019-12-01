@@ -16,8 +16,11 @@ from django.contrib import messages
 
 from django.template.loader import render_to_string, get_template
 
+from django.contrib.auth.models import User, Permission
+
 from .models import Unit, PreventiveMaintenance, MachineType, PmUnitHistory, ClientProfile,\
-BusinessUnit, Model, EmailTemplate
+BusinessUnit, Model, EmailTemplate, Processor, OperatingSystem, OfficeApplication, TotalRam, HddSize,\
+Brand
 
 from django.db.models import Count, Q
 
@@ -30,7 +33,7 @@ from django.utils.decorators import method_decorator
 
 import datetime
 
-from .utils import Render
+from .utils import Render, check_perm
 from xhtml2pdf import pisa
 
 import os
@@ -70,7 +73,6 @@ class UnitUpdateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessage
 		pk = self.kwargs.get('pk')
 		return get_object_or_404(Unit, pk=pk, active=True)
 
-#permission not working
 class UnitDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 	permission_required = 'inventory.view_unit'
 	login_url = settings.LOGOUT_REDIRECT_URL
@@ -88,21 +90,6 @@ class UnitDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 	def get_object(self, *args, **kwargs):
 		pk = self.kwargs.get('pk')
 		return get_object_or_404(Unit, pk=pk, active=True)
-
-@permission_required('inventory.view_unit')
-def unit_details(request, pk):
-	template_name = 'inventory/unit/unit_view.html'
-	unit = get_object_or_404(Unit, pk=pk, active=True)
-	if request.method == 'GET':
-		pm_history = PmUnitHistory.objects.select_related('preventive_maintenance')\
-					.filter(unit_id=pk, unit__active=True)\
-					.order_by('-preventive_maintenance__target_date')
-
-		context = {'unit': unit,
-				   'pm_history': pm_history}
-
-		return render(request, template_name, context)
-
 
 def unit_delete(request, pk):
 	unit = get_object_or_404(Unit, pk=pk, active=True)
@@ -141,18 +128,79 @@ def historical_changes(history):
 
 			if old_record is not None:
 				delta = new_record.diff_against(old_record)
+				for c in delta.changes:
+					if c.field == 'updated_by':
+						data = get_old_new_values(User, 'username', c.old, c.new)
+						c.old = data['old']
+						c.new = data['new']
+					elif c.field == 'business_unit':
+						# Special case - to see if client has also been changed.
+						old = BusinessUnit.objects.values('business_unit_name', 'client__client_code').get(pk=c.old)
+						new = BusinessUnit.objects.values('business_unit_name', 'client__client_code').get(pk=c.new)
+						c.old = old['business_unit_name'] + ' ({0})'.format(old['client__client_code'])
+						c.new = new['business_unit_name'] + ' ({0})'.format(new['client__client_code'])
+					elif c.field == 'machine_type':
+						data = get_old_new_values(MachineType, 'machine_type_name', c.old, c.new)
+						c.old = data['old']
+						c.new = data['new']
+					elif c.field == 'machine_brand':
+						data = get_old_new_values(Brand, 'brand_name', c.old, c.new)
+						c.old = data['old']
+						c.new = data['new']
+					elif c.field == 'model':
+						data = get_old_new_values(Model, 'model_name', c.old, c.new)
+						c.old = data['old']
+						c.new = data['new']
+					elif c.field == 'operating_system':
+						data = get_old_new_values(OperatingSystem, 'os_name', c.old, c.new)
+						c.old = data['old']
+						c.new = data['new']
+					elif c.field == 'office_application':
+						data = get_old_new_values(OfficeApplication, 'office_app_name', c.old, c.new)
+						c.old = data['old']
+						c.new = data['new']
+					elif c.field == 'processor':
+						data = get_old_new_values(Processor, 'processor_name', c.old, c.new)
+						c.old = data['old']
+						c.new = data['new']
+					elif c.field == 'total_ram':
+						data = get_old_new_values(TotalRam, 'total_ram_name', c.old, c.new)
+						c.old = data['old']
+						c.new = data['new']
+					elif c.field == 'hdd_size':
+						data = get_old_new_values(HddSize, 'hdd_size_name', c.old, c.new)
+						c.old = data['old']
+						c.new = data['new']
+					elif c.field == 'monitor_brand':
+						data = get_old_new_values(Brand, 'brand_name', c.old, c.new)
+						c.old = data['old']
+						c.new = data['new']
+					#print("{} changed from {} to {}".format(c.field, c.old, c.new))
 				changes.append(delta)
 			last = old_record
 
-	for c in changes:
-		print('Fields:', c.changes)
-		for field in c.changes:
-			#print(field.field)
-			print(field.old, field.new)
-			#print(field.new)
-		#print('Fields', c.changed_fields)
+	# for c in changes:
+	# 	attrs = vars(c)
+	# 	for field in c.changes:
+	# 		attrs2 = vars(field)
 
 	return changes
+
+def get_old_new_values(class_, values, old_pk, new_pk):
+	data = dict()
+	try:
+		old = class_.objects.values(values).get(pk=old_pk)
+		data['old'] = old[values]
+	except:
+		data['old'] = 'data has been remove/deleted'
+
+	try:
+		old = class_.objects.values(values).get(pk=new_pk)
+		data['new'] = old[values]
+	except:
+		data['new'] = 'data has been remove/deleted'
+
+	return data
 
 
 
@@ -386,7 +434,19 @@ def add_pm_remarks(request, pk):
 					.filter(unit=pm_history.unit, unit__active=True)\
 					.order_by('-preventive_maintenance__target_date')
 
-			data['pm_history_list'] = render_to_string('inventory/includes/unit/partial_pm_history.html', {'pm_history':pm_history_list})
+			user = request.user
+			# check user if has permission
+			if not user.is_superuser:
+				can_add_remarks_per_pm = Permission.objects.filter(Q(user=user) | Q(group__user=user)).distinct()
+				can_add_remarks_per_pm = can_add_remarks_per_pm.filter(codename=perm).exists()
+			else:
+				can_add_remarks_per_pm = True
+
+			context = {'request': request,
+					   'can_add_remarks_per_pm': can_add_remarks_per_pm,
+					   'pm_history': pm_history_list,}
+
+			data['pm_history_list'] = render_to_string('inventory/includes/unit/partial_pm_history.html', context)
 			data['message'] = 'Notes has been saved.'
 			data['is_valid'] = True
 

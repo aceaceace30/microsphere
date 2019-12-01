@@ -12,6 +12,13 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 
+import environ
+
+root = environ.Path(__file__) - 3  # get root of the project
+env = environ.Env()
+environ.Env.read_env()  # reading .env file
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,12 +27,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '!8s!mxg^t#9)n=e4_e*xmeg%6qvv2p4s)ds2@7825st(r1kw7x'
+SECRET_KEY = env.str('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+DEBUG = env.bool('DEBUG', default=False)
 
 
 # Application definition
@@ -84,14 +89,6 @@ WSGI_APPLICATION = 'inventory_management.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'microsphere',
-    #     'USER': 'postgres',
-    #     'PASSWORD': 'admin',
-    #     'HOST': 'localhost',
-    #     'PORT': '5433',
-    # }
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
@@ -160,8 +157,8 @@ LOGIN_URL = 'account:login'
 #email settings
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'aceaceace.test@gmail.com'
-EMAIL_HOST_PASSWORD = 'ace87654321!'
+EMAIL_HOST_USER = env.str('EMAIL_USERNAME')
+EMAIL_HOST_PASSWORD = env.str('EMAIL_PASS')
 EMAIL_PORT = 587
 
 # EMAIL_HEADER_MESSAGE = 'Good Day! This is the updated list of units after the Preventive Maintenance.'

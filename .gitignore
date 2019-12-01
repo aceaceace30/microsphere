@@ -1,3 +1,4 @@
 *.pyc
 Docs/
 py-3.7.2/
+.env

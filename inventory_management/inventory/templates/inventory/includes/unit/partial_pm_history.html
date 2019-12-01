@@ -74,9 +74,9 @@
                         </span>
                     </div>
                 {% endif %}
-            
+
                 <div class="col-12 pt-2">
-                    {% if perms.inventory.can_add_remarks_per_pm %}
+                    {% if perms.inventory.can_add_remarks_per_pm or can_add_remarks_per_pm %}
                         <div class="float-left">
                             <button type="button" data-url="{% url 'inventory:add-pm-remarks' history.pk %}" class="btn btn-success btn-sm" data-toggle="modal" data-target="#notes_modal">
                                 Edit notes

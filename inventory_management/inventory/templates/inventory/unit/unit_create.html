@@ -27,9 +27,9 @@
 				    	<div class="row pt-2 pl-2 pr-2">
 				        	<div class="col-lg-6">
 				                <div class="card">
-				                    <div class="card-header"><strong>Main Details</strong></div>
+				                    <div class="card-header bg-success text-light"><strong>Main Details</strong></div>
 				                    <div class="card-body">
-				                        {% for field in form.visible_fields|slice:":8" %}
+				                        {% for field in form.visible_fields|slice:":13" %}
 							                <div class="row form-group">
 							                    <div class="col col-md-5">{{ field.label_tag }}</div>
 							                    <div class="col-7 col-md-7">
@@ -44,9 +44,9 @@
 
 				            <div class="col-lg-6">
 				                <div class="card">
-				                    <div class="card-header"><strong>Other Details</strong></div>
+				                    <div class="card-header bg-success text-light"><strong>Other Details</strong></div>
 				                    <div class="card-body card-block">
-				                    	{% for field in form.visible_fields|slice:"8:" %}
+				                    	{% for field in form.visible_fields|slice:"13:" %}
 							                <div class="row form-group">
 							                    <div class="col col-md-5">{{ field.label_tag }}</div>
 							                    <div class="col-7 col-md-7">

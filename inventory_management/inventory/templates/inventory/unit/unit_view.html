@@ -38,6 +38,7 @@
                 </button>
             </div>
             <div class="modal-body">
+                <p class="text-danger font-weight-bold empty_notes"></p>
                 <textarea id="notes_remarks" class="form-control" cols="30" rows="10" required></textarea>
             </div>
             <div class="modal-footer">
@@ -80,11 +81,19 @@
 
             $('#notes_modal').on('show.bs.modal', function (e){
                 pm_history_url = $(e.relatedTarget).data('url');
+                $('.empty_notes').html('');
+                $('#notes_remarks').removeAttr('style');
             });
 
             $('#add_remarks_btn').click(function(){
 
                 let remarks = $('#notes_remarks').val();
+
+                if (remarks == '' || remarks == null) {
+                    $('.empty_notes').html('Notes can not be empty.');
+                    $('#notes_remarks').css('border-color', 'red');
+                    return true;
+                }
 
                 $.ajax({
                     url: pm_history_url,

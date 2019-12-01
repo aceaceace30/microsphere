@@ -340,7 +340,7 @@ class PreventiveMaintenance(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pm_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pm_updated')
 
-    history = HistoricalRecords()
+    #history = HistoricalRecords(cascade_delete_history=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -394,8 +394,8 @@ class PreventiveMaintenance(models.Model):
 
 class PmUnitHistory(models.Model):
 
-    preventive_maintenance = models.ForeignKey(PreventiveMaintenance, on_delete=models.PROTECT)
-    unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
+    preventive_maintenance = models.ForeignKey(PreventiveMaintenance, on_delete=models.CASCADE)
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     remarks = models.TextField(max_length=500, blank=True, null=True)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pmhistory_updated', null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)

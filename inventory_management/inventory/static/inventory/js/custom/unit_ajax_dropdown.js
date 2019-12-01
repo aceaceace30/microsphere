@@ -1,42 +1,4 @@
 jQuery(function($) {
-// auto load the choices for edit view in business unit
-  $("#id_area").filter(function() {
-
-      var url = $("#create-inventory").attr("data-url");  // get the url of the `load_business_units` view
-      var area = $(this).val();                           // get the selected area from the HTML input
-      var business_unit = $("#id_business_unit").val();
-      var client = $('#id_client').val();
-
-      $.ajax({                                            // initialize an AJAX request
-        url: url,                                         // set the url of the request
-        data: {
-          'area': area,                                   // add the area to the GET parameters
-          'business_unit': business_unit,
-          'client': client,
-        },
-        success: function (data) {                        // `data` is the return of the `load_business_units` view function
-          $("#id_business_unit").html(data);              // replace the contents of the business_unit input with the data that came from the server
-        }
-      });
-  });
-
-// change the value of business unit based on area value
-  $("#id_area").change(function () {
-      var url = $("#create-inventory").attr("data-url");  // get the url of the `load_business_units` view
-      var area = $(this).val();                           // get the selected area from the HTML input
-      var client = $('#id_client').val();
-
-      $.ajax({                                            // initialize an AJAX request
-        url: url,                                         // set the url of the request
-        data: {
-          'area': area,                                    // add the area to the GET parameters
-          'client': client,
-        },
-        success: function (data) {                        // `data` is the return of the `load_business_units` view function
-          $("#id_business_unit").html(data);              // replace the contents of the business_unit input with the data that came from the server
-        }
-      });
-  });
 
 // auto load the choices
   $("#id_client").filter(function () {
@@ -69,6 +31,53 @@ jQuery(function($) {
         },
         success: function (data) {
           $("#id_business_unit").html(data);
+        }
+      });
+  });
+
+// auto load the choices for edit view in business unit
+  $("#id_area").filter(function() {
+
+      var url = $("#create-inventory").attr("data-url");  // get the url of the `load_business_units` view
+      var area = $(this).val();                           // get the selected area from the HTML input
+      var business_unit = $("#id_business_unit").val();
+      var client = $('#id_client').val();
+
+      if (client == '' || client == null) {
+          return true;
+      }
+
+      $.ajax({                                            // initialize an AJAX request
+        url: url,                                         // set the url of the request
+        data: {
+          'area': area,                                   // add the area to the GET parameters
+          'business_unit': business_unit,
+          'client': client,
+        },
+        success: function (data) {                        // `data` is the return of the `load_business_units` view function
+          $("#id_business_unit").html(data);              // replace the contents of the business_unit input with the data that came from the server
+        }
+      });
+  });
+
+// change the value of business unit based on area value
+  $("#id_area").change(function () {
+      var url = $("#create-inventory").attr("data-url");  // get the url of the `load_business_units` view
+      var area = $(this).val();                           // get the selected area from the HTML input
+      var client = $('#id_client').val();
+
+      if (client == '' || client == null) {
+          return true;
+      }
+
+      $.ajax({                                            // initialize an AJAX request
+        url: url,                                         // set the url of the request
+        data: {
+          'area': area,                                    // add the area to the GET parameters
+          'client': client,
+        },
+        success: function (data) {                        // `data` is the return of the `load_business_units` view function
+          $("#id_business_unit").html(data);              // replace the contents of the business_unit input with the data that came from the server
         }
       });
   });

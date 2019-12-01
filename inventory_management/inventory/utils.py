@@ -59,7 +59,7 @@ def load_brand_choices(request):
 
     if machine_type:
         query = "SELECT id, model.brand_id, brand.brand_name FROM\
-                (SELECT DISTINCT brand_id FROM inventory_model WHERE machine_type_id={0} and active=1) AS model\
+                (SELECT DISTINCT brand_id FROM inventory_model WHERE machine_type_id={0} and active=true) AS model\
                 INNER JOIN inventory_brand AS brand\
                 ON model.brand_id = brand.id".format(machine_type)
 
@@ -123,6 +123,9 @@ def link_callback(uri, rel):
             )
     return path
 
+"""
+XHTML2PDF
+"""
 class Render:
     @staticmethod
     def render(path: str, filename: str, params: dict):
@@ -226,25 +229,25 @@ class UnitListJson(BaseDatatableView):
             qs = qs.filter(filter_)
 
         # more advanced example using extra parameters
-        filter_client = self.request.GET.get('columns[0][search][value]', None)
+        filter_serial_number = self.request.GET.get('columns[0][search][value]', None)
+        if filter_serial_number:
+            qs = qs.filter(serial_number__istartswith=filter_serial_number)
+
+        filter_client = self.request.GET.get('columns[1][search][value]', None)
         if filter_client:
             qs = qs.filter(business_unit__client__client_code__istartswith=filter_client)
 
-        filter_area = self.request.GET.get('columns[1][search][value]', None)
+        filter_area = self.request.GET.get('columns[2][search][value]', None)
         if filter_area:
             qs = qs.filter(area__istartswith=filter_area)
 
-        filter_business_unit = self.request.GET.get('columns[2][search][value]', None)
+        filter_business_unit = self.request.GET.get('columns[3][search][value]', None)
         if filter_business_unit:
             qs = qs.filter(business_unit__business_unit_name__istartswith=filter_business_unit)
 
-        filter_location = self.request.GET.get('columns[3][search][value]', None)
+        filter_location = self.request.GET.get('columns[4][search][value]', None)
         if filter_location:
             qs = qs.filter(business_unit__location__istartswith=filter_location)
-
-        filter_serial_number = self.request.GET.get('columns[4][search][value]', None)
-        if filter_serial_number:
-            qs = qs.filter(serial_number__istartswith=filter_serial_number)
 
         filter_status = self.request.GET.get('columns[5][search][value]', None)
         if filter_status:
