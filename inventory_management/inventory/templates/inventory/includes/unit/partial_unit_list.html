@@ -2,18 +2,15 @@
 
 {% for unit in units %}
 	<tr>
-		<td>{{ unit.business_unit.client }}</td>
-		<td>{{ unit.business_unit }}</td>
 		<td>
+			{% if unit.machine_type.machine_class|upper == 'CPU' %}
+				<img src="{% static 'inventory/images/CPU_ICON.ico' %}" alt="CPU Icon">
+			{% elif unit.machine_type.machine_class|upper == 'LAPTOP' %}
+				<img src="{% static 'inventory/images/LAPTOP_ICON.ico' %}" alt="LAPTOP Icon">
+			{% elif unit.machine_type.machine_class|upper == 'PRINTER' %}
+				<img src="{% static 'inventory/images/PRINTER_ICON.ico' %}" alt="PRINTER Icon">
+			{% endif %}
 			{% if perms.inventory.view_unit %}
-				{% if unit.machine_type.machine_class|upper == 'CPU' %}
-					<img src="{% static 'inventory/images/CPU_ICON.ico' %}" alt="CPU Icon">
-				{% elif unit.machine_type.machine_class|upper == 'LAPTOP' %}
-					<img src="{% static 'inventory/images/LAPTOP_ICON.ico' %}" alt="LAPTOP Icon">
-				{% elif unit.machine_type.machine_class|upper == 'PRINTER' %}
-					<img src="{% static 'inventory/images/PRINTER_ICON.ico' %}" alt="PRINTER Icon">
-				{% endif %}
-
 				<a href="{% url 'inventory:unit-view' unit.pk  %}" title="View unit details">
 					{{ unit.serial_number }}
 				</a>
@@ -21,6 +18,10 @@
 				{{ unit.serial_number }}
 			{% endif %}
 		</td>
+		<td>{{ unit.business_unit.client }}</td>
+		<td>{{ unit.area }}</td>
+		<td>{{ unit.business_unit }}</td>
+		<td>{{ unit.business_unit.location }}</td>
 		<td>{{ unit.status }}</td>
 	</tr>
 {% empty %}

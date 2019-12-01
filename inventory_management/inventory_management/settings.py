@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'inventory',
     'account',
+    'report',
     'import_export',
     'widget_tweaks',
     'admin_reorder',

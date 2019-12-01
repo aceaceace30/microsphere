@@ -74,28 +74,15 @@
                         </span>
                     </div>
                 {% endif %}
-
-                {% if perms.inventory.can_add_remarks_per_pm %}
-                    <!-- <div class="col-12 pt-2">
-                        <form action="{% url 'inventory:add-pm-remarks' history.pk %}" method="POST">
-                        {% csrf_token %}
-                        <input type="text" name="remarks" class="form-control" value="{% if history.remarks %}{{ history.remarks }}{% endif %}" placeholder="Enter remarks">
-                        </textarea>
-                    </div> -->
-                    <!-- <div class="col pt-2"> -->
-                        <!-- <input type="submit" value="Save PM Notes" class="btn btn-success btn-sm"> -->
-
-                        
-                        <!-- </form> -->
-                    <!-- </div> -->
-                {% endif %}
             
                 <div class="col-12 pt-2">
-                    <div class="float-left">
-                        <button type="button" data-url="{% url 'inventory:add-pm-remarks' history.pk %}" class="btn btn-success btn-sm" data-toggle="modal" data-target="#notes_modal">
-                            Edit notes
-                        </button>
-                    </div>
+                    {% if perms.inventory.can_add_remarks_per_pm %}
+                        <div class="float-left">
+                            <button type="button" data-url="{% url 'inventory:add-pm-remarks' history.pk %}" class="btn btn-success btn-sm" data-toggle="modal" data-target="#notes_modal">
+                                Edit notes
+                            </button>
+                        </div>
+                    {% endif %}
                     <small class="float-right">
                         By: {{ history.preventive_maintenance.created_by }} | {{ history.preventive_maintenance.created_at|date }}
                     </small>

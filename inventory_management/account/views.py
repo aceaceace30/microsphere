@@ -4,12 +4,15 @@ OperatingSystem, TotalRam, HddSize, OfficeApplication
 
 from account.forms import DashboardFilterForm
 
+from django.contrib.auth.decorators import permission_required, login_required
+
 from django.db.models import Count, Q
 from datetime import datetime
 
 def redirect_to_login(request):
 	return redirect('account:login')
 
+@login_required
 def dashboard(request):
 	template_name = 'registration/dashboard.html'
 

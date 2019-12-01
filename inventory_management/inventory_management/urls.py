@@ -9,6 +9,7 @@ urlpatterns = [
     path('', views.redirect_to_login),
     path('accounts/', include('account.urls', namespace='accounts')),
     path('inventory/', include('inventory.urls', namespace='inventory')),
+    path('report/', include('report.urls', namespace='report')),
     path('summernote/', include('django_summernote.urls')),
 ]
 

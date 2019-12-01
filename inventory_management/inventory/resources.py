@@ -78,6 +78,10 @@ class UnitResource(resources.ModelResource):
 		                  column_name='operating_system',
 		                  widget=ForeignKeyWidget(OperatingSystem, 'os_name'))
 
+	office_application = fields.Field(attribute='office_application',
+		                  column_name='office_application',
+		                  widget=ForeignKeyWidget(OfficeApplication, 'office_app_name'))
+
 	processor = fields.Field(attribute='processor',
 		                  column_name='processor',
 		                  widget=ForeignKeyWidget(Processor, 'processor_name'))

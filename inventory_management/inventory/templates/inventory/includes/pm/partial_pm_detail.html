@@ -6,7 +6,6 @@
             <strong class="card-title">Business Unit: </strong><span class="text-success">{{ pm.business_unit }}</span>
 
             <div class="float-right">
-               
             	{% if perms.inventory.can_view_units_per_pm %}
             	<a href="{% url 'inventory:get_list_per_businessunit' pm.business_unit.pk %}" class="btn btn-primary btn-sm">Show Units</a>
             	{% endif %}
@@ -31,6 +30,10 @@
                     <div class="card border border-success bg-success">
                         <div class="card-header">
                             <strong class="card-title text-white">Preventive Maintenance Details</strong>
+
+                            <div class="float-right">
+                                <a href="{% url 'inventory:generate_certification_form' pm.business_unit.pk %}" target="_blank" class="btn btn-light btn-sm font-weight-bold text-success"><i class="menu-icon fa fa-folder-o"></i> Print Certification Form</a>
+                            </div>
                         </div>
                         <div class="card-body bg-white">
                         	<div class="row">
@@ -148,7 +151,7 @@
                             	<div class="row">
                             		<div class="col-6">
                             			<p class="text-dark">Email Address:</p>
-                            			<p class="text-danger"><small>Use comma(,) as seperator for multiple emails.<br/>(eg. john@gmail.com,test@yahoo.com)</small></p>
+                            			<p class="text-danger"><small>Use comma(,) as seperator for multiple emails.<br/>(eg. john_doe@gmail.com,test@yahoo.com)</small></p>
                             		</div>
                             		<div class="col-6">
                             			<textarea name="emails" cols="40" rows="4" class="form-control form-control-sm"></textarea>
@@ -158,7 +161,7 @@
 	                            	<div class="row pt-2">
 	                            		<div class="col offset-9">
 	                            			
-	                            			<input type="submit" class="btn btn-success btn-sm" value="Mark as Done">
+	                            			<input type="submit" class="btn btn-success btn-sm" value="Mark as Done" id="mark_as_done_btn">
 	                            			
 	                            		</div>
 	                            	</div>

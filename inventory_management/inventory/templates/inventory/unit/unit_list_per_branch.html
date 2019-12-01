@@ -37,9 +37,11 @@
                                     <table class="table table-hover" id="unit-data-table">
                                         <thead>
                                             <tr>
-                                                <th>Client</th>
-                                                <th>Business Unit</th>
                                                 <th>Serial Number</th>
+                                                <th>Client</th>
+                                                <th>Area</th>
+                                                <th>Business Unit</th>
+                                                <th>Location</th>
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
@@ -73,6 +75,40 @@
     <script src="{% static 'inventory/vendors/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
     <script src="{% static 'inventory/vendors/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
     <script src="{% static 'inventory/assets/js/init-scripts/data-table/datatables-init.js' %}"></script>
+
+    <script>
+        /*  Data Table
+        -------------*/
+        (function ($) {
+            $('#unit-data-table thead th').each( function () {
+                var title = $(this).text();
+                if (title != 'Action') {
+                    $(this).html( '<input type="text" name="'+title+'" placeholder="'+title+'" />' );
+                }
+            } );    
+
+            var unit_table = $('#unit-data-table').DataTable({
+                order: [[1, "asc"], [2, "asc"], [3, "asc"]],
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                //"processing": true,
+                //"serverSide": true,
+                //"ajax": "{% url 'inventory:unit_list_json' %}",
+                //buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            });
+
+            unit_table.columns().every( function () {
+                var that = this;
+         
+                $( 'input', this.header() ).on( 'keyup change clear', function () {
+                    if ( that.search() !== this.value ) {
+                        that
+                            .search( this.value )
+                            .draw();
+                    }
+                });
+            });
+        })(jQuery);
+    </script>
 
     <!-- custom javascript -->
     <script src="{% static 'inventory/js/custom/unit_crud.js' %}"></script>

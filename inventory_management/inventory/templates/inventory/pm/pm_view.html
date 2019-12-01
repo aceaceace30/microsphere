@@ -3,7 +3,6 @@
 
 {% block title %} Microsphere - PM View {% endblock %}
 
-
 {% block page_title %} Service Report Number: <span class="text-success">{{ pm.service_report_number }}</span> {% endblock %}
 {% block page_title_second %}
 	<a href="{% url 'inventory:pm-list' %}"> PM List</a> > Details
@@ -20,5 +19,18 @@
             </div>
         </div><!-- .animated -->
     </div><!-- .content -->
+
+{% endblock %}
+
+{% block js %}
+
+	<script>
+		jQuery(function($) {
+			$('form').submit(function(){
+				// Animate loader off screen
+				$("#loader").toggle();
+			});
+		});
+	</script>
 
 {% endblock %}

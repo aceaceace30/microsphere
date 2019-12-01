@@ -1,72 +1,10 @@
 (function ($) {
     //    "use strict";
 
-
-    /*  Data Table
-    -------------*/
-
-    $('#unit-data-table thead th').each( function () {
-        var title = $(this).text();
-        if (title != 'Action') {
-            $(this).html( '<input type="text" name="'+title+'" placeholder="'+title+'" />' );
-        }
-    } );    
-
-    // $('#bootstrap-data-table').DataTable({
-    //     lengthMenu: [[10, 20, 50, -1], [10, 20, 50, "All"]],
-    // });
-
-    var unit_table = $('#unit-data-table').DataTable({
-        order: [[0, "asc"], [1, "asc"]],
-        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        // ...
-        //"processing": true,
-        //"serverSide": true,
-        //"ajax": "/inventory/load-unit-datatable/"
-        //buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-    });
-
-    unit_table.columns().every( function () {
-        var that = this;
- 
-        $( 'input', this.header() ).on( 'keyup change clear', function () {
-            if ( that.search() !== this.value ) {
-                that
-                    .search( this.value )
-                    .draw();
-            }
-        });
-    });
-
-    $('#pm-data-table thead th').each( function () {
-        var title = $(this).text();
-        if (title != 'Status') {
-            $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
-        }
-    } );
-
     $('#bootstrap-data-table').DataTable({
         lengthMenu: [[10, 20, 50, -1], [10, 20, 50, "All"]],
     });
 
-    var pm_table = $('#pm-data-table').DataTable({
-        columnDefs: [{ type: "date", "targets": [2] }],
-        order: [[3, "desc"], [2, "asc"]],
-        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-    });
-
-    pm_table.columns().every( function () {
-        var that = this;
- 
-        $( 'input', this.header() ).on( 'keyup change clear', function () {
-            if ( that.search() !== this.value ) {
-                that
-                    .search( this.value )
-                    .draw();
-            }
-        });
-    });
 
 	$('#row-select').DataTable( {
         initComplete: function () {

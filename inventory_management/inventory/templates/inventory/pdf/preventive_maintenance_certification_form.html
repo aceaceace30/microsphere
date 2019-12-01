@@ -4,7 +4,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Preventive Maintenance Certification Form</title>
+    <title>Certification Form - {{ business_unit_name }}({{ rc_code }})</title>
     <style type="text/css">
         @page {
             size: legal landscape;
@@ -14,12 +14,12 @@
                 left: 85pt; width: 512pt; top: 50pt; height: 125pt;
             }
             @frame content_frame {
-                left: 40pt; width: 920pt; top: 160pt; height: 350pt;
+                left: 40pt; width: 920pt; top: 160pt; height: 240pt;
             }
 
             @frame footer_frame { /* Static frame */
                 -pdf-frame-content: footer_content;
-                left: 85pt; width: 850pt; top: 320pt; height: 250pt;
+                left: 85pt; width: 850pt; top: 410pt; height: 250pt;
             }
         }
 
@@ -95,12 +95,11 @@
         </h2>
         <div class="footer_info">
             
-                
                     <p>Signature Over Printed Name</p>
 
-                    <p>Date</p>
+                    <p>Date: {{ today|date:'M d, Y' }}</p>
 
-                    <p>RC Code</p> 
+                    <p>RC Code: {{ rc_code }}</p> 
             
                 <p>Disposition / Remarks</p>
                 <ol id="conditions">
@@ -120,7 +119,7 @@
     <div class="content">
 
         
-        <table repeat="1">
+        <table repeat="1" style="width:100%">
             <thead>
                 <tr>
                     <th>NO</th>
@@ -135,7 +134,7 @@
                     <th>OTHER TAG</th>
                     <th>STATUS OF WARRANTY</th>
                     <th>WORKING (Y/N)</th>
-                    <!-- <th>DISPOSITION / REMARKS</th> -->
+                    <th>DISPOSITION / REMARKS</th>
                     <th>NAME OF USER</th>
                     <th>DESIGNATION</th>
                     <th>SIGNATURE</th>
@@ -143,23 +142,29 @@
             </thead>
             <tbody>
                 {% for unit in units %}
+                <!-- style="line-height: 25px; height: 25px;" -->
+                <tr style="height: 27px;">
+                    <td style="width:4%">{{ forloop.counter }}</td>
+                    <td style="width:6%">{{ unit.business_unit.rc_code }}</td>
+                    <td style="width:7%">{{ unit.business_unit.business_unit_name }}</td>
+                    <td style="width:7%">{{ unit.business_unit.location }}</td>
+                    <td style="width:7%">{{ unit.machine_type }}</td>
+                    <td style="width:7%">{{ unit.machine_brand }}</td>
+                    <td style="width:7%">{{ unit.model }}</td>
+                    <td style="width:7%">{{ unit.serial_number }}</td>
+                    <td style="width:7%">{{ unit.computer_tag }}</td>
+                    <td style="width:7%">{{ unit.mst_tag }}</td>
+                    <td style="width:7%">{{ unit.status }}</td>
+                    <td style="width:5%">{{ unit.working }}</td>
+                    <td style="width:8%">{{ unit.remarks|truncatechars:10 }}</td>
+                    <td style="width:8%">{{ unit.user }}</td>
+                    <td style="width:9%">{{ unit.designation }}</td>
+                    <td style="width:6%">&nbsp;</td>
+                </tr>
+                {% empty %}
+
                 <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ unit.business_unit.rc_code }}</td>
-                    <td>{{ unit.business_unit.business_unit_name }}</td>
-                    <td>{{ unit.business_unit.location }}</td>
-                    <td>{{ unit.machine_type }}</td>
-                    <td>{{ unit.machine_brand }}</td>
-                    <td>{{ unit.model }}</td>
-                    <td>{{ unit.serial_number }}</td>
-                    <td>{{ unit.computer_tag }}</td>
-                    <td>{{ unit.mst_tag }}</td>
-                    <td>{{ unit.status }}</td>
-                    <td>WORKING (Y/N)</td>
-                    <!-- <td>{{ unit.remarks }}</td> -->
-                    <td>{{ unit.user }}</td>
-                    <td>{{ unit.designation }}</td>
-                    <td>&nbsp;</td>
+                    <td colspan="16" style="color:red">No Available Unit</td>
                 </tr>
                 {% endfor %}
             </tbody>

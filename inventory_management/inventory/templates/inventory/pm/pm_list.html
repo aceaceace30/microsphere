@@ -10,7 +10,9 @@
 
 {% endblock %}
 
-{% block page_title %} PM List | {{ status }} {% endblock %}
+{% block page_title %}
+    PM List > <span class="badge badge-{% if status == 'Done' %}success{% elif status == 'Pending' %}danger{% else %}primary{% endif %}"><h6>{{ status }}</h6></span>
+{% endblock %}
 {% block page_title_second %} PM List {% endblock %}
 
 {% block content %}
@@ -46,12 +48,15 @@
                                 <thead>
                                     <tr>
                                         <th>SR #</th>
+                                        <th>Client</th>
+                                        <th>Area</th>
                                         <th>Business Unit</th>
                                         <th>Target Date</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <!-- This is not needed because we are using server side processing -->
                                     {% include 'inventory/includes/pm/partial_pm_list.html' %}
                                 </tbody>
                             </table>
@@ -74,14 +79,23 @@
 </div>
 <!--  End Modal -->
 
-<!-- PM Modal -->
-<div class="modal fade" id="modal-tag-pm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<!-- modal for notifications -->
+<div class="modal fade" id="notification_modal" tabindex="-1" role="dialog" aria-labelledby="notificationmodalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
+            <div class="modal-header bg-success text-light">
+                <h5 class="modal-title" id="notificationmodalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal">Okay</button>
+            </div>
         </div>
     </div>
 </div>
-<!--  End Modal -->
+<!-- end modal for notifications -->
 
 {% endblock %}
 
@@ -98,6 +112,44 @@
     <script src="{% static 'inventory/vendors/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
     <script src="{% static 'inventory/vendors/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
     <script src="{% static 'inventory/assets/js/init-scripts/data-table/datatables-init.js' %}"></script>
+
+    <script>
+        (function ($) {
+
+            $('#pm-data-table thead th').each( function () {
+                var title = $(this).text();
+                if (title != 'Status') {
+                    $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+                }
+            });
+
+            let status = '{{ status}}';
+
+            var pm_table = $('#pm-data-table').DataTable({
+                columnDefs: [{ type: "date", "targets": [4] }],
+                order: [[5, "asc"], [4, "asc"]],
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                "processing": true,
+                "serverSide": true,
+                "ajax": "{% url 'inventory:pm_list_json' %}?status=" + status,
+                //buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            });
+
+            pm_table.columns().every( function () {
+                var that = this;
+         
+                $( 'input', this.header() ).on( 'keyup change clear', function () {
+                    if ( that.search() !== this.value ) {
+                        that
+                            .search( this.value )
+                            .draw();
+                    }
+                });
+            });
+
+            
+        })(jQuery);
+    </script>
 
     <!-- custom javascript -->
     <script src="{% static 'inventory/js/custom/pm_crud.js' %}"></script>

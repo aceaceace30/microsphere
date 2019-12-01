@@ -50,4 +50,5 @@ class PreventiveMaintenanceEditForm(forms.ModelForm):
 
     class Meta:
         model = PreventiveMaintenance
-        exclude = ('service_report_number', 'pm_done', 'pm_date_done', 'active','created_at', 'updated_at', 'created_by', 'updated_by')
+        exclude = ('service_report_number', 'pm_done', 'pm_date_done',
+                   'active','created_at', 'updated_at', 'created_by', 'updated_by')

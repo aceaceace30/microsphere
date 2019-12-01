@@ -26,9 +26,6 @@ jQuery(function($) {
       var area = $(this).val();                           // get the selected area from the HTML input
       var client = $('#id_client').val();
 
-      console.log(area);
-      console.log(client);
-
       $.ajax({                                            // initialize an AJAX request
         url: url,                                         // set the url of the request
         data: {

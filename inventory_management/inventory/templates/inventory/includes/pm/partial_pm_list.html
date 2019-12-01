@@ -7,9 +7,12 @@
 				{{ pm.service_report_number }}
 			{% endif %}
 		</td>
+		<td>{{ pm.business_unit.client.client_code }}</td>
+		<td>{{ pm.business_unit.area }}</td>
 		<td>{{ pm.business_unit.business_unit_name }}</td>
 		<td>{{ pm.target_date }}</td>
-		<td>{% if pm.pm_done %} 
+		<td>
+			{% if pm.pm_done %} 
 				<span class="badge badge-pill badge-success">Done</span>
 			{% else %}
 				<span class="badge badge-pill badge-danger">Pending</span>

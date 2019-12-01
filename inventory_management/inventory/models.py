@@ -349,6 +349,8 @@ class PreventiveMaintenance(models.Model):
             ('can_view_units_per_pm', 'Can view units per pm'),
             ('can_mark_as_done', 'Can mark as done per pm'),
             ('can_soft_delete_pm', 'Can soft delete pm'),
+            ('can_generate_certification_form', 'Can generate certification form'),
+            ('can_generate_excel_report_count', 'Can generate excel report count'),
     ]
 
     def __str__(self):
@@ -358,17 +360,18 @@ class PreventiveMaintenance(models.Model):
         return reverse('inventory:pm-view', kwargs={'pk': self.pk})
 
     def get_active_pms(status=None, client=None):
-        if status == 'Done':
-            pm_done = True
-        elif status == 'Pending':
-            pm_done = False
 
         filter_ = Q(active=True)
 
-        if client:
-            filter_ &= Q(business_unit__client=client)
-        if status:
+        if status == 'Done':
+            pm_done = True
             filter_ &= Q(pm_done=pm_done)
+        elif status == 'Pending':
+            pm_done = False
+            filter_ &= Q(pm_done=pm_done)
+
+        if client:
+            filter_ &= Q(business_unit__client=client)            
             
         return PreventiveMaintenance.objects.filter(filter_)
 

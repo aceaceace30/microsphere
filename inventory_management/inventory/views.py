@@ -1,25 +1,32 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse, HttpResponse
+
 from django.views.generic import View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, CreateView
+from django.views.generic import TemplateView
+
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from django.contrib.auth.decorators import permission_required, login_required
-from django.contrib import messages
-from django.http import JsonResponse, HttpResponse
-from django.template.loader import render_to_string, get_template
 from django.contrib.messages.views import SuccessMessageMixin
+
+from django.contrib.auth.decorators import login_required
+from .decorators import permission_required
+from django.contrib import messages
+
+from django.template.loader import render_to_string, get_template
 
 from .models import Unit, PreventiveMaintenance, MachineType, PmUnitHistory, ClientProfile,\
 BusinessUnit, Model, EmailTemplate
+
 from django.db.models import Count, Q
+
 from .forms import PreventiveMaintenanceForm, UnitForm, PreventiveMaintenanceEditForm
 
 from django.conf import settings
 from django.core.mail import send_mail
 
-from django_datatables_view.base_datatable_view import BaseDatatableView
-from django.utils.html import escape
+from django.utils.decorators import method_decorator
 
 import datetime
 
@@ -28,131 +35,6 @@ from xhtml2pdf import pisa
 
 import os
 
-@login_required
-def load_business_units(request):
-	client = request.GET.get('client')
-	area = request.GET.get('area')
-	business_unit_id = request.GET.get('business_unit')
-
-	print('Client: ', client)
-	print('Area: ', area)
-
-	business_units = None
-
-	filter_ = Q(active=True)
-
-	if client:
-		filter_ &= Q(client=client)
-	if area:
-		filter_ &= Q(area=area)
-		business_units = BusinessUnit.objects.filter(filter_)
-
-	if business_unit_id:
-		business_unit = business_units.get(pk=business_unit_id)
-
-	context = {
-		'business_units':business_units,
-		'business_unit':business_unit if business_unit_id else None
-	}
-
-	return render(request, 'inventory/includes/unit/partial_business_unit_dropdown.html', context)
-
-@login_required
-def load_brand_choices(request):
-
-	machine_type = request.GET.get('machine_type')
-	machine_brand_id = request.GET.get('machine_brand')
-	brands = None
-
-	if machine_brand_id:
-		brand = Brand.objects.get(pk=machine_brand_id, active=True)
-
-	if machine_type:
-		query = "SELECT id, model.brand_id, brand.brand_name FROM\
-				(SELECT DISTINCT brand_id FROM inventory_model WHERE machine_type_id={0} and active=1) AS model\
-				INNER JOIN inventory_brand AS brand\
-				ON model.brand_id = brand.id".format(machine_type)
-
-		brands = Model.objects.raw(query)
-
-	context = {
-		'brands':brands,
-		'brand':brand if machine_brand_id else None
-	}
-
-	return render(request, 'inventory/includes/unit/partial_brand_dropdown.html', context)
-
-@login_required
-def load_model_choices(request):
-
-	machine_type = request.GET.get('machine_type')
-	machine_brand = request.GET.get('machine_brand')
-	model_id = request.GET.get('model')
-	models = None
-
-	if model_id:
-		model = Model.objects.get(pk=model_id, active=True)
-
-	if machine_type and machine_brand:
-		models = Model.objects.filter(machine_type=machine_type, brand=machine_brand, active=True)
-
-	context = {
-		'models':models,
-		'model':model if model_id else None
-	}
-
-	return render(request, 'inventory/includes/unit/partial_model_dropdown.html', context)
-
-class UnitListJson(BaseDatatableView):
-	# The model we're going to show
-	model = Unit
-
-	# define the columns that will be returned
-	columns = ['client', 'business_unit', 'serial_number', 'status']
-
-	# define column names that will be used in sorting
-	# order is important and should be same as order of columns
-	# displayed by datatables. For non sortable columns use empty
-	# value like ''
-	order_columns = ['business_unit__client', 'business_unit', 'serial_number', 'status']
-
-	# set max limit of records returned, this is used to protect our site if someone tries to attack our site
-	# and make it return huge amount of data
-	max_display_length = 500
-
-	def get_initial_queryset(self):
-		return Unit.get_active_units(self.request)
-
-	def render_column(self, row, column):
-		# We want to render client as a custom column
-		if column == 'client':
-			# escape HTML for security reasons
-			return escape('{0}'.format(row.business_unit.client))
-		else:
-			return super(UnitListJson, self).render_column(row, column)
-
-	# def filter_queryset(self, qs):
-	# 	# use parameters passed in GET request to filter queryset
-
-	# 	# simple example:
-	# 	# search = self.request.GET.get('search[value]', None)
-	# 	# if search:
-	# 	# 	qs = qs.filter(name__istartswith=search)
-
-	# 	# more advanced example using extra parameters
-	# 	# filter_serial_number = self.request.GET.get('serial_number', None)
-
-	# 	# if filter_serial_number:
-	# 	# 	qs = qs.filter(serial_number=filter_serial_number)
-
-	# 	filter_client = self.request.GET.get('Client', None)
-
-	# 	print('Client:', filter_client)
-
-	# 	if filter_client:
-	# 		qs = qs.filter(business_unit__client_client_code__istartswith=upper(filter_client))
-
-	# 	return qs
 
 class UnitListView(LoginRequiredMixin, ListView):
 	login_url = settings.LOGOUT_REDIRECT_URL
@@ -195,9 +77,32 @@ class UnitDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 	template_name = 'inventory/unit/unit_view.html'
 	context_object_name = 'unit'
 
-	def get_object(self):
+	def get_context_data(self, *args, **kwargs):
+		pk = self.kwargs.get('pk')
+		context = super(UnitDetailView, self).get_context_data(*args, **kwargs)
+		context['pm_history'] = PmUnitHistory.objects.select_related('preventive_maintenance')\
+													 .filter(unit_id=pk, unit__active=True)\
+													 .order_by('-preventive_maintenance__target_date')
+		return context
+
+	def get_object(self, *args, **kwargs):
 		pk = self.kwargs.get('pk')
 		return get_object_or_404(Unit, pk=pk, active=True)
+
+@permission_required('inventory.view_unit')
+def unit_details(request, pk):
+	template_name = 'inventory/unit/unit_view.html'
+	unit = get_object_or_404(Unit, pk=pk, active=True)
+	if request.method == 'GET':
+		pm_history = PmUnitHistory.objects.select_related('preventive_maintenance')\
+					.filter(unit_id=pk, unit__active=True)\
+					.order_by('-preventive_maintenance__target_date')
+
+		context = {'unit': unit,
+				   'pm_history': pm_history}
+
+		return render(request, template_name, context)
+
 
 def unit_delete(request, pk):
 	unit = get_object_or_404(Unit, pk=pk, active=True)
@@ -249,19 +154,6 @@ def historical_changes(history):
 
 	return changes
 
-def unit_details(request, pk):
-	template_name = 'inventory/unit/unit_view.html'
-	unit = get_object_or_404(Unit, pk=pk, active=True)
-	if request.method == 'GET':
-		pm_history = PmUnitHistory.objects.select_related('preventive_maintenance')\
-					.filter(unit_id=pk, unit__active=True)\
-					.order_by('-preventive_maintenance__target_date')
-
-		context = {'unit': unit,
-				   'pm_history': pm_history}
-
-		return render(request, template_name, context)
-
 
 
 ####################################################################################
@@ -278,14 +170,18 @@ class PmListView(LoginRequiredMixin, ListView):
 		return context
 
 	def get_queryset(self):
-		pk = self.kwargs.get('pk')
 		status = self.request.GET.get('status', default=None)
 
+		params = dict()
+
+		if status:
+			params['status'] = status
+
 		if ClientProfile.objects.filter(username=self.request.user).exists():
-			return PreventiveMaintenance.get_active_pms(status=status, client=self.request.user.clientprofile) if status\
-					else PreventiveMaintenance.get_active_pms(client=self.request.user.clientprofile)
-		else:
-			return PreventiveMaintenance.get_active_pms(status=status) if status else PreventiveMaintenance.get_active_pms()
+			params['client'] = self.request.user.clientprofile
+
+		return PreventiveMaintenance.get_active_pms(**params)
+
 		
 class PmDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 	permission_required = 'inventory.view_preventivemaintenance'
@@ -565,61 +461,34 @@ def mark_as_done(request, pk):
 
 	return redirect('inventory:pm-view', pk)
 
-def report_main(request):
 
-	return render(request, 'inventory/report/report_main.html')
+class GenerateCertificationForm(LoginRequiredMixin, PermissionRequiredMixin, View):
+	login_url = settings.LOGOUT_REDIRECT_URL
+	permission_required = 'inventory.can_generate_certification_form'
 
+	def get(self, request, *args, **kwargs):
+		pk = self.kwargs.get('pk')
 
-# def render_pdf_view(request):
-# 	template_path = 'inventory/pdf/preventive_maintenance_certification_form.html'
-
-# 	units = Unit.objects.filter(active=True)
-# 	today = datetime.datetime.today()
-
-# 	context = {
-# 		'units': units,
-# 		'request': request,
-# 		'today': today,
-# 		'rc_code': units[0].business_unit.rc_code,
-# 		'remarks': 'test_remarks',
-# 		'company': settings.COMPANY_NAME.upper(),
-# 		'address': settings.COMPANY_ADDRESS,
-# 		'contact': settings.COMPANY_CONTACT,
-# 	}
-# 	# Create a Django response object, and specify content_type as pdf
-# 	response = HttpResponse(content_type='application/pdf')
-# 	response['Content-Disposition'] = 'attachment; filename="report.pdf"'
-# 	# find the template and render it.
-# 	template = get_template(template_path)
-# 	html = template.render(context)
-
-# 	# create a pdf
-# 	pisaStatus = pisa.CreatePDF(
-# 	html, dest=response, link_callback=link_callback)
-# 	# if error then show some funy view
-# 	if pisaStatus.err:
-# 		return HttpResponse('We had some errors <pre>' + html + '</pre>')
-# 	return response
-
-class GeneratePdf(View):
-
-	def get(self, request):
-		#print('self: ', self.kwargs)
-		#pk = self.kwargs.get('pk')
-		#pk=2
-		units = Unit.objects.filter(active=True)
+		business_unit = get_object_or_404(BusinessUnit, pk=pk, active=True)
+		units = business_unit.unit_set.filter(active=True)
+		business_unit_name = business_unit.business_unit_name
+		rc_code = business_unit.rc_code
 		today = datetime.datetime.now()
+
+		file_name = 'Certification-Form-{0} ({1})'.format(business_unit_name, rc_code)
+
 		context = {
 			'units': units,
 			'request': request,
 			'today': today,
-			'rc_code': units[0].business_unit.rc_code,
-			'remarks': 'test_remarks',
+			'business_unit_name': business_unit_name,
+			'rc_code': rc_code,
 			'company': settings.COMPANY_NAME.upper(),
 			'address': settings.COMPANY_ADDRESS,
 			'contact': settings.COMPANY_CONTACT,
 		}
-		return Render.render('inventory/pdf/preventive_maintenance_certification_form.html', context)
+
+		return Render.render('inventory/pdf/preventive_maintenance_certification_form.html', file_name, context)
 
 
 

@@ -1,14 +1,14 @@
 from django.urls import path
 from . import views
+from .utils import UnitListJson, PmListJson, load_business_units, load_brand_choices, load_model_choices
 
 app_name = 'inventory'
 
 urlpatterns = [
     path('unit-list/', views.UnitListView.as_view(), name='unit-list'),
     path('unit-create/', views.UnitCreateView.as_view(), name='unit-create'),
-    path('unit-view/<int:pk>/', views.unit_details, name='unit-view'),
+    path('unit-view/<int:pk>/', views.UnitDetailView.as_view(), name='unit-view'),
     path('unit-edit/<int:pk>/', views.UnitUpdateView.as_view(), name='unit-edit'),
-    #path('unit-edit/<int:pk>/', views.unit_edit, name='unit-edit'),
     path('unit-delete/<int:pk>/', views.unit_delete, name='unit-delete'),
 
     path('pm-list/', views.PmListView.as_view(), name='pm-list'),
@@ -22,18 +22,16 @@ urlpatterns = [
     path('unit-list/<int:pk>/', views.UnitPerBranch.as_view(), name='get_list_per_businessunit'),
     path('unit-history/<int:pk>/', views.unit_history, name='unit-history'),
 
-    path('reports/', views.report_main, name='report-main'),
-
     # ajax calls
-    path('ajax/load-business-units/', views.load_business_units, name='load_business_units'),
-    path('ajax/load-model-choices/', views.load_model_choices, name='load_model_choices'),
-    path('ajax/load-brand-choices/', views.load_brand_choices, name='load_brand_choices'),
+    path('ajax/load-business-units/', load_business_units, name='load_business_units'),
+    path('ajax/load-model-choices/', load_model_choices, name='load_model_choices'),
+    path('ajax/load-brand-choices/', load_brand_choices, name='load_brand_choices'),
 
     # server side processing data table
-    path('load-unit-datatable/', views.UnitListJson.as_view(), name='unit_list_json'),
+    path('load-unit-datatable/', UnitListJson.as_view(), name='unit_list_json'),
+    path('load-pm-datatable/', PmListJson.as_view(), name='pm_list_json'),
 
     # generate pdf
-    #path('form/', views.render_pdf_view, name='generate_preventive_maintenance_form'),
-    path('form/', views.GeneratePdf.as_view(), name='generate_preventive_maintenance_form')
+    path('generate-certification-form/<int:pk>/', views.GenerateCertificationForm.as_view(), name='generate_certification_form')
     
 ]

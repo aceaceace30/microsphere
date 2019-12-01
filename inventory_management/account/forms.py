@@ -17,6 +17,10 @@ class DashboardFilterForm(forms.Form):
 
 		self.fields['business_unit'].queryset = BusinessUnit.objects.filter(active=True, client=client)\
 		if client else BusinessUnit.objects.filter(active=True)
+
+		if client:
+			self.fields['client'].empty_label = None
 		
 		for field in self.fields:
 			self.fields[field].widget.attrs['class'] = 'form-control form-control-sm'
+	
