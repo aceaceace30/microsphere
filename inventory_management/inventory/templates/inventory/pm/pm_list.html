@@ -44,6 +44,7 @@
                             {% endif %}
                         </div>
                         <div class="card-body">
+                            {% if perms.inventory.can_view_pm_list %}
                             <table id="pm-data-table" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
@@ -57,9 +58,12 @@
                                 </thead>
                                 <tbody>
                                     <!-- This is not needed because we are using server side processing -->
-                                    {% include 'inventory/includes/pm/partial_pm_list.html' %}
+                                    {% comment %}
+                                        {% include 'inventory/includes/pm/partial_pm_list.html' %}
+                                    {% endcomment %}
                                 </tbody>
                             </table>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -84,10 +88,13 @@
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header bg-success text-light">
-                <h5 class="modal-title" id="notificationmodalLabel"></h5>
+                <h5 class="modal-title">Notification</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+            </div>
+            <div class="modal-body">
+                <h6 id="pm_message"></h6>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" data-dismiss="modal">Okay</button>
@@ -123,7 +130,7 @@
                 }
             });
 
-            let status = '{{ status}}';
+            let status = '{{ status }}';
 
             var pm_table = $('#pm-data-table').DataTable({
                 columnDefs: [{ type: "date", "targets": [4] }],

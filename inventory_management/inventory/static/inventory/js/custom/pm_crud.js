@@ -25,7 +25,30 @@ jQuery(function($) {
         type: form.attr("method"),
         dataType: 'json',
         success: function (data) {
-          if (data.form_is_valid) {
+
+          if (data.no_unit_exist) {
+            $("#modal-pm").modal("hide");
+
+            // remove loader
+            $("#loader").fadeOut("slow");
+
+            // show message
+            $("#notification_modal").modal("show");
+            $("#pm_message").css("color", "red");
+
+            let show_message = "No unit exist for this branch.\
+                                Please <a href='/inventory/unit-create/' class='text-danger font-weight-bold'>\
+                                ADD UNIT</a> first before creating pm schedule."
+
+            $("#pm_message").html(show_message);
+
+            // refresh the page if modal is closed
+            $("#notification_modal").on('hidden.bs.modal', function(){
+                window.location.reload();
+            });
+            
+          }
+          else if (data.form_is_valid) {
             $("#modal-pm").modal("hide");
 
             // remove loader
@@ -33,7 +56,7 @@ jQuery(function($) {
 
             // display notification message
             $("#notification_modal").modal("show");
-            $("#notificationmodalLabel").html("PM has been created.");
+            $("#pm_message").html("PM has been created.");
 
             // refresh the page if modal is closed
             $("#notification_modal").on('hidden.bs.modal', function(){
@@ -44,6 +67,7 @@ jQuery(function($) {
             //$("#pm-data-table tbody").html(data.html_pm_list);
           }
           else {
+            $("#loader").fadeOut("slow");
             $("#modal-pm .modal-content").html(data.html_form);
           }
         }
@@ -51,9 +75,12 @@ jQuery(function($) {
       return false;
   };
 
+
 // create unit
 $(".js-create-pm").click(loadForm);
 $("#modal-pm").on("submit", ".js-pm-create-form", saveForm);
+
+
 
 // edit unit
 // $(".js-edit-pm").click(loadForm);

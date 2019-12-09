@@ -137,7 +137,6 @@ class Render:
         if not pdf.err:
             response = HttpResponse(response.getvalue(), content_type='application/pdf')
             response['Content-Disposition'] = 'inline; filename="{0}.pdf"'.format(filename)
-
             return response
         else:
             return HttpResponse("Error Rendering PDF", status=400)

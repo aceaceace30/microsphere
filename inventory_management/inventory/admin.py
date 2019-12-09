@@ -82,7 +82,7 @@ class UnitHistoryAdmin(ImportExportModelAdmin, SimpleHistoryAdmin):
 						'host_name', 'mac_address', 'ip_address', 'remarks',
 						'created_by__username', 'updated_by__username')
 
-	list_filter = ('active', 'business_unit__client', 'area',
+	list_filter = ('active', 'working', 'business_unit__client', 'area',
 				   'business_unit', 'machine_type', 'machine_brand',
 				   'model', 'operating_system', 'office_application',
 				   'processor', 'total_ram', 'hdd_size', 'monitor_type', 'created_by')
@@ -286,7 +286,7 @@ class PreventiveMaintenanceAdmin(ImportExportModelAdmin):
 	readonly_fields = ('created_by', 'created_at', 'updated_by', 'updated_at')
 
 	list_display = ('get_client_code', 'get_area', 'get_rc_code', 'business_unit', 'service_report_number', 'pm_type', 'target_date', 'target_time',
-					'actual_date', 'pm_date_done', 'pm_done', 'active', 'created_by')
+					'pm_date_done', 'pm_done', 'active', 'created_by')
 
 	search_fields = ('business_unit__client__client_code', 'business_unit__area', 'business_unit__rc_code',
 					 'business_unit__business_unit_name', 'service_report_number', 'pm_type')

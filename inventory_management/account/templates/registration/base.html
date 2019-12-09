@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{% block title %} {% endblock %}</title>
+
+    <!-- DISPLAY ICON -->
+    <link rel="icon" type="image/png" href="{% static 'inventory/images/microsphere_logo.ico' %}"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="{% static 'inventory/vendors/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/vendors/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/vendors/themify-icons/css/themify-icons.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/vendors/flag-icon-css/css/flag-icon.min.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/vendors/selectFX/css/cs-skin-elastic.css' %}">
+
+    <link rel="stylesheet" href="{% static 'inventory/assets/css/style.css' %}">
+
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+
+</head>
+
+<body class="bg-dark">
+
+
+    <div class="sufee-login d-flex align-content-center flex-wrap">
+        <div class="container">
+            <div class="login-content">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+	<!-- DONT REALLY NEED THIS JS SCRIPTS?
+    <script src="{% static 'inventory/vendors/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/popper.js/dist/umd/popper.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'inventory/assets/js/main.js' %}"></script>
+	-->
+
+</body>
+
+</html>

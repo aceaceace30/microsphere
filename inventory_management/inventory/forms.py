@@ -1,5 +1,8 @@
 from django import forms
-from .models import Unit, PreventiveMaintenance, AREA, BusinessUnit, ClientProfile
+from .models import Unit, PreventiveMaintenance, AREA, BusinessUnit, ClientProfile, PmUnitHistory
+
+# bootstrap datepicker
+# from bootstrap_datepicker_plus import DatePickerInput, TimePickerInput
 
 class UnitForm(forms.ModelForm):
 
@@ -37,14 +40,19 @@ class PreventiveMaintenanceForm(forms.ModelForm):
         super(PreventiveMaintenanceForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control form-control-sm'
-        #self.fields['service_report_number'].label = 'SR #'
+
         self.fields['target_date'].widget.attrs['placeholder'] = self.date_format
         self.fields['target_time'].widget.attrs['placeholder'] = self.time_format
-        self.fields['actual_date'].widget.attrs['placeholder'] = self.date_format
 
     class Meta:
         model = PreventiveMaintenance
-        exclude = ('service_report_number', 'pm_done', 'pm_date_done', 'active','created_at', 'updated_at', 'created_by', 'updated_by')
+        exclude = ('service_report_number', 'pm_done', 'pm_date_done', 'attachment',
+                   'active','created_at', 'updated_at', 'created_by', 'updated_by')
+
+        # widgets = {
+        #         'target_date': DatePickerInput(),
+        #         'target_time': TimePickerInput(),
+        # }
 
 class PreventiveMaintenanceEditForm(forms.ModelForm):
 
@@ -55,12 +63,51 @@ class PreventiveMaintenanceEditForm(forms.ModelForm):
         super(PreventiveMaintenanceEditForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs['class'] = 'form-control form-control-sm'
-        #self.fields['service_report_number'].label = 'SR #'
+
         self.fields['target_date'].widget.attrs['placeholder'] = self.date_format
         self.fields['target_time'].widget.attrs['placeholder'] = self.time_format
-        self.fields['actual_date'].widget.attrs['placeholder'] = self.date_format
 
     class Meta:
         model = PreventiveMaintenance
-        exclude = ('service_report_number', 'pm_done', 'pm_date_done',
+        exclude = ('service_report_number', 'pm_done', 'pm_date_done', 'attachment',
                    'active','created_at', 'updated_at', 'created_by', 'updated_by')
+
+        # widgets = {
+        #         'target_date': DatePickerInput(),
+        #         'target_time': TimePickerInput(),
+        # }
+
+class NotesForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(NotesForm, self).__init__(*args, **kwargs)
+
+        self.fields['remarks'].widget.attrs['class'] = 'form-control form-control-sm'
+
+    class Meta:
+        model = PmUnitHistory
+
+        fields = ('remarks',)
+
+class ServiceReportForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(ServiceReportForm, self).__init__(*args, **kwargs)
+        self.fields['service_report_number'].required = False
+        self.fields['service_report_number'].widget.attrs['class'] = 'form-control form-control-sm'
+
+    class Meta:
+        model = PreventiveMaintenance
+
+        fields = ('service_report_number',)
+
+class UploadAttachmentForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(UploadAttachmentForm, self).__init__(*args, **kwargs)
+        #self.fields['attachment'].widget.attrs['class'] = 'form-control form-control-sm'
+
+    class Meta:
+        model = PreventiveMaintenance
+
+        fields = ('attachment',)

@@ -1,6 +1,12 @@
+{% load static %}
 {% load widget_tweaks %}
 
-<div class="container-fluid">
+{% block css %}
+	<!-- <link rel="stylesheet" href="{% static 'inventory/js/jquery/jquery-ui.min.css' %}"> -->
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="{% static 'inventory/js/timepicker/jquery.timepicker.min.css' %}">
+{% endblock %}
+
 	<div class="row">
 		
 		<div class="col-md-4">
@@ -73,20 +79,6 @@
 			</div>
 		</div>
 
-		<div class="col-md-4">
-			<div class="form-group {% if form.actual_date.errors %} has-error {% endif %}">
-				<label for="{{ form.actual_date.id_for_label }}">{{ form.actual_date.label }}:</label>
-				{{ form.actual_date }}
-				{% if form.actual_date.errors %}
-					<ul class="text-danger">
-					{% for errors in form.actual_date.errors %}
-						<li>{{ errors }}</li>
-					{% endfor %}
-					</ul>
-				{% endif %}
-			</div>
-		</div>
-
 		<div class="col-md-6">
 			<div class="form-group {% if form.remarks.errors %} has-error {% endif %}">
 				<label for="{{ form.remarks.id_for_label }}">{{ form.remarks.label }}:</label>
@@ -129,4 +121,22 @@
 				
 		{% endfor %} -->
 	</div>
-</div>
+
+{% block js %}
+
+<script src="{% static 'inventory/js/jquery/jquery-ui.min.js' %}"></script>
+<script src="{% static 'inventory/js/timepicker/jquery.timepicker.min.js' %}"></script>
+
+<script>
+  jQuery(function($) {
+	$('.js-pm-create-form').submit(function() {
+		$('#loader').show(); 
+	});
+
+
+    $( "#id_target_date" ).datepicker();
+    $( "#id_target_time" ).timepicker({ zindex: 9999999});
+  }	);
+</script>
+
+{% endblock %}

@@ -27,7 +27,10 @@
                     <div class="card-header">
 
                         <div class="float-right">
-                            <a href="{{ previous }}" class="btn btn-dark btn-sm">Back</a>
+                            {% if perms.inventory.add_unit %}
+                                <a href="{% url 'inventory:unit-create' %}" class="btn btn-success btn-sm">Add Unit</a>
+                            {% endif %}
+                            <a href="{% url 'inventory:pm-view' pm_pk %}" class="btn btn-dark btn-sm">Back</a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -60,6 +63,78 @@
     </div>
 </div>
 
+<!-- modal for displaying unit information -->
+<div class="modal fade" id="unit_information_modal" tabindex="-1" role="dialog" aria-labelledby="unitInfoLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-light">
+                <h5 class="modal-title" id="unitInfoLabel">Serial Number: <span id="unit_serial_number" class="font-weight-bold text-warning"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4 offset-md-2">
+                            <label for="unit_machine_class">Machine:</label>
+                        </div>
+                        <div class="col-md-6">
+                            <span id="unit_machine_class" class="font-weight-bold text-success"></span>
+                        </div>
+
+                        <div class="col-md-4 offset-md-2">
+                            <label for="unit_computer_tag">Computer Tag:</label>
+                        </div>
+                        <div class="col-md-6">
+                            <span id="unit_computer_tag" class="font-weight-bold text-success"></span>
+                        </div>
+
+                        <div class="col-md-4 offset-md-2">
+                            <label for="unit_mst_tag">MST Tag:</label>
+                        </div>
+                        <div class="col-md-6">
+                            <span id="unit_mst_tag" class="font-weight-bold text-success"></span>
+                        </div>
+
+                        <div class="col-md-4 offset-md-2">
+                            <label for="unit_user">User:</label>
+                        </div>
+                        <div class="col-md-6">
+                            <span id="unit_user" class="font-weight-bold text-success"></span>
+                        </div>
+
+                        <div class="col-md-4 offset-md-2">
+                            <label for="unit_designation">Designation:</label>
+                        </div>
+                        <div class="col-md-6">
+                            <span id="unit_designation" class="font-weight-bold text-success"></span>
+                        </div>
+
+                        <div class="col-md-4 offset-md-2">
+                            <label for="unit_working">Working:</label>
+                        </div>
+                        <div class="col-md-6">
+                            <span id="unit_working" class="font-weight-bold text-success"></span>
+                        </div>
+
+                        <div class="col-md-4 offset-md-2">
+                            <label for="unit_status">Status:</label>
+                        </div>
+                        <div class="col-md-6">
+                            <span id="unit_status" class="font-weight-bold text-success"></span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block js %}
@@ -68,18 +143,33 @@
     <script src="{% static 'inventory/vendors/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
     <script src="{% static 'inventory/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
     <script src="{% static 'inventory/vendors/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js' %}"></script>
-    <script src="{% static 'inventory/vendors/jszip/dist/jszip.min.js' %}"></script>
-    <script src="{% static 'inventory/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
-    <script src="{% static 'inventory/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
-    <script src="{% static 'inventory/vendors/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
-    <script src="{% static 'inventory/vendors/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
-    <script src="{% static 'inventory/vendors/datatables.net-buttons/js/buttons.colVis.min.js' %}"></script>
-    <script src="{% static 'inventory/assets/js/init-scripts/data-table/datatables-init.js' %}"></script>
 
     <script>
         /*  Data Table
         -------------*/
         (function ($) {
+
+            // display unit information in a modal
+            $('#unit_information_modal').on('show.bs.modal', function(e){
+                let unit_info_url = $(e.relatedTarget).data('url');
+
+                $.ajax({
+                    url: unit_info_url,
+                    type: 'GET',
+                    success:function(data){
+                        console.log(data['unit'][0]['area']);
+                        $('#unit_machine_class').html(data['unit'][0]['machine_type__machine_class']);
+                        $('#unit_serial_number').html(data['unit'][0]['serial_number']);
+                        $('#unit_computer_tag').html(data['unit'][0]['computer_tag']);
+                        $('#unit_mst_tag').html(data['unit'][0]['mst_tag']);
+                        $('#unit_user').html(data['unit'][0]['user']);
+                        $('#unit_designation').html(data['unit'][0]['designation']);
+                        $('#unit_working').html(data['unit'][0]['working']);
+                        $('#unit_status').html(data['unit'][0]['status']);
+                    }
+                })
+            });
+
             $('#unit-data-table thead th').each( function () {
                 var title = $(this).text();
                 if (title != 'Action') {

@@ -4,8 +4,10 @@ from django.contrib.auth.models import User
 from simple_history.models import HistoricalRecords
 
 from django.core.validators import RegexValidator
-from .validators import validate_mac_address
+from .validators import validate_mac_address, validate_file_extension
 from django.urls import reverse
+
+import os
 
 
 PM_COVERAGE = (
@@ -42,6 +44,7 @@ MACHINE_CLASS = (
 MONITOR_TYPE = (
     ('LCD', 'LCD'),
     ('CRT', 'CRT'),
+    ('LED', 'LED'),
     )
 
 WORKING_CHOICES = (
@@ -50,6 +53,11 @@ WORKING_CHOICES = (
     )
 
 alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Please enter alphanumeric characters.')
+
+def update_filename(instance, filename):
+    ext = filename.split('.')[-1]
+    new_filename = instance.service_report_number + '.' + ext
+    return os.path.join("certification_forms/", new_filename)
 
 
 class ClientProfile(models.Model):
@@ -328,12 +336,13 @@ class PreventiveMaintenance(models.Model):
     pm_type = models.CharField(choices=PM_TYPE, max_length=50)
     target_date = models.DateField()
     target_time = models.TimeField()
-    actual_date = models.DateField()
+    #actual_date = models.DateField()
     pm_date_done = models.DateField(blank=True, null=True)
     pm_done = models.BooleanField(default=False)
     assigned_personnel = models.CharField(max_length=100)
     remarks = models.TextField(max_length=500, blank=True, null=True)
     active = models.BooleanField(default=True)
+    attachment = models.FileField(upload_to=update_filename, validators=[validate_file_extension], blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -355,6 +364,9 @@ class PreventiveMaintenance(models.Model):
 
     def __str__(self):
         return self.business_unit.business_unit_name
+
+    def filename(self):
+        return os.path.basename(self.attachment.name)
 
     def get_absolute_url(self):
         return reverse('inventory:pm-view', kwargs={'pk': self.pk})
@@ -384,7 +396,7 @@ class PreventiveMaintenance(models.Model):
                                             .order_by('pm_done')\
                                             .annotate(status_count=Count('pm_done'))
 
-    def get_pending_pm(number_to_retrive=3, client=None, business_unit=None, area=None):
+    def get_pending_pm(number_to_retrive=5, client=None, business_unit=None, area=None):
 
         filter_ = dynamic_filter_pm(client, business_unit, area)
         filter_ &= Q(pm_done=False)
@@ -396,6 +408,8 @@ class PmUnitHistory(models.Model):
 
     preventive_maintenance = models.ForeignKey(PreventiveMaintenance, on_delete=models.CASCADE)
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+    pm_done = models.BooleanField(default=False)
+    pm_date_done = models.DateTimeField(blank=True, null=True)
     remarks = models.TextField(max_length=500, blank=True, null=True)
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pmhistory_updated', null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -1,0 +1,523 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %} Microsphere - PM Mark Done {% endblock %}
+
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'inventory/vendors/datatables.net-bs4/css/dataTables.bootstrap4.min.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/vendors/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css' %}">
+
+{% endblock %}
+
+
+{% block page_title %}
+	Service Report Number: <span class="text-success">{{ pm.service_report_number }}</span>
+{% endblock %}
+
+{% block page_title_second %}
+	<a href="{% url 'inventory:pm-list' %}"> PM List</a> > <a href="{% url 'inventory:pm-view' pm.pk %}"> Details</a> > PM Mark Done 
+{% endblock %}
+
+{% block content %}
+
+    <div class="content mt-3">
+        <div class="animated fadeIn">
+            <div class="row">
+
+				<div class="col-md-12">
+				    <div class="card">
+				        <div class="card-header">
+				            <strong class="card-title">Client: </strong><span class="text-success">{{ pm.business_unit.client|upper }}</span> | 
+				            <strong class="card-title">Area: </strong><span class="text-success">{{ pm.business_unit.area }}</span> | 
+				            <strong class="card-title">Business Unit: </strong><span class="text-success">{{ pm.business_unit }}</span>
+
+				            <div class="float-right">
+
+                                {% if pm.pm_done %}
+
+				            	<a href="#" class="btn btn-primary btn-sm text-light" data-toggle="modal" data-target="#send_email_modal" data-url="{% url 'inventory:pm-send-mail' pm.pk %}"><span class="ti-email"></span> Send email</a>
+
+                                {% endif %}
+								
+								{% comment %}
+									only admin(superuser) account can revert back if the user
+									ticked incorrectly
+								{% endcomment%}
+								{% if not pm.pm_done or request.user.is_superuser %}
+				            	<a href="{% url 'inventory:pm-list' %}" class="btn btn-success btn-sm text-light" data-toggle="modal" data-target="#confirmation_modal" data-url="{% url 'inventory:pm-mark-done' pm.pk %}">Update</a>
+				            	{% endif %}
+
+				            	<a href="{% url 'inventory:pm-view' pm.pk %}" class="btn btn-dark btn-sm">Back</a>
+				            </div>
+				        </div>
+				        <div class="card-body">
+				        	<div class="container-fluid">
+
+				        		<div class="alert alert-success" role="alert">
+                                    <h4 class="alert-heading">Please select all the following units which hasn't been checked yet before saving.</h4>
+                                    <p class="pt-2 mb-0">
+                                    	<span class="text-success font-weight-bold">GREEN</span> - Inspected.<br/>
+                                    	<span class="text-danger font-weight-bold">RED</span> - Not inspected.<br/>
+                                    	Preventive Maintenance will <span class="text-warning font-weight-bold">CLOSE</span> if all units has been marked as inspected.</p>
+                                </div>
+
+				        		<div class="card-body table-full-width table-responsive">
+                                    <table class="table table-hover" id="unit-data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Serial Number</th>
+                                                <th>Client</th>
+                                                <th>Area</th>
+                                                <th>Business Unit</th>
+                                                <th>Location</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for unit in units %}
+											<tr class="bg-{% if unit.pm_done %}success{% else %}danger{% endif %}">
+												<td>
+													<input type="checkbox" name="chk_unit" value="{{ unit.pk }}">
+													{% if unit.unit.machine_type.machine_class|upper == 'CPU' %}
+														<img src="{% static 'inventory/images/CPU_ICON.ico' %}" alt="CPU Icon">
+													{% elif unit.unit.machine_type.machine_class|upper == 'LAPTOP' %}
+														<img src="{% static 'inventory/images/LAPTOP_ICON.ico' %}" alt="LAPTOP Icon">
+													{% elif unit.unit.machine_type.machine_class|upper == 'PRINTER' %}
+														<img src="{% static 'inventory/images/PRINTER_ICON.ico' %}" alt="PRINTER Icon">
+													{% endif %}
+													{% if perms.inventory.view_unit %} 
+														<a href="{% url 'inventory:unit-edit' unit.unit.pk  %}" class="text-light font-weight-bold" target="_blank" title="Edit Unit">
+															{{ unit.unit.serial_number }}
+														</a>
+													{% else %}
+														{{ unit.unit.serial_number }}
+													{% endif %}
+													
+												</td>
+												<td>{{ unit.unit.business_unit.client }}</td>
+												<td>{{ unit.unit.area }}</td>
+												<td>{{ unit.unit.business_unit }}</td>
+												<td>{{ unit.unit.business_unit.location }}</td>
+												<td>{{ unit.unit.status }}</td>
+											</tr>
+										{% empty %}
+											<tr>
+										      <td colspan="9" class="text-center bg-light">No Unit Available</td>
+										    </tr>
+										{% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+				        	</div>
+				        </div>
+				    </div>
+				</div>
+
+            </div>
+        </div><!-- .animated -->
+    </div><!-- .content -->
+
+<!-- modal for confirmation -->
+<div class="modal fade" id="confirmation_modal" tabindex="-1" role="dialog" aria-labelledby="confirmationLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-light">
+                <h5 class="modal-title">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<p class="bg-warning text-dark font-weight-bold">All units without check will be marked as <span class="text-success">INSPECTED.</span></p>
+            	<h6>Do you wish to continue?</h6>
+            </div>
+            <div class="modal-footer">
+            	<button type="button" class="btn btn-success" id="confirm_btn">Yes</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- modal for sending email -->
+<div class="modal fade" id="send_email_modal" tabindex="-1" role="dialog" aria-labelledby="confirmationLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-light">
+                <h5 class="modal-title">Column set up</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<p class="bg-warning text-dark font-weight-bold">Please check the columns the client wishes to see:</p>
+
+            	<label for="check_firstrow" class="text-success font-weight-bold">check all first row: </label>
+            	<input type="checkbox" id="check_firstrow">
+		
+            	<table class="table table-bordered">
+            		<thead style="font-size: 10px">
+	            		<tr>
+	            			<th>Client</th>
+	            			<th>Area</th>
+	            			<th>Business Unit</th>
+	            			<th>Machine Type</th>
+	            			<th>Machine Brand</th>
+	            			<th>Model</th>
+	            			<th>Serial Number</th>
+	            			<th>Computer Tag</th>
+	            			<th>User</th>
+	            			<th>Designation</th>
+	            			<th>Operating System</th>
+							<th>Office App.</th>
+	            		</tr>
+            		</thead>
+            		<tbody>
+            			<tr>
+            				<td><input type="checkbox" name="chk_col_email" value="client" class="chk_firstrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="area" class="chk_firstrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="business_unit" class="chk_firstrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="machine_type" class="chk_firstrow" checked></td>
+            				<td><input type="checkbox" name="chk_col_email" value="machine_brand" class="chk_firstrow" checked></td>
+            				<td><input type="checkbox" name="chk_col_email" value="model" class="chk_firstrow" checked></td>
+            				<td><input type="checkbox" name="chk_col_email" value="serial_number" class="chk_firstrow" checked></td>
+            				<td><input type="checkbox" name="chk_col_email" value="computer_tag" class="chk_firstrow" checked></td>
+            				<td><input type="checkbox" name="chk_col_email" value="user" class="chk_firstrow" checked></td>
+            				<td><input type="checkbox" name="chk_col_email" value="designation" class="chk_firstrow" checked></td>
+            				<td><input type="checkbox" name="chk_col_email" value="operating_system" class="chk_firstrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="office_application" class="chk_firstrow"></td>
+            			</tr>
+            		</tbody>
+            	</table>
+
+				<label for="check_secondrow" class="text-success font-weight-bold">check all second row: </label>
+            	<input type="checkbox" id="check_secondrow">
+
+            	<table class="table table-bordered">
+            		<thead style="font-size: 10px">
+	            		<tr>
+	            			
+							<th>Host Name</th>
+							<th>MAC</th>
+							<th>IP</th>
+							<th>Processor</th>
+							<th>RAM</th>
+							<th>HDD</th>
+							<th>Monitor Type</th>
+							<th>Brand</th>
+							<th>Size</th>
+	            			<th>Working</th>
+	            			<th>Status</th>
+	            			<th>Remarks</th>
+	            		</tr>
+            		</thead>
+            		<tbody>
+            			<tr>
+            				<td><input type="checkbox" name="chk_col_email" value="host_name" class="chk_secondrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="mac_address" class="chk_secondrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="ip_address" class="chk_secondrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="processor" class="chk_secondrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="total_ram" class="chk_secondrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="hdd_size" class="chk_secondrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="monitor_type" class="chk_secondrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="monitor_brand" class="chk_secondrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="monitor_size" class="chk_secondrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="working" class="chk_secondrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="status" class="chk_secondrow"></td>
+            				<td><input type="checkbox" name="chk_col_email" value="remarks" class="chk_secondrow"></td>
+            			</tr>
+            		</tbody>
+            	</table>
+            </div>
+            <div class="modal-footer">
+            	<button type="button" class="btn btn-success" id="proceed_btn">Proceed</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- modal for email confirmation -->
+<div class="modal fade" id="email_confirmation_modal" tabindex="-1" role="dialog" aria-labelledby="email_confirmation_modalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-light">
+                <h5 class="modal-title">Send email confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<p>You have selected the ff. columns: <span id="show_columns_checked" class="text-warning font-weight-bold"></span></p>
+            	<br/>
+    			<p class="text-danger"><small>Use comma(,) as seperator for multiple emails.<br/>(eg. john_doe@gmail.com,test@yahoo.com)</small></p>
+    			<label for="emails">Email Address:</label>
+            	<textarea name="emails" id="emails" cols="40" rows="4" class="form-control form-control-sm" required></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="send_mail_btn">Send email</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- modal for notification -->
+<div class="modal fade" id="notification_modal" tabindex="-1" role="dialog" aria-labelledby="notificationLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-light">
+                <h5 class="modal-title">Notification</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            	<h6 class="notification_message"></h6>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal">Okay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- modal for set service report # -->
+<div class="modal fade" id="service_report_set_modal" tabindex="-1" role="dialog" aria-labelledby="service_report_setservice_report_setLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-light">
+                <h5 class="modal-title">Enter Service report #:</h5>
+                <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button> -->
+            </div>
+            <div class="modal-body">
+            	<h6 class="notification_message"></h6><br/>
+            	<table id="service_report_table">
+            		
+            	</table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="service_report_btn" data-url="{% url 'inventory:save-service-report-no' pm.pk %}">Save service report #</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block js %}
+
+    <script src="{% static 'inventory/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/datatables.net-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'inventory/vendors/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js' %}"></script>
+
+    <script>
+        /*  Data Table
+        -------------*/
+        (function ($) {
+
+        	// check the first row of checkbox in send_email_modal
+        	$("#check_firstrow").click(function(){
+			    $('.chk_firstrow').not(this).prop('checked', this.checked);
+			});
+
+        	// check the second row of checkbox in send_email_modal
+        	$("#check_secondrow").click(function(){
+			    $('.chk_secondrow').not(this).prop('checked', this.checked);
+			});
+
+        	// if all units has been done show modal to enter service report no.
+        	$(document).ready(function(){
+	        	$.ajax({
+	        		url: '{% url "inventory:check-all-unit-done" pm.pk %}',
+	        		type: 'GET',
+	        		datatype: 'json',
+	        		success: function(data){
+	        			if (data.pm_overall_done) {
+	    					/*set modals backdrop and keyboard option to false so it cant be 	   closed until the save button is pressed*/
+	    					let sr_modal = $('#service_report_set_modal');
+	    					sr_modal.modal({
+					            backdrop: 'static',
+					            keyboard: false
+					        });
+	    					sr_modal.modal('show');
+	    					$('.notification_message').html(data.message);
+	    					$('#service_report_table').html(data.form);
+	    				}
+	    			}
+	        	});
+	        });
+
+        	let mark_done_url;
+        	$('#confirmation_modal').on('show.bs.modal', function(e){
+        		let btn = $(e.relatedTarget);
+        		mark_done_url = btn.attr('data-url');
+        	});
+
+        	$('#confirm_btn').click(function(){
+        		var checked_units = []
+        		$.each($('input[name="chk_unit"]:checked'), function(){
+        			checked_units.push($(this).val());
+        		});
+
+        		checked_units = checked_units.join(",");
+
+        		$.ajax({
+        			url: mark_done_url,
+        			type: 'POST',
+        			data: {csrfmiddlewaretoken: '{{ csrf_token }}',
+        				   'checked_units': checked_units,},
+        			success: function(data) {
+        				$('#confirmation_modal').modal('hide');
+
+        				if (data.pm_overall_done) {
+        					/*set modals backdrop and keyboard option to false so it cant be 	   closed until the save button is pressed*/
+        					let sr_modal = $('#service_report_set_modal');
+        					sr_modal.modal({
+					            backdrop: 'static',
+					            keyboard: false
+					        });
+        					sr_modal.modal('show');
+        					$('.notification_message').html(data.message);
+        					$('#service_report_table').html(data.form);
+        				}
+        				else {
+        					$('#notification_modal').modal('show');
+        					$('.notification_message').html(data.message);
+        					$('#notification_modal').on('hide.bs.modal', function(){
+	        					window.location.reload();
+	        				});
+        				}
+        				
+        			}
+        		})	
+        	});
+
+        	$('#service_report_btn').click(function(){
+        		let btn = $(this);
+        		let save_service_report_url = btn.attr('data-url');
+
+        		let service_report_number = $('#id_service_report_number').val();
+
+        		$.ajax({
+        			url: save_service_report_url,
+        			type: 'POST',
+        			datatype: 'json',
+        			data: {csrfmiddlewaretoken: '{{ csrf_token }}',
+        				   'service_report_number': service_report_number,},
+        			success: function(data){
+        				if (data.is_valid){
+        					$('#service_report_set_modal').modal('hide');
+        					$('#notification_modal').modal('show');
+        					$('.notification_message').html(data.message);
+        					$('#notification_modal').on('hide.bs.modal', function(){
+	        					window.location.reload();
+	        				});
+        				}
+        				else{
+        					$('#service_report_table').html(data.form);
+        				}
+        			}
+        		});
+        	});
+
+        	let send_mail_url;
+        	$('#send_email_modal').on('show.bs.modal', function(e){
+        		let btn = $(e.relatedTarget);
+        		send_mail_url = btn.attr('data-url');
+        	});
+
+        	$('#proceed_btn').click(function(){
+        		var checked_cols = []
+        		$.each($('input[name="chk_col_email"]:checked'), function(){
+        			checked_cols.push($(this).val());
+        		});
+
+        		if (checked_cols.length == 0) {
+        			alert('Please select columns you wish the clients wants to see.')
+        			return true;
+        		}
+
+        		checked_cols = checked_cols.join(", ");
+
+        		$('#send_email_modal').modal('hide');
+        		$('#email_confirmation_modal').modal('show');
+        		$('#show_columns_checked').html(checked_cols);
+
+        		$('#send_mail_btn').click(function(){
+
+        			let emails = $('#emails').val();
+
+        			if (emails == '' || emails == null) {
+        				$('#emails').css('border-color', 'red');
+        				return true;
+        			}
+
+        			$("#loader").toggle();
+
+        			$.ajax({
+        				url: send_mail_url,
+        				type: 'POST',
+        				datatype: 'json',
+        				data: {csrfmiddlewaretoken: '{{ csrf_token }}',
+        					   'emails': emails,
+        					   'checked_cols': checked_cols,},
+        				success:function(data) {
+        					$("#loader").fadeOut("slow");
+
+        					if (data.email_sent) {
+        						text_color = 'green'
+        					}
+        					else {
+        						text_color = 'red'
+        					}
+
+        					$('#email_confirmation_modal').modal('hide');
+        					$('#notification_modal').modal('show');
+        					$('.notification_message').css('color', text_color);
+        					$('.notification_message').html(data.message);
+        					$('#emails').css('border-color', 'None');
+        					$('#emails').val('');
+        				}
+        			})
+
+        		});
+        	});
+
+            $('#unit-data-table thead th').each( function () {
+                var title = $(this).text();
+                if (title != 'Action') {
+                    $(this).html( '<input type="text" name="'+title+'" placeholder="'+title+'" />' );
+                }
+            } );    
+
+            var unit_table = $('#unit-data-table').DataTable({
+                order: [[1, "asc"], [2, "asc"], [3, "asc"]],
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                // "processing": true,
+                // "serverSide": true,
+                // "ajax": "{% url 'inventory:unit_list_json' %}",
+                //buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+            });
+
+            unit_table.columns().every( function () {
+                var that = this;
+         
+                $( 'input', this.header() ).on( 'keyup change clear', function () {
+                    if ( that.search() !== this.value ) {
+                        that
+                            .search( this.value )
+                            .draw();
+                    }
+                });
+            });
+        })(jQuery);
+    </script>
+
+{% endblock %}

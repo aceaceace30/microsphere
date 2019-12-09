@@ -58,8 +58,7 @@
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-menu" aria-controls="main-menu" aria-expanded="false" aria-label="Toggle navigation">
                     <i class="fa fa-bars"></i>
                 </button>
-            <a class="navbar-brand" href="./">Microsphere Systems</a><!--<img src="{% static 'inventory/images/logo.png' %}" alt="Logo">-->
-                <!-- <a class="navbar-brand hidden" href="./"><img src="{% static 'inventory/images/logo2.png' %}" alt="Logo"></a> -->
+                <a class="navbar-brand" href="./">Microsphere Systems</a>
             </div>
 
             <div id="main-menu" class="main-menu collapse navbar-collapse">
@@ -68,12 +67,17 @@
                         <a href="{% url 'account:dashboard' %}"> <i class="menu-icon fa fa-dashboard"></i>Dashboard </a>
                     </li>
                     <h3 class="menu-title">Navigation</h3><!-- /.menu-title -->
+                    {% if perms.inventory.can_view_unit_list %}
                     <li>
                         <a href="{% url 'inventory:unit-list' %}"> <i class="menu-icon fa fa-laptop"></i>Units</a>
                     </li>
+                    {% endif %}
+
+                    {% if perms.inventory.can_view_pm_list %}
                     <li>
                         <a href="{% url 'inventory:pm-list' %}"> <i class="menu-icon fa fa-calendar"></i></i>Preventive Maintenance</a>
                     </li>
+                    {% endif %}
                     
                     {% if perms.inventory.can_generate_certification_form %}
                     <li>

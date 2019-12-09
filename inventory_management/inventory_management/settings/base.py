@@ -128,6 +128,10 @@ USE_L10N = True
 
 USE_TZ = False
 
+#accepted time formats
+TIME_INPUT_FORMATS = ('%I:%M %p',)
+
+
 #SUMMER NOTE THEME (can use bs3 for bootstrap 3)
 SUMMERNOTE_THEME = 'bs4'
 
@@ -143,7 +147,7 @@ STATIC_URL = '/static/'
 #     os.path.join(BASE_DIR, 'static'),
 # ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, '../mystatic/')
+STATIC_ROOT = os.path.join(BASE_DIR, '../../mystatic/')
 
 DASHBOARD_URL = 'account:dashboard'
 
@@ -160,10 +164,15 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = env.str('EMAIL_USERNAME')
 EMAIL_HOST_PASSWORD = env.str('EMAIL_PASS')
 EMAIL_PORT = 587
+DEFAULT_FROM_EMAIL  = env.str('EMAIL_USERNAME')
 
-# EMAIL_HEADER_MESSAGE = 'Good Day! This is the updated list of units after the Preventive Maintenance.'
+BCC_EMAIL = 'marcababao@gmail.com'
 
-COMPANY_NAME = 'Microsphere System Technology'
+#EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+
+
+COMPANY_NAME = 'Microsphere Systems Technology'
 COMPANY_ADDRESS = '53B Acacia St., Cembo Makati City'
 COMPANY_CONTACT = 'Tel. no. 882-8638 / 556-2398'
 

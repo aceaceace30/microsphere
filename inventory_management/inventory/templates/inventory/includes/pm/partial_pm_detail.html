@@ -6,15 +6,22 @@
             <strong class="card-title">Business Unit: </strong><span class="text-success">{{ pm.business_unit }}</span>
 
             <div class="float-right">
-            	{% if perms.inventory.can_view_units_per_pm %}
-            	<a href="{% url 'inventory:get_list_per_businessunit' pm.business_unit.pk %}" class="btn btn-primary btn-sm">Show Units</a>
-            	{% endif %}
-            	{% if perms.inventory.change_preventivemaintenance %}
-            		<a href="{% url 'inventory:pm-edit' pm.pk %}" class="btn btn-success btn-sm">Edit</a>
-            	{% endif %}
-            	{% if perms.inventory.can_soft_delete_pm %}
-        			<a href="{% url 'inventory:pm-delete' pm.pk %}" class="btn btn-danger btn-sm">Delete</a>
-        		{% endif %}
+            	<!-- {% if perms.inventory.can_view_units_per_pm %}
+            	<a href="{% url 'inventory:get_list_per_businessunit' pm.business_unit.pk %}?pm_pk={{ pm.pk }}" class="btn btn-primary btn-sm">Show Units</a>
+            	{% endif %} -->
+
+                {% if not pm.pm_done %}
+                	{% if perms.inventory.change_preventivemaintenance %}
+                		<a href="{% url 'inventory:pm-edit' pm.pk %}" class="btn btn-success btn-sm">Edit</a>
+                	{% endif %}
+                	{% if perms.inventory.can_soft_delete_pm %}
+            			<a href="{% url 'inventory:pm-delete' pm.pk %}" class="btn btn-danger btn-sm">Delete</a>
+            		{% endif %}
+                {% endif %}
+
+                {% if pm.pm_done %}
+                    <a href="#" class="btn btn-warning btn-sm" data-url="{% url 'inventory:pm-upload-attachment' pm.pk %}" data-toggle="modal" data-target="#upload_attachment_modal">Upload attachment</a>
+                {% endif %}
             	<a href="{% url 'inventory:pm-list' %}" class="btn btn-dark btn-sm">Back</a>
             </div>
         </div>
@@ -23,11 +30,8 @@
 
         		{% include 'inventory/notifs/message.html' %}
 
-				<form method="POST" action="{% url 'inventory:mark-as-done' pm.pk %}" id="mark_done_form">
-                	{% csrf_token %}
-
 				<div class="col-md-5 offset-md-3">
-                    <div class="card border border-success bg-success">
+                    <div class="card bg-{% if pm.pm_done %}success{% else %}danger{% endif %}">
                         <div class="card-header">
                             <strong class="card-title text-white">Preventive Maintenance Details</strong>
 
@@ -52,12 +56,8 @@
                         		<div class="col-6">
                         			<p class="text-dark">SR #:</p>
                         		</div>
-                        		<div class="col-6">
-                        			{% if not pm.service_report_number and perms.inventory.can_mark_as_done %}
-                        				<input type="text" name="service_report_number" class="form-control form-control-sm" required>
-                        			{% else %}
-                        				<p class="text-success">{{ pm.service_report_number }}</p>
-                        			{% endif %}
+                        		<div class="col-6">	
+                        			<p class="text-success">{{ pm.service_report_number }}</p>
                         		</div>
                         	</div>
 
@@ -112,14 +112,6 @@
                         			<p class="text-success">{{ pm.target_time }}</p>
                         		</div>
                         	</div>
-                        	<div class="row">
-                        		<div class="col-6">
-                        			<p class="text-dark">Actual Date:</p>
-                        		</div>
-                        		<div class="col-6">
-                        			<p class="text-success">{{ pm.actual_date }}</p>
-                        		</div>
-                        	</div>
                             <div class="row">
                                 <div class="col-6">
                                     <p class="text-dark">Assigned Personnel:</p>
@@ -146,27 +138,31 @@
                             		</div>
                             	</div>
                         	{% endif %}
+
+                            <div class="row">
+                                <div class="col-6">
+                                    <p class="text-dark">Attachment:</p>
+                                </div>
+                                <div class="col-6">
+                                    <p class="text-success">
+                                        {% if pm.attachment %}
+                                            {{ pm.filename }}
+                                             <a href="{{ pm.attachment.url }}" target="_blank" class="text-muted"><i class="fa fa-download"></i></a>
+                                        {% else%}
+                                            No attachment
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
                         	
+                            {% comment %}
                         	{% if not pm.pm_done and perms.inventory.can_mark_as_done %}
-                            	<div class="row">
-                            		<div class="col-6">
-                            			<p class="text-dark">Email Address:</p>
-                            			<p class="text-danger"><small>Use comma(,) as seperator for multiple emails.<br/>(eg. john_doe@gmail.com,test@yahoo.com)</small></p>
-                            		</div>
-                            		<div class="col-6">
-                            			<textarea name="emails" cols="40" rows="4" class="form-control form-control-sm"></textarea>
-                            		</div>
-                            	</div>
-                            	
-	                            	<div class="row pt-2">
-	                            		<div class="col offset-9">
-	                            			
-	                            			<input type="submit" class="btn btn-success btn-sm" value="Mark as Done" id="mark_as_done_btn">
-	                            			
-	                            		</div>
-	                            	</div>
-	                            </form>
+                            {% endcomment %}
+
+                            <a href="{% url 'inventory:pm-mark-done' pm.pk %}" class="btn btn-success btn-sm w-100">Update PM</a>
+                            {% comment %}
 							{% endif %}
+                            {% endcomment%}
 							
 							<div class="float-right">
 								<small class="text-dark">By: {{ pm.created_by }} | {{ pm.created_at }}</small>

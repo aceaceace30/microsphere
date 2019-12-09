@@ -11,15 +11,15 @@
             
             @frame header_frame { /* Static frame */
                 -pdf-frame-content: header_content;
-                left: 85pt; width: 512pt; top: 50pt; height: 125pt;
+                left: 85pt; width: 512pt; top: 25pt; height: 125pt;
             }
             @frame content_frame {
-                left: 40pt; width: 920pt; top: 160pt; height: 240pt;
+                left: 40pt; width: 920pt; top: 135pt; height: 240pt;
             }
 
             @frame footer_frame { /* Static frame */
                 -pdf-frame-content: footer_content;
-                left: 85pt; width: 850pt; top: 410pt; height: 250pt;
+                left: 85pt; width: 850pt; top: 385pt; height: 250pt;
             }
         }
 
@@ -57,20 +57,6 @@
             display:inline-block;
         }
 
-/*        .disposition {
-            position: fixed;
-            bottom: 0;
-            right: 0;
-          }*/
-/*
-        .item {
-            width: 100px;
-            padding: 10px;
-            background-color: rgba(111,41,97,.3);
-            border: 2px solid rgba(111,41,97,.5);
-            display: inline-block;
-            vertical-align: middle
-        }*/
 
     </style>
 </head>
@@ -79,7 +65,7 @@
     <div id="header_content">
         <div class="header_info">
             <p>
-                <img align="left" class="logo" src="{% static 'inventory/images/microsphere_logo.jpg' %}" alt="microsphere logo">
+                <img align="left" class="logo" src="{% static 'inventory/images/microsphere_logo.png' %}" alt="microsphere logo">
                 <span>{{ company }}</span><br/>
                 <span>{{ address }}</span><br/>
                 <span>{{ contact }}</span>
@@ -94,12 +80,12 @@
             This is to certify that the list of machines above were remarked, checked and verified true, correct and completed by the Branch Officer whose name and signature affix below.
         </h2>
         <div class="footer_info">
-            
-                    <p>Signature Over Printed Name</p>
-
-                    <p>Date: {{ today|date:'M d, Y' }}</p>
-
-                    <p>RC Code: {{ rc_code }}</p> 
+                <p style="text-decoration: underline; padding-top:5px; padding-bottom: -15px;">
+                    {{ line_spacing|safe }} 
+                </p>
+                <p>Signature Over Printed Name</p>
+                <p>Date: {{ today|date:'M d, Y' }}</p>
+                <p>RC Code: {{ rc_code }}</p> 
             
                 <p>Disposition / Remarks</p>
                 <ol id="conditions">
@@ -159,7 +145,7 @@
                     <td style="width:8%">{{ unit.remarks|truncatechars:10 }}</td>
                     <td style="width:8%">{{ unit.user }}</td>
                     <td style="width:9%">{{ unit.designation }}</td>
-                    <td style="width:6%">&nbsp;</td>
+                    <td style="width:9%">&nbsp;</td>
                 </tr>
                 {% empty %}
 

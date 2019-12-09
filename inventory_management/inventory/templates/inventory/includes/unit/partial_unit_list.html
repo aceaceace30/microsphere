@@ -3,26 +3,29 @@
 {% for unit in units %}
 	<tr>
 		<td>
-			{% if unit.machine_type.machine_class|upper == 'CPU' %}
+			{% if unit.unit.machine_type.machine_class|upper == 'CPU' %}
 				<img src="{% static 'inventory/images/CPU_ICON.ico' %}" alt="CPU Icon">
-			{% elif unit.machine_type.machine_class|upper == 'LAPTOP' %}
+			{% elif unit.unit.machine_type.machine_class|upper == 'LAPTOP' %}
 				<img src="{% static 'inventory/images/LAPTOP_ICON.ico' %}" alt="LAPTOP Icon">
-			{% elif unit.machine_type.machine_class|upper == 'PRINTER' %}
+			{% elif unit.unit.machine_type.machine_class|upper == 'PRINTER' %}
 				<img src="{% static 'inventory/images/PRINTER_ICON.ico' %}" alt="PRINTER Icon">
 			{% endif %}
 			{% if perms.inventory.view_unit %}
-				<a href="{% url 'inventory:unit-view' unit.pk  %}" title="View unit details">
-					{{ unit.serial_number }}
+				<a href="#" title="View unit details" data-toggle="modal" data-target="#unit_information_modal" data-url="{% url 'inventory:unit-view-json' unit.unit.pk  %}">
+					{{ unit.unit.serial_number }}
+				</a> | 
+				<a href="{% url 'inventory:unit-edit' unit.unit.pk  %}" title="Edit Unit">
+					Edit
 				</a>
 			{% else %}
-				{{ unit.serial_number }}
+				{{ unit.unit.serial_number }}
 			{% endif %}
 		</td>
-		<td>{{ unit.business_unit.client }}</td>
-		<td>{{ unit.area }}</td>
-		<td>{{ unit.business_unit }}</td>
-		<td>{{ unit.business_unit.location }}</td>
-		<td>{{ unit.status }}</td>
+		<td>{{ unit.unit.business_unit.client }}</td>
+		<td>{{ unit.unit.area }}</td>
+		<td>{{ unit.unit.business_unit }}</td>
+		<td>{{ unit.unit.business_unit.location }}</td>
+		<td>{{ unit.unit.status }}</td>
 	</tr>
 {% empty %}
 	<tr>

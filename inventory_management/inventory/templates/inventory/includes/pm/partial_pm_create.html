@@ -1,28 +1,16 @@
-<form method="post" action="{% url 'inventory:pm-create' %}" class="js-pm-create-form">
+
+<form method="post" action="{% url 'inventory:pm-create' %}" class="js-pm-create-form" autocomplete="off">
   {% csrf_token %}
   <div class="modal-header">
     <h5 class="modal-title">Create PM Schedule</h5>
   </div>
   <div class="modal-body">
-    <div class="container-fluid col-md-12">
+    <div class="container-fluid">
         {% include 'inventory/includes/pm/partial_pm_form.html' %}
     </div>
   </div>
   <div class="modal-footer">
-    <input type="checkbox" name="sendmail" value="True" checked>Send email notification to the client?
-    <button type="submit" class="btn btn-success btn-fill" id="pm_create_btn">Create PM</button>
+    <button type="submit" class="btn btn-success btn-fill">Create PM</button>
     <button type="button" class="btn btn-danger btn-fill" data-dismiss="modal">Cancel</button>
   </div>
 </form>
-
-{% block js %}
-
-<script>
-  jQuery(function($) {
-      $('#pm_create_btn').click(function(){
-          $('#loader').toggle();
-      });
-  });
-</script>
-
-{% endblock %}

@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.db.models import Count, Q
 from datetime import datetime
 
+from django.conf import settings
+
 def redirect_to_login(request):
 	return redirect('account:login')
 
@@ -97,6 +99,7 @@ def dashboard(request):
 			   'monitor_type_count':monitor_type_count,
 			   'office_app_count':office_app_count,
 			   'filter_form':filter_form,
+			   'company_name':settings.COMPANY_NAME,
 			   'date_today': datetime.now()}
 
 	return render(request, template_name, context)

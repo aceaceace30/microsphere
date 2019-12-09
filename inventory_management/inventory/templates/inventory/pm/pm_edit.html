@@ -1,13 +1,25 @@
 {% extends 'inventory/base.html' %}
+{% load static %}
 {% load widget_tweaks %}
 
 {% block title %} Microsphere - PM Edit {% endblock %}
 
-{% block page_title %} Service Report Number: <span class="text-success">{{ preventivemaintenance.service_report_number }}</span> {% endblock %}
-{% block page_title_second %}<a href="{% url 'inventory:pm-list' %}"> PM List</a> > <a href="{% url 'inventory:pm-view' preventivemaintenance.pk %}"> Details</a> > Edit {% endblock %}
+{% block css %}
+	<!-- <link rel="stylesheet" href="{% static 'inventory/js/jquery/jquery-ui.min.css' %}"> -->
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="{% static 'inventory/js/timepicker/jquery.timepicker.min.css' %}">
+{% endblock %}
+
+{% block page_title %}
+	Service Report Number: <span class="text-success">{{ preventivemaintenance.service_report_number }}</span>
+{% endblock %}
+
+{% block page_title_second %}
+	<a href="{% url 'inventory:pm-list' %}"> PM List</a> > <a href="{% url 'inventory:pm-view' preventivemaintenance.pk %}"> Details</a> > Edit 
+{% endblock %}
 
 {% block content %}
-<form method="POST">
+<form method="POST" autocomplete="off">
 {% csrf_token %}
 	<div class="content mt-3">
 	    <div class="animated fadeIn">
@@ -26,7 +38,7 @@
 	    	
 				    	<div class="row pt-2 pl-2 pr-2">
 				        	<div class="col-lg-5 offset-lg-3">
-				                <div class="card bg-success">
+				                <div class="card bg-{% if pm.pm_done %}success{% else %}danger{% endif %}">
 				                    <div class="card-header text-light"><strong>Preventive Maintenance Details</strong></div>
 				                    <div class="card-body bg-light">
 				                    	<div class="row form-group">
@@ -41,8 +53,10 @@
 						                </div>
 				                        {% for field in form %}
 							                <div class="row form-group">
-							                    <div class="col col-md-5">{{ field.label_tag }}</div>
-							                    <div class="col-7 col-md-7">
+							                    <div class="col-md-5">
+							                    	{{ field.label_tag }}
+							                	</div>
+							                    <div class="col-md-7">
 							                    	{{ field }}
 							                    	<small class="form-text text-danger">{{ field.errors }}</small>
 							                    </div>
@@ -61,5 +75,18 @@
 	</div><!-- .content -->
 </form>
 
+{% endblock %}
+
+{% block js %}
+
+<script src="{% static 'inventory/js/jquery/jquery-ui.min.js' %}"></script>
+<script src="{% static 'inventory/js/timepicker/jquery.timepicker.min.js' %}"></script>
+
+<script>
+  jQuery(function($) {
+    $( "#id_target_date" ).datepicker();
+    $( "#id_target_time" ).timepicker();
+  }	);
+</script>
 
 {% endblock %}

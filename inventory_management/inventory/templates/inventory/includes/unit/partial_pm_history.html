@@ -3,7 +3,7 @@
         <div class="card-header bg-success text-white">
             <strong class="card-title">
                 
-                <a href="{% url 'inventory:pm-view' history.preventive_maintenance.pk %}" class="text-dark">Business Unit: <span class="text-light">{{ history.unit.business_unit }}</span></a>
+                <a href="{% url 'inventory:pm-view' history.preventive_maintenance.pk %}" class="text-dark">Business Unit: <span class="text-light">{{ history.preventive_maintenance.business_unit.business_unit_name }}</span></a>
 
                 <div class="float-right">
                     {% if history.preventive_maintenance.pm_done %}

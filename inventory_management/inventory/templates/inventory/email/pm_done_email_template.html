@@ -64,19 +64,204 @@
 		<table>
 			<thead>
 				<tr>
-					<th>MST Tag</th>
-					<th>Machine Type</th>
-					<th>Machine Brand / Model</th>
-					<th>Serial Number</th>
+					{% if 'client' in table_columns %}
+					<th>Client</th>
+					{% endif %}
+
+					{% if 'area' in table_columns %}
+        			<th>Area</th>
+        			{% endif %}
+
+        			{% if 'business_unit' in table_columns %}
+        			<th>Business Unit</th>
+        			{% endif %}
+
+        			{% if 'machine_type' in table_columns %}
+        			<th>Machine Type</th>
+        			{% endif %}
+
+        			{% if 'machine_brand' in table_columns %}
+        			<th>Machine Brand</th>
+        			{% endif %}
+	
+					{% if 'model' in table_columns %}
+        			<th>Model</th>
+        			{% endif %}
+
+        			{% if 'serial_number' in table_columns %}
+        			<th>Serial Number</th>
+        			{% endif %}
+
+        			{% if 'computer_tag' in table_columns %}
+        			<th>Computer Tag</th>
+        			{% endif %}
+
+        			{% if 'user' in table_columns %}
+        			<th>User</th>
+        			{% endif %}
+
+        			{% if 'designation' in table_columns %}
+        			<th>Designation</th>
+        			{% endif %}
+
+        			{% if 'operating_system' in table_columns %}
+        			<th>Operating System</th>
+        			{% endif %}
+
+        			{% if 'office_application' in table_columns %}
+					<th>Office App.</th>
+					{% endif %}
+
+
+
+					{% if 'host_name' in table_columns %}
+        			<th>HostName</th>
+        			{% endif %}
+
+        			{% if 'mac_address' in table_columns %}
+        			<th>MAC</th>
+        			{% endif %}
+
+        			{% if 'ip_address' in table_columns %}
+        			<th>IP</th>
+        			{% endif %}
+
+        			{% if 'processor' in table_columns %}
+					<th>Processor</th>
+					{% endif %}
+
+					{% if 'total_ram' in table_columns %}
+        			<th>RAM</th>
+        			{% endif %}
+
+        			{% if 'hdd_size' in table_columns %}
+        			<th>HDD</th>
+        			{% endif %}
+
+        			{% if 'monitor_type' in table_columns %}
+        			<th>OS</th>
+        			{% endif %}
+
+        			{% if 'monitor_brand' in table_columns %}
+					<th>Monitor Brand</th>
+					{% endif %}
+
+					{% if 'monitor_size' in table_columns %}
+        			<th>Monitor Size</th>
+        			{% endif %}
+
+        			{% if 'working' in table_columns %}
+        			<th>Working</th>
+        			{% endif %}
+
+        			{% if 'status' in table_columns %}
+        			<th>Status</th>
+        			{% endif %}
+
+        			{% if 'remarks' in table_columns %}
+					<th>Remarks</th>
+					{% endif %}
 				</tr>
 			</thead>
 			<tbody>
 				{% for unit in units %}
 					<tr>
-						<th>{{ unit.mst_tag }}</th>
-						<th>{{ unit.machine_type }}</th>
-						<th>{{ unit.machine_brand }} / {{ unit.model }}</th>
-						<th>{{ unit.serial_number }}</th>
+						{% if 'client' in table_columns %}
+						<td>{{ unit.preventive_maintenance.business_unit.client.client_code }}</td>
+						{% endif %}
+
+						{% if 'area' in table_columns %}
+	        			<td>{{ unit.preventive_maintenance.business_unit.area }}</td>
+	        			{% endif %}
+
+	        			{% if 'business_unit' in table_columns %}
+	        			<td>{{ unit.preventive_maintenance.business_unit.business_unit_name }}</td>
+	        			{% endif %}
+
+	        			{% if 'machine_type' in table_columns %}
+	        			<td>{{ unit.unit.machine_type }}</td>
+	        			{% endif %}
+
+	        			{% if 'machine_brand' in table_columns %}
+	        			<td>{{ unit.unit.machine_brand }}</td>
+	        			{% endif %}
+
+	        			{% if 'model' in table_columns %}
+	        			<td>{{ unit.unit.model }}</td>
+	        			{% endif %}
+
+	        			{% if 'serial_number' in table_columns %}
+	        			<td>{{ unit.unit.serial_number }}</td>
+	        			{% endif %}
+
+	        			{% if 'computer_tag' in table_columns %}
+	        			<td>{{ unit.unit.computer_tag }}</td>
+	        			{% endif %}
+
+	        			{% if 'user' in table_columns %}
+	        			<td>{{ unit.unit.user }}</td>
+	        			{% endif %}
+
+	        			{% if 'designation' in table_columns %}
+	        			<td>{{ unit.unit.designation }}</td>
+	        			{% endif %}
+
+	        			{% if 'operating_system' in table_columns %}
+	        			<td>{{ unit.unit.operating_system }}</td>
+	        			{% endif %}
+
+	        			{% if 'office_application' in table_columns %}
+	        			<td>{{ unit.unit.office_application }}</td>
+	        			{% endif %}
+
+	        			{% if 'host_name' in table_columns %}
+	        			<td>{{ unit.unit.host_name }}</td>
+	        			{% endif %}
+
+	        			{% if 'mac_address' in table_columns %}
+	        			<td>{{ unit.unit.mac_address }}</td>
+	        			{% endif %}
+
+	        			{% if 'ip_address' in table_columns %}
+	        			<td>{{ unit.unit.ip_address }}</td>
+	        			{% endif %}
+
+	        			{% if 'processor' in table_columns %}
+	        			<td>{{ unit.unit.processor }}</td>
+	        			{% endif %}
+
+	        			{% if 'total_ram' in table_columns %}
+	        			<td>{{ unit.unit.total_ram }}</td>
+	        			{% endif %}
+
+	        			{% if 'hdd_size' in table_columns %}
+	        			<td>{{ unit.unit.hdd_size }}</td>
+	        			{% endif %}
+
+	        			{% if 'monitor_type' in table_columns %}
+	        			<td>{{ unit.unit.monitor_type }}</td>
+	        			{% endif %}
+
+	        			{% if 'monitor_brand' in table_columns %}
+	        			<td>{{ unit.unit.monitor_brand }}</td>
+	        			{% endif %}
+
+	        			{% if 'monitor_size' in table_columns %}
+	        			<td>{{ unit.unit.monitor_size }}</td>
+	        			{% endif %}
+
+	        			{% if 'working' in table_columns %}
+	        			<td>{{ unit.unit.working }}</td>
+	        			{% endif %}
+
+	        			{% if 'status' in table_columns %}
+	        			<td>{{ unit.unit.status }}</td>
+	        			{% endif %}
+
+	        			{% if 'remarks' in table_columns %}
+	        			<td>{{ unit.unit.remarks }}</td>
+	        			{% endif %}
+
 					</tr>
 				{% endfor %}
 			</tbody>

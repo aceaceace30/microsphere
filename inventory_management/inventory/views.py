@@ -24,10 +24,12 @@ Brand
 
 from django.db.models import Count, Q
 
-from .forms import PreventiveMaintenanceForm, UnitForm, PreventiveMaintenanceEditForm
+from .forms import PreventiveMaintenanceForm, UnitForm, PreventiveMaintenanceEditForm, NotesForm,\
+ServiceReportForm, UploadAttachmentForm
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
+
 
 from django.utils.decorators import method_decorator
 
@@ -90,6 +92,16 @@ class UnitDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
 	def get_object(self, *args, **kwargs):
 		pk = self.kwargs.get('pk')
 		return get_object_or_404(Unit, pk=pk, active=True)
+
+def unit_view_json(request, pk):
+	data = dict()
+
+	unit = Unit.objects.filter(pk=pk).values('machine_type__machine_class', 'serial_number', 'computer_tag',
+										'mst_tag', 'user', 'designation', 'working', 'status')[:1]
+
+	if request.is_ajax():
+		data['unit'] = list(unit)
+		return JsonResponse(data)
 
 def unit_delete(request, pk):
 	unit = get_object_or_404(Unit, pk=pk, active=True)
@@ -179,10 +191,6 @@ def historical_changes(history):
 				changes.append(delta)
 			last = old_record
 
-	# for c in changes:
-	# 	attrs = vars(c)
-	# 	for field in c.changes:
-	# 		attrs2 = vars(field)
 
 	return changes
 
@@ -249,70 +257,35 @@ class PmUpdateView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMi
 	template_name = 'inventory/pm/pm_edit.html'
 	success_message = 'Your changes has been save.'
 
+	def get(self, request, *args, **kwargs):
+		if self.get_object().pm_done:
+			return redirect('account:dashboard')
+		return super().get(request, *args, **kwargs)
+
 	def get_object(self):
 		pk = self.kwargs.get('pk')
 		return get_object_or_404(PreventiveMaintenance, pk=pk, active=True)
 
-class UnitPerBranch(LoginRequiredMixin, ListView):
+class UnitPerBranch(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+	permission_required = 'inventory.can_view_unit_history'
 	login_url = settings.LOGOUT_REDIRECT_URL
 	template_name = 'inventory/unit/unit_list_per_branch.html'
 	context_object_name = 'units'
 
 	def get_queryset(self):
 		pk = self.kwargs.get('pk')
-		units = Unit.objects.filter(business_unit__pk=pk, active=True)
-		self.business_unit_name = units[0].business_unit
-		self.client = units[0].business_unit.client
+		units = PmUnitHistory.objects.filter(preventive_maintenance__pk=self.request.GET.get('pm_pk'))
+		business_unit = BusinessUnit.objects.get(pk=pk)
+		self.business_unit_name = business_unit.business_unit_name
+		self.client = business_unit.client
 		return units
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['previous'] = self.request.META['HTTP_REFERER']
 		context['business_unit_name'] = self.business_unit_name
 		context['client'] = self.client
+		context['pm_pk'] = self.request.GET.get('pm_pk')
 		return context
-
-# def unit_save(request, form, template_name):
-# 	data = dict()
-
-# 	render_table_html = 'inventory/includes/unit/partial_unit_list.html'
-
-# 	if request.method == 'POST':
-# 		if form.is_valid():
-
-# 			post = form.save(commit=False)
-
-# 			if not post.pk:
-# 				post.created_by = request.user
-# 			post.updated_by = request.user
-# 			post.save()
-
-# 			data['form_is_valid'] = True
-
-# 			units = Unit.get_active_units()
-# 			data['html_unit_list'] = render_to_string(render_table_html, {'units': units})
-# 		else:
-# 			data['form_is_valid'] = False
-
-# 	context = {'form': form}
-# 	data['html_form'] = render_to_string(template_name, context, request=request)
-
-# 	return JsonResponse(data)
-
-# @permission_required('inventory.add_unit')
-# def unit_create(request):
-
-# 	render_create_html = 'inventory/includes/unit/partial_unit_create.html'
-
-# 	if request.method == 'POST':
-
-# 		form = UnitForm(request.POST)
-
-# 	else:
-
-# 		form = UnitForm()
-
-# 	return unit_save(request, form, render_create_html)
 
 def pm_save(request, form, template_name):
 	data = dict()
@@ -322,12 +295,23 @@ def pm_save(request, form, template_name):
 	if request.method == 'POST':
 
 		# checks if to send an email or not
-		sendmail = request.POST.get('sendmail', default=None)
+		# sendmail = request.POST.get('sendmail', default=None)
 
 		if form.is_valid():
 
 			emails = form.cleaned_data['emails']
 			post = form.save(commit=False)
+
+			""" checks first if their is an available unit when creating a pm for that branch 
+				do not allow to proceed if their is no unit available. """
+
+			no_unit_exist = Unit.objects.filter(business_unit=post.business_unit).exists()
+
+			if not no_unit_exist:
+				data['no_unit_exist'] = True
+
+				return JsonResponse(data)
+
 			post.created_by = request.user
 			post.updated_by = request.user
 
@@ -340,7 +324,6 @@ def pm_save(request, form, template_name):
 				format_email = None
 				subject = 'Microshphere Systems Technology'
 
-
 			email_message = 'Please be informed that the Preventive Maintenance Activity for\
 							 PC and Printers enrolled in <br/>Maintenance Agreement and assigned\
 							 to your branch will be scheduled on <u>{0} at {1}</u>.<br/>\
@@ -348,7 +331,7 @@ def pm_save(request, form, template_name):
 
 			split_emails = []
 
-			if emails and sendmail:
+			if emails:
 				if ',' in emails:
 					split_emails = emails.split(',')
 				else:
@@ -358,10 +341,19 @@ def pm_save(request, form, template_name):
 												 {'email_message': email_message,
 												  'format_email':format_email,})
 
-				send_mail(subject, '',
-					      settings.COMPANY_NAME + ' <' + settings.EMAIL_HOST_USER + '>',
-					      split_emails,
-					      html_message=EMAIL_TEMPLATE)
+				email_send = EmailMessage(subject,
+									  EMAIL_TEMPLATE,
+								      settings.EMAIL_HOST_USER,
+								      split_emails,
+								      [settings.BCC_EMAIL])
+
+				email_send.content_subtype = 'html'
+				email_send.send(fail_silently=True)
+
+				# send_mail(subject, '',
+				# 	      settings.EMAIL_HOST_USER,
+				# 	      split_emails,
+				# 	      html_message=EMAIL_TEMPLATE)
 
 			post.save()
 
@@ -404,7 +396,11 @@ def pm_delete(request, pk):
 	pm = get_object_or_404(PreventiveMaintenance, pk=pk, active=True)
 	template_name = 'inventory/pm/pm_delete.html'
 
+	if pm.pm_done:
+			return redirect('account:dashboard')
+
 	if request.method == 'POST':
+
 		pm.active = False
 		pm.save()
 		messages.error(request, 'PM has been deleted.')
@@ -424,11 +420,13 @@ def add_pm_remarks(request, pk):
 		data['is_valid'] = False
 		remarks = request.POST.get('remarks', default=None)
 
-		if remarks:
-			pm_history.remarks = remarks
-			pm_history.updated_by = request.user
-			pm_history.updated_at = datetime.datetime.now()
-			pm_history.save()
+		form = NotesForm(request.POST, instance=pm_history)
+
+		if form.is_valid():
+			post = form.save(commit=False)
+			post.updated_by = request.user
+			post.updated_at = datetime.datetime.now()
+			post.save()
 
 			pm_history_list = PmUnitHistory.objects.select_related('preventive_maintenance')\
 					.filter(unit=pm_history.unit, unit__active=True)\
@@ -446,55 +444,215 @@ def add_pm_remarks(request, pk):
 					   'can_add_remarks_per_pm': can_add_remarks_per_pm,
 					   'pm_history': pm_history_list,}
 
-			data['pm_history_list'] = render_to_string('inventory/includes/unit/partial_pm_history.html', context)
+			data['pm_history_list'] = render_to_string('inventory/includes/unit/partial_pm_history.html', context, request=request)
 			data['message'] = 'Notes has been saved.'
 			data['is_valid'] = True
 
-		#messages.success(request, 'Remarks has been added.')
-		return JsonResponse(data)
-	#return redirect('inventory:unit-view', pm_history.unit.pk)
+	form = NotesForm(instance=pm_history)
+
+	context = {
+		'form': form
+	}
+	data['notes_form'] = render_to_string('inventory/includes/unit/partial_history_form.html', context, request=request)
+
+	return JsonResponse(data)
+
+# @login_required
+# def mark_as_done(request, pk):
+# 	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
+# 	units = Unit.objects.filter(active=True, business_unit__pk=pm.business_unit.pk)
+
+# 	if request.method == 'POST':
+
+# 		emails = request.POST.get('emails', default=None).replace(' ', '')
+# 		service_report_number = request.POST.get('service_report_number', default=None)
+
+# 		# validation for sr field if blank
+# 		if not service_report_number:
+# 			messages.error(request, 'SR # cannot be blank.')
+# 			return redirect('inventory:pm-view', pk)
+
+# 		# validation for sr field if exist in database
+# 		if PreventiveMaintenance.objects.filter(service_report_number=service_report_number).exists():
+# 			messages.error(request, 'SR # already exist. Please try a new one.')
+# 			return redirect('inventory:pm-view', pk)
+
+# 		# if validations passed
+# 		pm.service_report_number = service_report_number
+# 		pm.pm_done = True
+# 		pm.pm_date_done = datetime.datetime.now()
+# 		pm.save()
+
+# 		# declared empty list to append if the user input a single email
+# 		split_emails = []
+
+# 		""" if emails exist check if the email field has a comma ',' character to determine if it has
+# 			more than one email to send if it has more than one use the split function to transform it into
+# 			a list else append the single email to the empty list because the send_mail function needed a list
+# 			on the recipient """
+# 		if emails:
+# 			if ',' in emails:
+# 				split_emails = emails.split(',')
+# 			else:
+# 				split_emails.append(emails)
+
+# 			""" Dynamic part of the email sending. needed to use try catch to handle errors if their is no available 
+# 				data from the database """
+# 			try:
+# 				format_email = EmailTemplate.objects.get(used_for='done pm')
+# 				subject = format_email.subject
+# 			except:
+# 				format_email = None
+# 				subject = settings.COMPANY_NAME
+
+# 			EMAIL_TEMPLATE = render_to_string('inventory/email/pm_done_email_template.html', 
+# 											 {'units':units,
+# 											  'pm':pm,
+# 											  'format_email':format_email,})
+
+# 			test_emails = ['michaelababao200@gmail.com', 'marcababao@gmail.com']
+# 			mail_check = send_mail(subject, '', settings.EMAIL_HOST_USER, split_emails, html_message=EMAIL_TEMPLATE)
+
+# 			if mail_check:
+# 				messages.success(request, 'Email has been sent.')
+# 			else:
+# 				messages.error(request, 'There was an issue while trying to send the email. Please check your internet connection.')
+# 		else:
+# 			messages.error(request, 'There was no email input.')
+
+# 		messages.success(request, 'Preventive maintenance has marked as done.')
+
+# 	return redirect('inventory:pm-view', pk)
 
 @login_required
-def mark_as_done(request, pk):
+def pm_mark_done(request, pk):
+	template_name = 'inventory/pm/pm_mark_done.html'
+
 	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
-	units = Unit.objects.filter(active=True, business_unit__pk=pm.business_unit.pk)
+	units = pm.pmunithistory_set.all()
+
+	if request.method == 'POST':
+		data = dict()
+
+		checked_units = request.POST.get('checked_units', default=None)
+		unit_list = list()
+
+		if checked_units:
+			if ',' in checked_units:
+				unit_list = checked_units.split(',')
+				unit_list = list(map(int, unit_list))
+			else:
+				unit_list.append(int(checked_units))
+
+		# units = units.filter(pm_done=False)
+		for unit in units:
+			if unit.pk in unit_list:
+				unit.pm_done = False
+				unit.pm_date_done = None
+			else:
+				unit.pm_done = True
+				unit.pm_date_done = datetime.datetime.now()
+			unit.save()
+
+		if len(unit_list) == 0 or not unit_list:
+			pm.pm_done = True
+			pm.pm_date_done = datetime.datetime.now()
+			data['pm_overall_done'] = True
+			form = str(ServiceReportForm(instance=pm))
+			data['form'] = form
+			message = 'All units under this pm has been inspected. Please set Service report #.'
+		else:
+			pm.pm_done = False
+			pm.pm_date_done = None
+			data['pm_overall_done'] = False
+			message = 'PM has been saved.'
+
+		pm.save()
+
+		data['is_valid'] = True
+		data['message'] = message
+
+		return JsonResponse(data)
+
+	context = { 'pm': pm,
+				'units': units, }
+
+	return render(request, template_name, context)
+
+@login_required
+def save_service_report_no(request, pk):
+	data = dict()
+	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
+
+	if request.method == 'POST':
+		form = ServiceReportForm(request.POST, instance=pm)
+
+		if form.is_valid():
+			form.save()
+			data['is_valid'] = True
+			data['message'] = 'Service report has been saved.'
+
+		else:
+			data['is_valid'] = False
+			data['form'] = str(form)
+
+	return JsonResponse(data)
+
+@login_required
+def check_all_unit_done(request, pk):
+	data = dict()
+	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
+
+	if request.method == 'GET':
+		if pm.pm_done and not pm.service_report_number:
+			for history in pm.pmunithistory_set.all():
+				if history.pm_done == False:
+					data['pm_overall_done'] = False
+					break
+				else:
+					data['pm_overall_done'] = True
+					form = str(ServiceReportForm(instance=pm))
+					data['form'] = form
+					data['message'] = 'All units under this pm has been inspected. Please set Service report #.'
+
+	return JsonResponse(data)
+
+@login_required
+def pm_send_email(request, pk):
+	data = dict()
 
 	if request.method == 'POST':
 
 		emails = request.POST.get('emails', default=None).replace(' ', '')
-		service_report_number = request.POST.get('service_report_number', default=None)
 
-		# validation for sr field if blank
-		if not service_report_number:
-			messages.error(request, 'SR # cannot be blank.')
-			return redirect('inventory:pm-view', pk)
+		# which columns does the table contains
+		checked_cols = request.POST.get('checked_cols', default=None)
 
-		# validation for sr field if exist in database
-		if PreventiveMaintenance.objects.filter(service_report_number=service_report_number).exists():
-			messages.error(request, 'SR # already exist. Please try a new one.')
-			return redirect('inventory:pm-view', pk)
-
-		# if validations passed
-		pm.service_report_number = service_report_number
-		pm.pm_done = True
-		pm.pm_date_done = datetime.datetime.now()
-		pm.save()
+		# split the checked cols to a python list
+		table_columns = checked_cols.split(', ')
 
 		# declared empty list to append if the user input a single email
 		split_emails = []
 
-		""" if emails exist check if the email field has a comma ',' character to determine if it has
-			more than one email to send if it has more than one use the split function to transform it into
-			a list else append the single email to the empty list because the send_mail function needed a list
-			on the recipient """
+		""" if emails exist check if the email field has a comma ',' character
+			to determine if it has more than one email to send if it has more
+			than one use the split function to transform it into a list else append
+			the single email to the empty list because the send_mail function
+			needed a list on the recipient. """
 		if emails:
 			if ',' in emails:
 				split_emails = emails.split(',')
 			else:
 				split_emails.append(emails)
 
-			""" Dynamic part of the email sending. needed to use try catch to handle errors if their is no available 
-				data from the database """
+			# query all the units
+			pm = get_object_or_404(PreventiveMaintenance, pk=pk)
+			units = pm.pmunithistory_set.all()
+
+			""" Dynamic part of the email sending.
+				needed to use try catch to handle
+				errors if their is no available 
+				data from the database. """
 			try:
 				format_email = EmailTemplate.objects.get(used_for='done pm')
 				subject = format_email.subject
@@ -505,21 +663,58 @@ def mark_as_done(request, pk):
 			EMAIL_TEMPLATE = render_to_string('inventory/email/pm_done_email_template.html', 
 											 {'units':units,
 											  'pm':pm,
+											  'table_columns': table_columns,
 											  'format_email':format_email,})
 
-			test_emails = ['michaelababao200@gmail.com', 'marcababao@gmail.com']
-			mail_check = send_mail(subject, '', settings.EMAIL_HOST_USER, split_emails, html_message=EMAIL_TEMPLATE)
+			email_send = EmailMessage(subject,
+									  EMAIL_TEMPLATE,
+								      settings.EMAIL_HOST_USER,
+								      split_emails,
+								      [settings.BCC_EMAIL])
 
-			if mail_check:
-				messages.success(request, 'Email has been sent.')
+			email_send.content_subtype = 'html'
+			email_send.send(fail_silently=True)
+
+			# mail_check = send_mail(subject, '',
+			# 					   settings.EMAIL_HOST_USER,
+			# 					   split_emails,
+			# 					   html_message=EMAIL_TEMPLATE)
+
+			if email_send:
+				data['message'] = 'Email has been sent.'
+				data['email_sent'] = True
 			else:
-				messages.danger(request, 'There was an issue while trying to send the email. Please check your internet connection.')
+				data['message'] = 'There was an issue while trying to send the email.\
+								   Make sure you have an internet connection.'
+				data['email_sent'] = False
+
+		return JsonResponse(data)
+
+def pm_upload_attachment(request, pk):
+	data = dict()
+	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
+
+	if request.method == 'POST':
+		form = UploadAttachmentForm(request.POST, request.FILES, instance=pm)
+
+		if form.is_valid():
+			form.save()
+			#data['is_valid'] = True
+			#data['message'] = 'Upload successful.'
+			messages.success(request, 'Upload successful.')
+			return redirect('inventory:pm-view', pm.pk)
 		else:
-			messages.danger(request, 'There was no email input.')
+			messages.error(request, 'Invalid file format. Only accepts .pdf, .doc, .docx, .xlsx, .xls files.')
+			return redirect('inventory:pm-view', pm.pk)
+	else:
+		form = UploadAttachmentForm(instance=pm)
 
-		messages.success(request, 'Preventive maintenance has marked as done.')
+	context = {'form': form,
+			   'pm': pm}
 
-	return redirect('inventory:pm-view', pk)
+	data['html_form'] = render_to_string('inventory/includes/pm/partial_upload_attachment.html', context, request=request)
+
+	return JsonResponse(data)
 
 
 class GenerateCertificationForm(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -540,12 +735,17 @@ class GenerateCertificationForm(LoginRequiredMixin, PermissionRequiredMixin, Vie
 		context = {
 			'units': units,
 			'request': request,
-			'today': today,
+			'today': None,
 			'business_unit_name': business_unit_name,
 			'rc_code': rc_code,
 			'company': settings.COMPANY_NAME.upper(),
 			'address': settings.COMPANY_ADDRESS,
 			'contact': settings.COMPANY_CONTACT,
+
+			# used to create line in over signature because
+			# this library doesn't support 'text-decorator:overline' in CSS
+
+			'line_spacing': '&nbsp;' * 51
 		}
 
 		return Render.render('inventory/pdf/preventive_maintenance_certification_form.html', file_name, context)
