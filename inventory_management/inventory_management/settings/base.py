@@ -146,7 +146,7 @@ STATIC_URL = '/static/'
 #     os.path.join(BASE_DIR, 'static'),
 # ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, '../../mystatic/')
+STATIC_ROOT = os.path.join(BASE_DIR, '../static/')
 
 DASHBOARD_URL = 'account:dashboard'
 
