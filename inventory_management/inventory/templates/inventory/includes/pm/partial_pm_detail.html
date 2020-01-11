@@ -34,10 +34,12 @@
                     <div class="card bg-{% if pm.pm_done %}success{% else %}danger{% endif %}">
                         <div class="card-header">
                             <strong class="card-title text-white">Preventive Maintenance Details</strong>
-
+                            
+                            {% if not pm.pm_done or request.user.is_superuser %}
                             <div class="float-right">
-                                <a href="{% url 'inventory:generate_certification_form' pm.business_unit.pk %}" target="_blank" class="btn btn-light btn-sm font-weight-bold text-success"><i class="menu-icon fa fa-folder-o"></i> Print Certification Form</a>
+                                <a href="{% url 'inventory:generate_certification_form' pm.pk %}" target="_blank" class="btn btn-light btn-sm font-weight-bold text-success"><i class="menu-icon fa fa-folder-o"></i> Print Certification Form</a>
                             </div>
+                            {% endif %}
                         </div>
                         <div class="card-body bg-white">
                         	<div class="row">

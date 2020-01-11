@@ -58,7 +58,11 @@ class BusinessUnitResource(resources.ModelResource):
 
 class UnitResource(resources.ModelResource):
 
-	business_unit = fields.Field(attribute='business_unit',
+	# client = fields.Field(attribute='business_unit',
+	# 					  column_name='client',
+	# 					  widget=ForeignKeyWidget(BusinessUnit, 'client__client_code'))
+
+	rc_code = fields.Field(attribute='business_unit',
 		                  column_name='rc_code',
 		                  widget=ForeignKeyWidget(BusinessUnit, 'rc_code'))
 
@@ -105,7 +109,7 @@ class UnitResource(resources.ModelResource):
 		model = Unit
 		exclude = ('id', 'active', 'created_at', 'updated_at')
 
-		export_order = ('area','business_unit','machine_type',
+		export_order = ('area','rc_code','machine_type',
 						'machine_brand','model','serial_number',
 						'computer_tag','mst_tag','user','designation',
 						'operating_system','office_application','host_name',
@@ -113,13 +117,15 @@ class UnitResource(resources.ModelResource):
 						'hdd_size','monitor_type','monitor_brand','monitor_size',
 						'remarks','working','status')
 
-		import_id_fields = ['serial_number', 'business_unit']
+		import_id_fields = ['area', 'rc_code', 'serial_number',]
 		skip_unchange = True
 		report_skipped = False
 
 	def before_import_row(self, row, **kwargs):
 		unit = Unit.objects.filter(serial_number=row['serial_number'],
 								   business_unit__rc_code=row['rc_code']).exists()
+
+		row['rc_code'] = int(row['rc_code'])
 
 		if not unit:
 			row['created_by'] = kwargs['user']

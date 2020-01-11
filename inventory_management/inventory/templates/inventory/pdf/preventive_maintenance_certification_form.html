@@ -127,24 +127,24 @@
                 </tr>
             </thead>
             <tbody>
-                {% for unit in units %}
+                {% for history in pm.pmunithistory_set.all %}
                 <!-- style="line-height: 25px; height: 25px;" -->
                 <tr style="height: 27px;">
                     <td style="width:4%">{{ forloop.counter }}</td>
-                    <td style="width:6%">{{ unit.business_unit.rc_code }}</td>
-                    <td style="width:7%">{{ unit.business_unit.business_unit_name }}</td>
-                    <td style="width:7%">{{ unit.business_unit.location }}</td>
-                    <td style="width:7%">{{ unit.machine_type }}</td>
-                    <td style="width:7%">{{ unit.machine_brand }}</td>
-                    <td style="width:7%">{{ unit.model }}</td>
-                    <td style="width:7%">{{ unit.serial_number }}</td>
-                    <td style="width:7%">{{ unit.computer_tag }}</td>
-                    <td style="width:7%">{{ unit.mst_tag }}</td>
-                    <td style="width:7%">{{ unit.status }}</td>
-                    <td style="width:5%">{{ unit.working }}</td>
-                    <td style="width:8%">{{ unit.remarks|truncatechars:10 }}</td>
-                    <td style="width:8%">{{ unit.user }}</td>
-                    <td style="width:9%">{{ unit.designation }}</td>
+                    <td style="width:6%">{{ history.unit.business_unit.rc_code }}</td>
+                    <td style="width:7%">{{ history.unit.business_unit.business_unit_name }}</td>
+                    <td style="width:7%">{{ history.unit.business_unit.location }}</td>
+                    <td style="width:7%">{{ history.unit.machine_type }}</td>
+                    <td style="width:7%">{{ history.unit.machine_brand }}</td>
+                    <td style="width:7%">{{ history.unit.model }}</td>
+                    <td style="width:7%">{{ history.unit.serial_number }}</td>
+                    <td style="width:7%">{{ history.unit.computer_tag }}</td>
+                    <td style="width:7%">{{ history.unit.mst_tag }}</td>
+                    <td style="width:7%">{{ history.unit.status }}</td>
+                    <td style="width:5%">{{ history.unit.working }}</td>
+                    <td style="width:8%">{{ history.unit.remarks|truncatechars:10 }}</td>
+                    <td style="width:8%">{{ history.unit.user }}</td>
+                    <td style="width:9%">{{ history.unit.designation }}</td>
                     <td style="width:9%">&nbsp;</td>
                 </tr>
                 {% empty %}

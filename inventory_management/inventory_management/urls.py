@@ -19,7 +19,7 @@ if settings.DEBUG:
 
 # django admin customization
 # redirect page when clicking the 'view site' in django admin
-admin.site.site_url = '/accounts/dashboard/'
+admin.site.site_url = '/account/dashboard/'
 
 # overide header and title
 admin.site.site_header = 'Microsphere | Inventory Management'

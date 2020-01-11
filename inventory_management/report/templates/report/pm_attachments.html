@@ -1,0 +1,27 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %} Microsphere - PM Attachments {% endblock %}
+
+{% block page_title %} PM Attachments {% endblock %}
+{% block page_title_second %} PM Attachments {% endblock %}
+
+{% block content %}
+
+<div class="container">
+	<div class="row">
+		<div class="col-4 offset-3 text-center">
+			<form method="POST" id="create-inventory" data-url="{% url 'inventory:load_business_units' %}">
+			{% csrf_token %}
+				{{ form.as_p }}
+				<button type="submit" class="btn btn-success w-100">Generate PM Attachments</button>
+			</form>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'inventory/js/custom/unit_ajax_dropdown.js' %}"></script>
+{% endblock%}

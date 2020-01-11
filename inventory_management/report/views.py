@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 
 from .forms import ReportFilterForm, CertficateFilterForm
 
-from inventory.models import MachineType, Processor, TotalRam, HddSize, Unit
+from inventory.models import MachineType, Processor, TotalRam, HddSize, Unit, PreventiveMaintenance
 from django.db.models import Count, Q
 
 from django.contrib.auth.decorators import login_required
@@ -20,7 +20,12 @@ from datetime import datetime
 
 from django.conf import settings
 
+from PyPDF2 import PdfFileMerger, PdfFileReader
+from io import BytesIO
+
 import xlwt
+
+import os
 
 """
 This class can be a function because its main purpose
@@ -60,6 +65,56 @@ class ExcelWriter(object):
 			row_num += 1
 			for col_num in range(len(row)):
 				ws.write(row_num, col_num, row[col_num], row_style)
+
+
+@login_required
+def download_pm_attachments(request):
+	template_name = 'report/pm_attachments.html'
+	if request.method == 'POST':
+		form = CertficateFilterForm(request.POST)
+
+		if form.is_valid():
+			business_unit = form.cleaned_data['business_unit']
+
+			# get all the pm for a business unit
+			# ordering: latest pm date done
+			pms = PreventiveMaintenance.objects.filter(business_unit=business_unit).order_by('-pm_date_done')
+
+			# path where to download the save files
+			# used business_unit + username of the current user
+			# overwrite the file in the temp folder to save space
+			filepath_filename = '/media/temp/{0}_{1}.pdf'.format(business_unit, request.user.get_username())
+			download_path = settings.BASE_DIR + filepath_filename
+
+			# create instance of PdfFileMerger
+			merger = PdfFileMerger()
+
+			"""
+				loop through all pms and used the append function of pdf file merger
+				which concats pdf
+			"""
+			for pm in pms:
+				if pm.pm_done:
+					path_to_file = settings.BASE_DIR + pm.attachment.url
+					print(path_to_file)
+					merger.append(PdfFileReader(path_to_file))
+
+			# write the merge files and write in the download path
+			merger.write(download_path)
+			merger.close()
+
+			context = {
+				'filepath_filename': filepath_filename
+			}
+			
+			return render(request, 'report/pm_attachments_download.html', context)
+
+	else:
+		form = CertficateFilterForm()
+		context = {
+			'form': form,
+		}
+		return render(request, template_name, context)
 
 @login_required
 @permission_required('inventory.can_generate_excel_report_count')

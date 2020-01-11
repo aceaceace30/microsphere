@@ -78,17 +78,21 @@
                         <a href="{% url 'inventory:pm-list' %}"> <i class="menu-icon fa fa-calendar"></i></i>Preventive Maintenance</a>
                     </li>
                     {% endif %}
-                    
-                    {% if perms.inventory.can_generate_certification_form %}
+
+                    {% if perms.inventory.can_generate_excel_report_count %}
                     <li>
                         <a href="{% url 'report:generate_count_report' %}"> <i class="menu-icon fa fa-book"></i></i>Reports</a>
                     </li>
                     {% endif %}
-                    {% if perms.inventory.can_generate_excel_report_count %}
+                    
+                    <!-- {% if perms.inventory.can_generate_certification_form %}
                     <li>
                         <a href="{% url 'report:certification_form' %}"> <i class="menu-icon fa fa-folder-o"></i>Certification Form</a>
                     </li>
-                    {% endif %}
+                    {% endif %} -->
+                    <li>
+                        <a href="{% url 'report:download_pm_attachments' %}"> <i class="menu-icon fa fa-print"></i>PM Attachment</a>
+                    </li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </nav>

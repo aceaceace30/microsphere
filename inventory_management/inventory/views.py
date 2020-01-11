@@ -457,73 +457,6 @@ def add_pm_remarks(request, pk):
 
 	return JsonResponse(data)
 
-# @login_required
-# def mark_as_done(request, pk):
-# 	pm = get_object_or_404(PreventiveMaintenance, pk=pk)
-# 	units = Unit.objects.filter(active=True, business_unit__pk=pm.business_unit.pk)
-
-# 	if request.method == 'POST':
-
-# 		emails = request.POST.get('emails', default=None).replace(' ', '')
-# 		service_report_number = request.POST.get('service_report_number', default=None)
-
-# 		# validation for sr field if blank
-# 		if not service_report_number:
-# 			messages.error(request, 'SR # cannot be blank.')
-# 			return redirect('inventory:pm-view', pk)
-
-# 		# validation for sr field if exist in database
-# 		if PreventiveMaintenance.objects.filter(service_report_number=service_report_number).exists():
-# 			messages.error(request, 'SR # already exist. Please try a new one.')
-# 			return redirect('inventory:pm-view', pk)
-
-# 		# if validations passed
-# 		pm.service_report_number = service_report_number
-# 		pm.pm_done = True
-# 		pm.pm_date_done = datetime.datetime.now()
-# 		pm.save()
-
-# 		# declared empty list to append if the user input a single email
-# 		split_emails = []
-
-# 		""" if emails exist check if the email field has a comma ',' character to determine if it has
-# 			more than one email to send if it has more than one use the split function to transform it into
-# 			a list else append the single email to the empty list because the send_mail function needed a list
-# 			on the recipient """
-# 		if emails:
-# 			if ',' in emails:
-# 				split_emails = emails.split(',')
-# 			else:
-# 				split_emails.append(emails)
-
-# 			""" Dynamic part of the email sending. needed to use try catch to handle errors if their is no available 
-# 				data from the database """
-# 			try:
-# 				format_email = EmailTemplate.objects.get(used_for='done pm')
-# 				subject = format_email.subject
-# 			except:
-# 				format_email = None
-# 				subject = settings.COMPANY_NAME
-
-# 			EMAIL_TEMPLATE = render_to_string('inventory/email/pm_done_email_template.html', 
-# 											 {'units':units,
-# 											  'pm':pm,
-# 											  'format_email':format_email,})
-
-# 			test_emails = ['michaelababao200@gmail.com', 'marcababao@gmail.com']
-# 			mail_check = send_mail(subject, '', settings.EMAIL_HOST_USER, split_emails, html_message=EMAIL_TEMPLATE)
-
-# 			if mail_check:
-# 				messages.success(request, 'Email has been sent.')
-# 			else:
-# 				messages.error(request, 'There was an issue while trying to send the email. Please check your internet connection.')
-# 		else:
-# 			messages.error(request, 'There was no email input.')
-
-# 		messages.success(request, 'Preventive maintenance has marked as done.')
-
-# 	return redirect('inventory:pm-view', pk)
-
 @login_required
 def pm_mark_done(request, pk):
 	template_name = 'inventory/pm/pm_mark_done.html'
@@ -722,18 +655,20 @@ class GenerateCertificationForm(LoginRequiredMixin, PermissionRequiredMixin, Vie
 	permission_required = 'inventory.can_generate_certification_form'
 
 	def get(self, request, *args, **kwargs):
-		pk = self.kwargs.get('pk')
+		pm_pk = self.kwargs.get('pk')
 
-		business_unit = get_object_or_404(BusinessUnit, pk=pk, active=True)
-		units = business_unit.unit_set.filter(active=True)
-		business_unit_name = business_unit.business_unit_name
-		rc_code = business_unit.rc_code
+		pm = get_object_or_404(PreventiveMaintenance, pk=pm_pk, active=True)
+		#for history in pm.pmunithistory_set.all():
+
+		#units = business_unit.unit_set.filter(active=True)
+		business_unit_name = pm.business_unit.business_unit_name #business_unit.business_unit_name
+		rc_code = pm.business_unit.rc_code
 		today = datetime.datetime.now()
 
 		file_name = 'Certification-Form-{0} ({1})'.format(business_unit_name, rc_code)
 
 		context = {
-			'units': units,
+			'pm': pm,
 			'request': request,
 			'today': None,
 			'business_unit_name': business_unit_name,
@@ -742,7 +677,7 @@ class GenerateCertificationForm(LoginRequiredMixin, PermissionRequiredMixin, Vie
 			'address': settings.COMPANY_ADDRESS,
 			'contact': settings.COMPANY_CONTACT,
 
-			# used to create line in over signature because
+			# used to create line over signature because
 			# this library doesn't support 'text-decorator:overline' in CSS
 
 			'line_spacing': '&nbsp;' * 51

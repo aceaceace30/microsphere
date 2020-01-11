@@ -1,0 +1,23 @@
+{% extends 'inventory/base.html' %}
+{% load static %}
+
+{% block title %} Microsphere - PM Attachments {% endblock %}
+
+{% block page_title %} PM Attachments {% endblock %}
+{% block page_title_second %}<a href="{% url 'report:download_pm_attachments' %}"> PM Attachments</a> > Download{% endblock %}
+
+{% block content %}
+
+<div class="container">
+	<div class="row mt-5">
+		<div class="col-4 offset-3 text-center">
+			<a href="{{ filepath_filename }}" target="_blank" class="btn btn-warning w-100">Click to view file <i class="fa fa-eye"></i></a>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'inventory/js/custom/unit_ajax_dropdown.js' %}"></script>
+{% endblock%}
