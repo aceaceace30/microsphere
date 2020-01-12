@@ -95,9 +95,8 @@ def download_pm_attachments(request):
 				which concats pdf
 			"""
 			for pm in pms:
-				if pm.pm_done:
+				if pm.pm_done and pm.attachment:
 					path_to_file = settings.BASE_DIR + pm.attachment.url
-					print(path_to_file)
 					merger.append(PdfFileReader(path_to_file))
 
 			# write the merge files and write in the download path
