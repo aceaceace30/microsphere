@@ -90,9 +90,11 @@
                         <a href="{% url 'report:certification_form' %}"> <i class="menu-icon fa fa-folder-o"></i>Certification Form</a>
                     </li>
                     {% endif %} -->
+                    {% if perms.inventory.can_generate_pm_attachment %}
                     <li>
                         <a href="{% url 'report:download_pm_attachments' %}"> <i class="menu-icon fa fa-print"></i>PM Attachment</a>
                     </li>
+                    {% endif %}
                 </ul>
             </div><!-- /.navbar-collapse -->
         </nav>

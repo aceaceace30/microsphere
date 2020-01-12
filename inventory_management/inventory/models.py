@@ -359,6 +359,7 @@ class PreventiveMaintenance(models.Model):
             ('can_mark_as_done', 'Can mark as done per pm'),
             ('can_soft_delete_pm', 'Can soft delete pm'),
             ('can_generate_certification_form', 'Can generate certification form'),
+            ('can_generate_pm_attachment', 'Can generate pm attachment'),
             ('can_generate_excel_report_count', 'Can generate excel report count'),
     ]
 

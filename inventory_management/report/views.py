@@ -68,6 +68,7 @@ class ExcelWriter(object):
 
 
 @login_required
+@permission_required('inventory.can_generate_pm_attachment')
 def download_pm_attachments(request):
 	template_name = 'report/pm_attachments.html'
 	if request.method == 'POST':

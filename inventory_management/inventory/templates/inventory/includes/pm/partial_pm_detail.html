@@ -35,10 +35,12 @@
                         <div class="card-header">
                             <strong class="card-title text-white">Preventive Maintenance Details</strong>
                             
-                            {% if not pm.pm_done or request.user.is_superuser %}
-                            <div class="float-right">
-                                <a href="{% url 'inventory:generate_certification_form' pm.pk %}" target="_blank" class="btn btn-light btn-sm font-weight-bold text-success"><i class="menu-icon fa fa-folder-o"></i> Print Certification Form</a>
-                            </div>
+                            {% if perms.inventory.can_generate_certification_form %}
+                                {% if not pm.pm_done or request.user.is_superuser %}
+                                <div class="float-right">
+                                    <a href="{% url 'inventory:generate_certification_form' pm.pk %}" target="_blank" class="btn btn-light btn-sm font-weight-bold text-success"><i class="menu-icon fa fa-folder-o"></i> Print Certification Form</a>
+                                </div>
+                                {% endif %}
                             {% endif %}
                         </div>
                         <div class="card-body bg-white">
@@ -157,14 +159,11 @@
                                 </div>
                             </div>
                         	
-                            {% comment %}
-                        	{% if not pm.pm_done and perms.inventory.can_mark_as_done %}
-                            {% endcomment %}
+                        	{% if perms.inventory.can_mark_as_done %}
 
-                            <a href="{% url 'inventory:pm-mark-done' pm.pk %}" class="btn btn-success btn-sm w-100">Update PM</a>
-                            {% comment %}
+                                <a href="{% url 'inventory:pm-mark-done' pm.pk %}" class="btn btn-success btn-sm w-100">Update PM</a>
+
 							{% endif %}
-                            {% endcomment%}
 							
 							<div class="float-right">
 								<small class="text-dark">By: {{ pm.created_by }} | {{ pm.created_at }}</small>
