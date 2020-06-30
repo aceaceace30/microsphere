@@ -2,3 +2,6 @@
 Docs/
 py-3.7.2/
 .env
+media
+inventory_management/static/
+micro_env
