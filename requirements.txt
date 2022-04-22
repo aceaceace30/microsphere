@@ -22,7 +22,7 @@ openpyxl==2.6.3
 Pillow==7.2.0
 psycopg2==2.8.5
 pylint==2.3.1
-PyPDF2==1.26.0
+PyPDF2==1.27.5
 pytz==2019.2
 PyYAML==5.1.2
 reportlab==3.5.44
